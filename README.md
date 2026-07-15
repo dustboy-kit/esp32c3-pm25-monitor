@@ -73,12 +73,12 @@ If your workshop does not use MQTT, remove this line from `workshop.yaml`:
   mqtt: !include packages/mqtt.yaml
 ```
 
-If MQTT is enabled, also fill in the MQTT fields in `secrets.yaml`:
+If MQTT is enabled, ask the workshop instructor for the current MQTT broker, port, username, and password. Enter the values they provide in `secrets.yaml`:
 
 ```yaml
 mqtt_broker: mqtt.example.com
 mqtt_port: "1883"
-mqtt_username: dbk
+mqtt_username: your-mqtt-username
 mqtt_password: your-mqtt-password
 ```
 
