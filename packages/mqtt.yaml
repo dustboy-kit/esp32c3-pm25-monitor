@@ -1,10 +1,19 @@
 # Optional DustBoy fleet profile. Copy secrets.yaml.example to secrets.yaml first.
 mqtt:
+  id: mqtt_client
   broker: !secret mqtt_broker
   port: !secret mqtt_port
   username: !secret mqtt_username
   password: !secret mqtt_password
   discovery: false
+  on_connect:
+    - globals.set:
+        id: mqtt_connected
+        value: "true"
+  on_disconnect:
+    - globals.set:
+        id: mqtt_connected
+        value: "false"
   topic_prefix: DUSTBOY/DBK/WiFi/${device_id}
   birth_message:
     topic: DUSTBOY/DBK/WiFi/${device_id}/status

@@ -7,6 +7,12 @@ i2c:
   scan: true
   frequency: 400kHz
 
+globals:
+  - id: mqtt_connected
+    type: bool
+    restore_value: false
+    initial_value: "false"
+
 font:
   - file: "https://raw.githubusercontent.com/Templarian/MaterialDesign-Webfont/v7.4.47/fonts/materialdesignicons-webfont.ttf"
     id: font_icons
@@ -33,10 +39,16 @@ display:
     address: 0x3C
     update_interval: 1s
     lambda: |-
-      if (id(wifi_component).is_connected()) {
-        it.print(78, 0, id(font_icons), "\U000F05A9");
+      if (id(mqtt_connected)) {
+        it.filled_circle(68, 5, 3);
       } else {
-        it.print(78, 0, id(font_icons), "\U000F05AA");
+        it.circle(68, 5, 3);
+      }
+
+      if (id(wifi_component).is_connected()) {
+        it.print(74, 0, id(font_icons), "\U000F05A9");
+      } else {
+        it.print(74, 0, id(font_icons), "\U000F05AA");
       }
       it.print(127, 0, id(font_header), TextAlign::TOP_RIGHT, "${device_id}");
       it.horizontal_line(0, 10, 128);
