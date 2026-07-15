@@ -5,6 +5,7 @@ ota:
 
 wifi:
   id: wifi_component
+  reboot_timeout: ${wifi_reboot_timeout_minutes}min
   ap:
     ssid: ${friendly_name}
     ap_timeout: ${wifi_ap_timeout_seconds}s
