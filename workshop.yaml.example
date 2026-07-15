@@ -7,3 +7,8 @@ substitutions:
 packages:
   device: !include dbk.yaml
   mqtt: !include packages/mqtt.yaml
+
+wifi:
+  networks:
+    - ssid: !secret wifi_ssid
+      password: !secret wifi_password
