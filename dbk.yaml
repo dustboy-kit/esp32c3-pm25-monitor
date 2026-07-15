@@ -8,6 +8,7 @@ substitutions:
   fair_limit: "50"
   splash_seconds: "3"
   wifi_ap_timeout_seconds: "90"
+  timezone: "Asia/Bangkok"
   warmup_seconds: "30"
   stale_seconds: "10"
 

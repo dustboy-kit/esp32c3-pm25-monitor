@@ -22,7 +22,6 @@ font:
     id: font_icons
     size: 10
     glyphs:
-      - "\U000F033E" # mdi-lock
       - "\U000F05A9" # mdi-wifi
       - "\U000F05AA" # mdi-wifi-off
   - file: "gfonts://Roboto Mono"
@@ -54,7 +53,12 @@ display:
       }
 
       if (id(wifi_component).is_connected()) {
-        it.print(0, 0, id(font_icons), "\U000F033E");
+        const auto now = id(network_time).now();
+        if (now.is_valid()) {
+          it.strftime(0, -1, id(font_header), TextAlign::TOP_LEFT, "%H:%M", now);
+        } else {
+          it.print(0, -1, id(font_header), TextAlign::TOP_LEFT, "--:--");
+        }
       }
 
       if (id(mqtt_connected)) {

@@ -20,6 +20,11 @@ wifi:
 
 captive_portal:
 
+time:
+  - platform: sntp
+    id: network_time
+    timezone: ${timezone}
+
 improv_serial:
 
 esp32_improv:

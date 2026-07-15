@@ -59,6 +59,8 @@ github://dustboy-kit/esp32c3-pm25-monitor/dbk.yaml@main
 
 The generic firmware has no embedded Wi-Fi credentials. Provision it through Improv Serial, Improv BLE, or the fallback access point, then adopt it in Home Assistant or the ESPHome dashboard. When Wi-Fi is unavailable, the OLED counts down from 90 seconds before showing the fallback AP name.
 
+When connected, the main-page header shows SNTP time in `HH:MM` format using the configurable `timezone` substitution. The default timezone is `Asia/Bangkok`.
+
 ## Configuration
 
 ### Device identity
