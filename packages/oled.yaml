@@ -18,6 +18,7 @@ font:
     id: font_icons
     size: 10
     glyphs:
+      - "\U000F033E" # mdi-lock
       - "\U000F05A9" # mdi-wifi
       - "\U000F05AA" # mdi-wifi-off
   - file: "gfonts://Roboto Mono"
@@ -28,7 +29,7 @@ font:
     size: 7
   - file: "gfonts://Roboto Mono"
     id: font_value
-    size: 14
+    size: 10
     glyphs: " 0123456789"
 
 display:
@@ -39,6 +40,10 @@ display:
     address: 0x3C
     update_interval: 1s
     lambda: |-
+      if (id(wifi_component).is_connected()) {
+        it.print(0, 0, id(font_icons), "\U000F033E");
+      }
+
       if (id(mqtt_connected)) {
         it.filled_circle(68, 5, 3);
       } else {
@@ -72,6 +77,6 @@ display:
       it.print(64, 11, id(font_label), TextAlign::TOP_CENTER, "PM2.5");
       it.print(106, 11, id(font_label), TextAlign::TOP_CENTER, "PM10");
 
-      it.printf(21, 18, id(font_value), TextAlign::TOP_CENTER, "%.0f", id(pms_pm1).state);
-      it.printf(64, 18, id(font_value), TextAlign::TOP_CENTER, "%.0f", id(pms_pm25).state);
-      it.printf(106, 18, id(font_value), TextAlign::TOP_CENTER, "%.0f", id(pms_pm10).state);
+      it.printf(21, 19, id(font_value), TextAlign::TOP_CENTER, "%.0f", id(pms_pm1).state);
+      it.printf(64, 19, id(font_value), TextAlign::TOP_CENTER, "%.0f", id(pms_pm25).state);
+      it.printf(106, 19, id(font_value), TextAlign::TOP_CENTER, "%.0f", id(pms_pm10).state);
