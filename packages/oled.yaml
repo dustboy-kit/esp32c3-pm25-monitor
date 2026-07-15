@@ -59,6 +59,19 @@ display:
         } else {
           it.print(0, -1, id(font_header), TextAlign::TOP_LEFT, "--:--");
         }
+      } else {
+        const uint32_t disconnected_since = id(wifi_disconnected_since_ms);
+        const uint32_t disconnected_ms = disconnected_since == 0
+                                             ? millis()
+                                             : (uint32_t) (millis() - disconnected_since);
+        const uint32_t timeout_seconds = ${wifi_ap_timeout_seconds};
+        const uint32_t elapsed_seconds = disconnected_ms / 1000UL;
+        if (elapsed_seconds < timeout_seconds) {
+          const uint32_t remaining_seconds = timeout_seconds - elapsed_seconds;
+          it.printf(0, -1, id(font_header), TextAlign::TOP_LEFT, "(%lus)", remaining_seconds);
+        } else {
+          it.print(0, -1, id(font_header), TextAlign::TOP_LEFT, "(AP)");
+        }
       }
 
       if (id(mqtt_connected)) {
@@ -74,22 +87,6 @@ display:
       }
       it.print(127, -1, id(font_header), TextAlign::TOP_RIGHT, "${device_id}");
       it.horizontal_line(0, 10, 128);
-
-      if (!id(wifi_component).is_connected()) {
-        const uint32_t disconnected_since = id(wifi_disconnected_since_ms);
-        const uint32_t disconnected_ms = disconnected_since == 0
-                                             ? millis()
-                                             : (uint32_t) (millis() - disconnected_since);
-        const uint32_t timeout_seconds = ${wifi_ap_timeout_seconds};
-        const uint32_t elapsed_seconds = disconnected_ms / 1000UL;
-        if (elapsed_seconds < timeout_seconds) {
-          const uint32_t remaining_seconds = timeout_seconds - elapsed_seconds;
-          it.printf(64, 18, id(font_header), TextAlign::CENTER, "AP IN %lus", remaining_seconds);
-        } else {
-          it.print(64, 18, id(font_header), TextAlign::CENTER, "AP: ${device_id}");
-        }
-        return;
-      }
 
       if (millis() < (${warmup_seconds} * 1000UL)) {
         it.print(64, 18, id(font_header), TextAlign::CENTER, "WARMING UP");
