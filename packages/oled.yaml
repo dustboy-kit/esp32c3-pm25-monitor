@@ -8,12 +8,21 @@ i2c:
   frequency: 400kHz
 
 font:
+  - file: "https://raw.githubusercontent.com/Templarian/MaterialDesign-Webfont/v7.4.47/fonts/materialdesignicons-webfont.ttf"
+    id: font_icons
+    size: 10
+    glyphs:
+      - "\U000F05A9" # mdi-wifi
+      - "\U000F05AA" # mdi-wifi-off
   - file: "gfonts://Roboto Mono"
-    id: font_small
-    size: 8
+    id: font_header
+    size: 10
   - file: "gfonts://Roboto Mono"
-    id: font_large
-    size: 18
+    id: font_label
+    size: 7
+  - file: "gfonts://Roboto Mono"
+    id: font_value
+    size: 14
     glyphs: " 0123456789"
 
 display:
@@ -24,35 +33,33 @@ display:
     address: 0x3C
     update_interval: 1s
     lambda: |-
-      it.print(0, 0, id(font_small), "PM2.5");
-      it.print(127, 0, id(font_small), TextAlign::TOP_RIGHT, "${device_id}");
-
       if (id(wifi_component).is_connected()) {
-        it.filled_rectangle(78, 6, 2, 2);
-        it.filled_rectangle(81, 4, 2, 4);
-        it.filled_rectangle(84, 2, 2, 6);
+        it.print(78, 0, id(font_icons), "\U000F05A9");
       } else {
-        it.line(78, 1, 85, 8);
-        it.line(85, 1, 78, 8);
+        it.print(78, 0, id(font_icons), "\U000F05AA");
       }
-      it.horizontal_line(0, 9, 128);
+      it.print(127, 0, id(font_header), TextAlign::TOP_RIGHT, "${device_id}");
+      it.horizontal_line(0, 10, 128);
 
       if (millis() < (${warmup_seconds} * 1000UL)) {
-        it.print(64, 17, id(font_small), TextAlign::CENTER, "WARMING UP");
+        it.print(64, 18, id(font_header), TextAlign::CENTER, "WARMING UP");
         return;
       }
 
       const bool stale = id(last_pms_update_ms) == 0 ||
                          (uint32_t) (millis() - id(last_pms_update_ms)) > (${stale_seconds} * 1000UL);
       if (!id(pms_pm25).has_state() || stale) {
-        it.print(64, 17, id(font_small), TextAlign::CENTER, "SENSOR ERROR");
+        it.print(64, 18, id(font_header), TextAlign::CENTER, "SENSOR ERROR");
         return;
       }
 
-      it.vertical_line(61, 10, 22);
-      it.printf(58, 10, id(font_large), TextAlign::TOP_RIGHT, "%.0f", id(pms_pm25).state);
+      it.vertical_line(42, 11, 21);
+      it.vertical_line(85, 11, 21);
 
-      it.print(64, 11, id(font_small), "PM1");
-      it.printf(126, 11, id(font_small), TextAlign::TOP_RIGHT, "%.0f", id(pms_pm1).state);
-      it.print(64, 22, id(font_small), "PM10");
-      it.printf(126, 22, id(font_small), TextAlign::TOP_RIGHT, "%.0f", id(pms_pm10).state);
+      it.print(21, 11, id(font_label), TextAlign::TOP_CENTER, "PM1");
+      it.print(64, 11, id(font_label), TextAlign::TOP_CENTER, "PM2.5");
+      it.print(106, 11, id(font_label), TextAlign::TOP_CENTER, "PM10");
+
+      it.printf(21, 18, id(font_value), TextAlign::TOP_CENTER, "%.0f", id(pms_pm1).state);
+      it.printf(64, 18, id(font_value), TextAlign::TOP_CENTER, "%.0f", id(pms_pm25).state);
+      it.printf(106, 18, id(font_value), TextAlign::TOP_CENTER, "%.0f", id(pms_pm10).state);
