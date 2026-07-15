@@ -14,12 +14,12 @@ mqtt:
     - globals.set:
         id: mqtt_connected
         value: "false"
-  topic_prefix: DUSTBOY/DBK/WiFi/${device_id}
+  topic_prefix: DUSTBOY/DBK/${device_id}
   birth_message:
-    topic: DUSTBOY/DBK/WiFi/${device_id}/status
+    topic: DUSTBOY/DBK/${device_id}/status
     payload: online
     retain: true
   will_message:
-    topic: DUSTBOY/DBK/WiFi/${device_id}/status
+    topic: DUSTBOY/DBK/${device_id}/status
     payload: offline
     retain: true

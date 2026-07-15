@@ -60,7 +60,7 @@ Every numbered unit uses the public identity `DBK-xxx`, where `xxx` is its uniqu
 | `friendly_name` | `DBK-001` | Home Assistant and ESPHome display name |
 | `device_id` | `DBK-001` | OLED header and MQTT topic identity |
 
-Keep the same number in all three settings. A configured `DBK-001` publishes below the MQTT root `DUSTBOY/DBK/WiFi/DBK-001`.
+Keep the same number in all three settings. A configured `DBK-001` publishes below the MQTT root `DUSTBOY/DBK/DBK-001`.
 
 The generic factory image uses a MAC suffix so the same image can safely boot on multiple unnumbered devices. Assign the `DBK-xxx` identity when configuring an individual unit.
 
