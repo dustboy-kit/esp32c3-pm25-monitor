@@ -65,21 +65,22 @@ display:
                                              ? millis()
                                              : (uint32_t) (millis() - disconnected_since);
         const uint32_t timeout_seconds = ${wifi_ap_timeout_seconds};
-        const uint32_t reboot_seconds = ${wifi_reboot_timeout_minutes} * 60UL;
+        const uint32_t ap_active_seconds = ${wifi_ap_active_timeout_minutes} * 60UL;
         const uint32_t elapsed_seconds = disconnected_ms / 1000UL;
         if (elapsed_seconds < timeout_seconds) {
           const uint32_t remaining_seconds = timeout_seconds - elapsed_seconds;
-          it.printf(0, -1, id(font_header), TextAlign::TOP_LEFT, "(AP %lus)", remaining_seconds);
-        } else if (elapsed_seconds < reboot_seconds) {
-          const uint32_t remaining_seconds = reboot_seconds - elapsed_seconds;
+          it.printf(0, -1, id(font_header), TextAlign::TOP_LEFT, "(%lus)", remaining_seconds);
+        } else if (elapsed_seconds < timeout_seconds + ap_active_seconds) {
+          const uint32_t ap_elapsed_seconds = elapsed_seconds - timeout_seconds;
+          const uint32_t remaining_seconds = ap_active_seconds - ap_elapsed_seconds;
           if (remaining_seconds >= 60) {
             const uint32_t remaining_minutes = (remaining_seconds + 59) / 60;
-            it.printf(0, -1, id(font_header), TextAlign::TOP_LEFT, "(RST %lum)", remaining_minutes);
+            it.printf(0, -1, id(font_header), TextAlign::TOP_LEFT, "(AP %lum)", remaining_minutes);
           } else {
-            it.printf(0, -1, id(font_header), TextAlign::TOP_LEFT, "(RST %lus)", remaining_seconds);
+            it.printf(0, -1, id(font_header), TextAlign::TOP_LEFT, "(AP %lus)", remaining_seconds);
           }
         } else {
-          it.print(0, -1, id(font_header), TextAlign::TOP_LEFT, "(RST)");
+          it.print(0, -1, id(font_header), TextAlign::TOP_LEFT, "(AP 0s)");
         }
       }
 

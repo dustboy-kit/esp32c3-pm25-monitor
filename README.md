@@ -57,7 +57,7 @@ Import this package URL:
 github://dustboy-kit/esp32c3-pm25-monitor/dbk.yaml@main
 ```
 
-The generic firmware has no embedded Wi-Fi credentials. Provision it through Improv Serial, Improv BLE, or the fallback access point, then adopt it in Home Assistant or the ESPHome dashboard. When Wi-Fi is unavailable, `(AP 90s)` in the OLED header counts down until the fallback access point starts. It then changes to `(RST 14m)` and counts down to the 15-minute Wi-Fi recovery reboot. A successful Wi-Fi connection cancels and resets both timers.
+The generic firmware has no embedded Wi-Fi credentials. Provision it through Improv Serial, Improv BLE, or the fallback access point, then adopt it in Home Assistant or the ESPHome dashboard. When Wi-Fi is unavailable, `(90s)` in the OLED header counts down until the fallback access point starts. The AP then remains available for a full 15 minutes, shown as `(AP 15m)` and then `(AP 59s)` during the final minute. After that, DBK reboots and retries Wi-Fi. A successful connection cancels and resets both timers.
 
 When connected, the main-page header shows SNTP time in `HH:MM` format using the configurable `timezone` substitution. The default timezone is `Asia/Bangkok`.
 
