@@ -33,7 +33,7 @@ GPIO2, GPIO8, and GPIO9 are ESP32-C3 strapping pins. This firmware matches the p
 | 0-25 ug/m3 | Green | GOOD |
 | 26-50 ug/m3 | Yellow | FAIR |
 | Above 50 ug/m3 | Red | BAD |
-| First 30 seconds | Blue | WARMING UP |
+| First 30 seconds | Blue | CHECKING SENSOR... |
 | Missing sensor data | Magenta | SENSOR ERROR |
 
 ## Install

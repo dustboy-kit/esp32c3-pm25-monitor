@@ -96,10 +96,10 @@ display:
         it.print(74, 0, id(font_icons), "\U000F05AA");
       }
       it.print(127, -1, id(font_header), TextAlign::TOP_RIGHT, "${device_id}");
-      it.horizontal_line(0, 10, 128);
+      it.horizontal_line(0, 11, 128);
 
       if (millis() < (${warmup_seconds} * 1000UL)) {
-        it.print(64, 18, id(font_header), TextAlign::CENTER, "WARMING UP");
+        it.print(64, 18, id(font_header), TextAlign::CENTER, "CHECKING SENSOR...");
         return;
       }
 

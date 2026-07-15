@@ -20,7 +20,7 @@ interval:
           then:
             - text_sensor.template.publish:
                 id: air_quality_level
-                state: WARMING UP
+                state: CHECKING SENSOR...
             - light.turn_on:
                 id: air_quality_led
                 red: 0%
