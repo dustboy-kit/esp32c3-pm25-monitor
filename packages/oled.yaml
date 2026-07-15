@@ -12,6 +12,10 @@ globals:
     type: bool
     restore_value: false
     initial_value: "false"
+  - id: wifi_disconnected_since_ms
+    type: uint32_t
+    restore_value: false
+    initial_value: "0"
 
 font:
   - file: "https://raw.githubusercontent.com/Templarian/MaterialDesign-Webfont/v7.4.47/fonts/materialdesignicons-webfont.ttf"
@@ -40,6 +44,15 @@ display:
     address: 0x3C
     update_interval: 1s
     lambda: |-
+      const uint32_t splash_duration_ms = ${splash_seconds} * 1000UL;
+      if (millis() < splash_duration_ms) {
+        it.print(64, 5, id(font_header), TextAlign::TOP_CENTER, "Dustboy Kit For Kids");
+        it.rectangle(14, 24, 100, 6);
+        const int progress_width = (millis() * 96UL) / splash_duration_ms;
+        it.filled_rectangle(16, 26, progress_width, 2);
+        return;
+      }
+
       if (id(wifi_component).is_connected()) {
         it.print(0, 0, id(font_icons), "\U000F033E");
       }
@@ -57,6 +70,22 @@ display:
       }
       it.print(127, -1, id(font_header), TextAlign::TOP_RIGHT, "${device_id}");
       it.horizontal_line(0, 10, 128);
+
+      if (!id(wifi_component).is_connected()) {
+        const uint32_t disconnected_since = id(wifi_disconnected_since_ms);
+        const uint32_t disconnected_ms = disconnected_since == 0
+                                             ? millis()
+                                             : (uint32_t) (millis() - disconnected_since);
+        const uint32_t timeout_seconds = ${wifi_ap_timeout_seconds};
+        const uint32_t elapsed_seconds = disconnected_ms / 1000UL;
+        if (elapsed_seconds < timeout_seconds) {
+          const uint32_t remaining_seconds = timeout_seconds - elapsed_seconds;
+          it.printf(64, 18, id(font_header), TextAlign::CENTER, "AP IN %lus", remaining_seconds);
+        } else {
+          it.print(64, 18, id(font_header), TextAlign::CENTER, "AP: ${device_id}");
+        }
+        return;
+      }
 
       if (millis() < (${warmup_seconds} * 1000UL)) {
         it.print(64, 18, id(font_header), TextAlign::CENTER, "WARMING UP");

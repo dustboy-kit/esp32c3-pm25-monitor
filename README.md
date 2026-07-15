@@ -2,7 +2,7 @@
 
 ESPHome firmware for a compact real-time particulate monitor built from an ESP32-C3 SuperMini, Plantower PMS7003, 0.91-inch SSD1306 OLED, and one WS2812 LED.
 
-The firmware measures PM1.0, PM2.5, and PM10, reproduces the original 128x32 instrument display, exposes measurements to Home Assistant, and supports Wi-Fi provisioning and OTA updates.
+The firmware measures PM1.0, PM2.5, and PM10, shows a "Dustboy Kit For Kids" startup screen followed by the 128x32 instrument dashboard, exposes measurements to Home Assistant, and supports Wi-Fi provisioning and OTA updates.
 
 ## Hardware
 
@@ -57,7 +57,7 @@ Import this package URL:
 github://dustboy-kit/esp32c3-pm25-monitor/dbk.yaml@main
 ```
 
-The generic firmware has no embedded Wi-Fi credentials. Provision it through Improv Serial, Improv BLE, or the fallback access point, then adopt it in Home Assistant or the ESPHome dashboard.
+The generic firmware has no embedded Wi-Fi credentials. Provision it through Improv Serial, Improv BLE, or the fallback access point, then adopt it in Home Assistant or the ESPHome dashboard. When Wi-Fi is unavailable, the OLED counts down from 90 seconds before showing the fallback AP name.
 
 ## Configuration
 

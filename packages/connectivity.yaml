@@ -7,6 +7,16 @@ wifi:
   id: wifi_component
   ap:
     ssid: ${friendly_name}
+    ap_timeout: ${wifi_ap_timeout_seconds}s
+  on_connect:
+    - globals.set:
+        id: wifi_disconnected_since_ms
+        value: "0"
+  on_disconnect:
+    - lambda: |-
+        if (id(wifi_disconnected_since_ms) == 0) {
+          id(wifi_disconnected_since_ms) = millis();
+        }
 
 captive_portal:
 
