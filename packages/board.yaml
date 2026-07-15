@@ -21,7 +21,7 @@ esp32:
   variant: ESP32C3
   flash_size: 4MB
   framework:
-    type: esp-idf
+    type: arduino
 
 logger:
   hardware_uart: USB_SERIAL_JTAG
