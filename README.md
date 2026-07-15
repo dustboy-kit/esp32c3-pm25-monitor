@@ -125,10 +125,6 @@ Pull requests validate and compile the factory image. Tags matching `v*` publish
 
 Before a hardware release, verify repeated cold boots, sensor readings, OLED orientation, all PM2.5 threshold boundaries, sensor-disconnect behavior, provisioning, OTA, and at least 24 hours of continuous operation.
 
-## Origin
-
-This is an independent ESPHome implementation inspired by [KakaoFull/esp32c3-pm25-monitor](https://github.com/KakaoFull/esp32c3-pm25-monitor). It uses ESPHome's native components rather than copying the original PlatformIO source.
-
 ## License
 
 MIT
