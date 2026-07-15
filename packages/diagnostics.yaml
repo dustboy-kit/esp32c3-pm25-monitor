@@ -1,7 +1,8 @@
 sensor:
   - platform: wifi_signal
-    name: Wi-Fi Signal
-    update_interval: 60s
+    id: wifi_rssi
+    name: Wi-Fi RSSI
+    update_interval: 30s
     entity_category: diagnostic
 
   - platform: uptime
@@ -20,6 +21,9 @@ text_sensor:
       entity_category: diagnostic
     mac_address:
       name: MAC Address
+      entity_category: diagnostic
+    scan_results:
+      name: Wi-Fi Scan Results
       entity_category: diagnostic
 
 button:
