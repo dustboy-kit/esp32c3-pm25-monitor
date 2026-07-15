@@ -114,17 +114,6 @@ esphome run workshop.yaml
 
 Users who do not need MQTT can use the generic `dbk.yaml` image and provision Wi-Fi through Improv Serial, Improv BLE, or the fallback access point.
 
-## Development
-
-```bash
-esphome config dbk.yaml
-esphome compile factory.yaml
-```
-
-Pull requests validate and compile the factory image. Tags matching `v*` publish factory and OTA binaries as a GitHub release.
-
-Before a hardware release, verify repeated cold boots, sensor readings, OLED orientation, all PM2.5 threshold boundaries, sensor-disconnect behavior, provisioning, OTA, and at least 24 hours of continuous operation.
-
 ## License
 
 MIT
