@@ -1,6 +1,6 @@
 # DBK ESP32-C3 PM2.5 Monitor
 
-ESPHome firmware for a compact real-time particulate monitor built from an ESP32-C3 SuperMini, Plantower PMS7003, 0.91-inch SSD1306 OLED, and one WS2812 LED.
+ESPHome firmware for a compact real-time particulate monitor built from an ESP32-C3 SuperMini, Plantower PMS7003, and 0.91-inch SSD1306 OLED. The firmware also supports an optional WS2812 LED on boards where that LED is physically fitted.
 
 The firmware measures PM1.0, PM2.5, and PM10, shows a "Dustboy Kit For Kids" startup screen followed by the 128x32 instrument dashboard, exposes measurements to Home Assistant, and supports Wi-Fi provisioning and OTA updates.
 
@@ -18,15 +18,15 @@ The firmware measures PM1.0, PM2.5, and PM10, shows a "Dustboy Kit For Kids" sta
 | SSD1306 OLED | GND | GND |
 | SSD1306 OLED | SDA | GPIO9 |
 | SSD1306 OLED | SCL | GPIO10 |
-| WS2812 | VCC | 5V |
-| WS2812 | GND | GND |
-| WS2812 | DIN | GPIO2 |
+| Optional WS2812 | VCC | 5V |
+| Optional WS2812 | GND | GND |
+| Optional WS2812 | DIN | GPIO2 |
 
 The PMS7003 requires a stable 5V supply. Its UART signals are 3.3V-compatible. Always disconnect power before changing wiring.
 
 GPIO2, GPIO8, and GPIO9 are ESP32-C3 strapping pins. This firmware matches the proven reference wiring, but new PCB designs should review those connections carefully and every assembled unit should be cold-boot tested with all peripherals attached.
 
-## Air-quality indication
+## Air-quality indication (optional WS2812)
 
 | PM2.5 | LED | State |
 |---:|---|---|
@@ -57,7 +57,7 @@ Import this package URL:
 github://dustboy-kit/esp32c3-pm25-monitor/dbk.yaml@main
 ```
 
-The generic firmware has no embedded Wi-Fi credentials. Provision it through Improv Serial, Improv BLE, or the fallback access point, then adopt it in Home Assistant or the ESPHome dashboard. When Wi-Fi is unavailable, `(90s)` in the OLED header counts down until the fallback access point starts. The AP then remains available for a full 15 minutes, shown as `(AP 15m)` and then `(AP 59s)` during the final minute. After that, DBK reboots and retries Wi-Fi. A successful connection cancels and resets both timers.
+The generic firmware has no embedded Wi-Fi credentials. Provision it through Improv Serial, Improv BLE, or the fallback access point, then adopt it in Home Assistant or the ESPHome dashboard. When Wi-Fi is unavailable, `(90s)` in the OLED header counts down while the fallback access point is available. The AP timeout is controlled by `wifi_ap_timeout_seconds` (90 seconds by default); after it expires, DBK retries Wi-Fi. A successful connection cancels and resets the timer.
 
 When connected, the main-page header shows SNTP time in `HH:MM` format using the configurable `timezone` substitution. The default timezone is `Asia/Bangkok`.
 
