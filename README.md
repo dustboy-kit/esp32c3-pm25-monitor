@@ -65,7 +65,9 @@ Select the USB serial device when ESPHome asks. The first upload must use USB. L
 
 ## Optional MQTT
 
-The example workshop configuration includes the DBK MQTT package. If your workshop does not use MQTT, remove this line from `workshop.yaml`:
+The example workshop configuration includes the DBK MQTT package. Ask the workshop instructor for the current broker address, port, DBK username, and DBK password. Do not guess these values or copy credentials from another project.
+
+If your workshop does not use MQTT, remove this line from `workshop.yaml`:
 
 ```yaml
   mqtt: !include packages/mqtt.yaml
