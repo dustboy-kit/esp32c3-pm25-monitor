@@ -1,6 +1,6 @@
 # DBK ESP32-C3 PM2.5 Monitor
 
-ESPHome firmware for a compact real-time particulate monitor built from an ESP32-C3 SuperMini, Plantower PMS7003, and 0.91-inch SSD1306 OLED. The firmware also supports an optional WS2812 LED on boards where that LED is physically fitted.
+ESPHome firmware for a compact real-time particulate monitor built from an ESP32-C3 SuperMini, Plantower PMS7003, and 0.91-inch SSD1306 OLED.
 
 The firmware measures PM1.0, PM2.5, and PM10, shows a "Dustboy Kit For Kids" startup screen followed by the 128x32 instrument dashboard, exposes measurements to Home Assistant, and supports Wi-Fi provisioning and OTA updates.
 
@@ -18,23 +18,10 @@ The firmware measures PM1.0, PM2.5, and PM10, shows a "Dustboy Kit For Kids" sta
 | SSD1306 OLED | GND | GND |
 | SSD1306 OLED | SDA | GPIO9 |
 | SSD1306 OLED | SCL | GPIO10 |
-| Optional WS2812 | VCC | 5V |
-| Optional WS2812 | GND | GND |
-| Optional WS2812 | DIN | GPIO2 |
 
 The PMS7003 requires a stable 5V supply. Its UART signals are 3.3V-compatible. Always disconnect power before changing wiring.
 
 GPIO2, GPIO8, and GPIO9 are ESP32-C3 strapping pins. This firmware matches the proven reference wiring, but new PCB designs should review those connections carefully and every assembled unit should be cold-boot tested with all peripherals attached.
-
-## Air-quality indication (optional WS2812)
-
-| PM2.5 | LED | State |
-|---:|---|---|
-| 0-25 ug/m3 | Green | GOOD |
-| 26-50 ug/m3 | Yellow | FAIR |
-| Above 50 ug/m3 | Red | BAD |
-| First 30 seconds | Blue | CHECKING SENSOR... |
-| Missing sensor data | Magenta | SENSOR ERROR |
 
 ## Install
 
