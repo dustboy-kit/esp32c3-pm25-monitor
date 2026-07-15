@@ -1,0 +1,9 @@
+substitutions:
+  name: dbk-001
+  friendly_name: DBK-001
+  device_id: DBK-001
+  name_add_mac_suffix: "false"
+
+packages:
+  device: !include dbk.yaml
+  mqtt: !include packages/mqtt.yaml

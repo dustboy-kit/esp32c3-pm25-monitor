@@ -4,6 +4,7 @@ ota:
   - platform: esphome
 
 wifi:
+  id: wifi_component
   ap:
     ssid: ${friendly_name}
 

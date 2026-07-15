@@ -71,7 +71,9 @@ packages:
   mqtt: !include packages/mqtt.yaml
 ```
 
-Set a unique `name` such as `dbk-001` for every MQTT-connected unit. Its MQTT root will be `DUSTBOY/DBK/WiFi/dbk-001`.
+Set a unique lowercase ESPHome `name` and an uppercase display `device_id` for every MQTT-connected unit. For example, `name: dbk-001` and `device_id: DBK-001` produce the MQTT root `DUSTBOY/DBK/WiFi/DBK-001`.
+
+For workshops, copy `workshop.yaml.example` to the ignored `workshop.yaml`, change both IDs for each unit, and compile that file. The workshop file enables MQTT without committing its password.
 
 Never commit `secrets.yaml`.
 

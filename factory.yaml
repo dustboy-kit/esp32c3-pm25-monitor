@@ -1,6 +1,8 @@
 substitutions:
   name: dbk
   friendly_name: DBK
+  device_id: DBK
+  name_add_mac_suffix: "true"
   project_version: "0.1.0"
 
 packages:
