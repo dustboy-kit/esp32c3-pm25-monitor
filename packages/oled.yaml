@@ -9,6 +9,9 @@ i2c:
 
 font:
   - file: "gfonts://Roboto Mono"
+    id: font_tiny
+    size: 6
+  - file: "gfonts://Roboto Mono"
     id: font_small
     size: 8
   - file: "gfonts://Roboto Mono"
@@ -25,14 +28,16 @@ display:
     update_interval: 1s
     lambda: |-
       if (millis() < (${warmup_seconds} * 1000UL)) {
-        it.print(64, 12, id(font_small), TextAlign::CENTER, "WARMING UP");
+        it.print(64, 7, id(font_small), TextAlign::CENTER, "WARMING UP");
+        it.print(64, 22, id(font_tiny), TextAlign::CENTER, App.get_name().c_str());
         return;
       }
 
       const bool stale = id(last_pms_update_ms) == 0 ||
                          (uint32_t) (millis() - id(last_pms_update_ms)) > (${stale_seconds} * 1000UL);
       if (!id(pms_pm25).has_state() || stale) {
-        it.print(64, 12, id(font_small), TextAlign::CENTER, "SENSOR ERROR");
+        it.print(64, 7, id(font_small), TextAlign::CENTER, "SENSOR ERROR");
+        it.print(64, 22, id(font_tiny), TextAlign::CENTER, App.get_name().c_str());
         return;
       }
 
@@ -40,7 +45,7 @@ display:
       it.horizontal_line(80, 16, 48);
 
       it.print(0, 0, id(font_small), "PM2.5");
-      it.print(0, 23, id(font_small), "ug/m3");
+      it.print(0, 26, id(font_tiny), App.get_name().c_str());
       it.printf(76, 5, id(font_large), TextAlign::TOP_RIGHT, "%.0f", id(pms_pm25).state);
 
       it.print(82, 0, id(font_small), "PM1.0");
