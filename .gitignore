@@ -2,4 +2,5 @@
 .venv/
 secrets.yaml
 workshop.yaml
+mqtt-workshop.yaml
 *.bin
