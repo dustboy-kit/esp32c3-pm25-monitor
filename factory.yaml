@@ -1,0 +1,7 @@
+substitutions:
+  name: dustboy-pm25
+  friendly_name: DustBoy PM2.5 Monitor
+  project_version: "0.1.0"
+
+packages:
+  device: !include dustboy-pm25.yaml

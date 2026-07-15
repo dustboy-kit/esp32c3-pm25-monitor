@@ -1,0 +1,29 @@
+name: Release firmware
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: esphome compile factory.yaml
+      - name: Collect release files
+        run: |
+          mkdir -p release
+          cp .esphome/build/dustboy-pm25/.pioenvs/dustboy-pm25/firmware.factory.bin release/dustboy-pm25.factory.bin
+          cp .esphome/build/dustboy-pm25/.pioenvs/dustboy-pm25/firmware.ota.bin release/dustboy-pm25.ota.bin
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" release/*.bin --generate-notes --verify-tag

@@ -1,0 +1,77 @@
+uart:
+  id: pms_uart
+  rx_pin: GPIO6
+  tx_pin: GPIO7
+  baud_rate: 9600
+  data_bits: 8
+  parity: NONE
+  stop_bits: 1
+  rx_buffer_size: 256
+
+switch:
+  - platform: gpio
+    id: pms_set
+    name: PMS7003 Set
+    internal: true
+    restore_mode: ALWAYS_ON
+    pin: GPIO5
+
+  - platform: gpio
+    id: pms_reset
+    name: PMS7003 Reset
+    internal: true
+    restore_mode: ALWAYS_ON
+    pin:
+      number: GPIO8
+      ignore_strapping_warning: true
+
+globals:
+  - id: last_pms_update_ms
+    type: uint32_t
+    restore_value: false
+    initial_value: "0"
+
+sensor:
+  - platform: pmsx003
+    type: PMSX003
+    uart_id: pms_uart
+    pm_1_0:
+      id: pms_pm1
+      name: PM1.0
+      accuracy_decimals: 0
+    pm_2_5:
+      id: pms_pm25
+      name: PM2.5
+      accuracy_decimals: 0
+      on_value:
+        then:
+          - lambda: |-
+              id(last_pms_update_ms) = millis();
+              if (millis() < (${warmup_seconds} * 1000UL)) {
+                return;
+              }
+
+              auto led = id(air_quality_led).turn_on();
+              led.set_brightness(0.04f);
+              if (x <= ${good_limit}) {
+                id(air_quality_level).publish_state("GOOD");
+                led.set_rgb(0.0f, 0.70f, 0.0f);
+              } else if (x <= ${fair_limit}) {
+                id(air_quality_level).publish_state("FAIR");
+                led.set_rgb(0.70f, 0.70f, 0.0f);
+              } else {
+                id(air_quality_level).publish_state("BAD");
+                led.set_rgb(0.86f, 0.0f, 0.0f);
+              }
+              led.perform();
+    pm_10_0:
+      id: pms_pm10
+      name: PM10
+      accuracy_decimals: 0
+
+text_sensor:
+  - platform: template
+    id: air_quality_level
+    name: Air Quality Level
+    icon: mdi:air-filter
+    update_interval: never

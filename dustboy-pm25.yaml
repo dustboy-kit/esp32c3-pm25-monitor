@@ -1,0 +1,16 @@
+substitutions:
+  name: dustboy-pm25
+  friendly_name: DustBoy PM2.5 Monitor
+  project_version: "0.1.0"
+  good_limit: "25"
+  fair_limit: "50"
+  warmup_seconds: "30"
+  stale_seconds: "10"
+
+packages:
+  board: !include packages/board.yaml
+  connectivity: !include packages/connectivity.yaml
+  pms7003: !include packages/pms7003.yaml
+  status_led: !include packages/status-led.yaml
+  oled: !include packages/oled.yaml
+  diagnostics: !include packages/diagnostics.yaml

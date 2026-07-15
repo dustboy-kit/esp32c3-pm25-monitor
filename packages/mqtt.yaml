@@ -1,0 +1,15 @@
+# Optional DustBoy fleet profile. Copy secrets.yaml.example to secrets.yaml first.
+mqtt:
+  broker: !secret mqtt_broker
+  port: !secret mqtt_port
+  username: !secret mqtt_username
+  password: !secret mqtt_password
+  topic_prefix: dustboy/pm25/${name}
+  birth_message:
+    topic: dustboy/pm25/${name}/status
+    payload: online
+    retain: true
+  will_message:
+    topic: dustboy/pm25/${name}/status
+    payload: offline
+    retain: true

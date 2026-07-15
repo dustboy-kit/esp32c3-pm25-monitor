@@ -1,0 +1,45 @@
+light:
+  - platform: esp32_rmt_led_strip
+    id: air_quality_led
+    name: Air Quality Indicator
+    internal: true
+    pin:
+      number: GPIO2
+      ignore_strapping_warning: true
+    num_leds: 1
+    chipset: WS2812
+    rgb_order: GRB
+    restore_mode: ALWAYS_OFF
+
+interval:
+  - interval: 1s
+    then:
+      - if:
+          condition:
+            lambda: return millis() < (${warmup_seconds} * 1000UL);
+          then:
+            - text_sensor.template.publish:
+                id: air_quality_level
+                state: WARMING UP
+            - light.turn_on:
+                id: air_quality_led
+                red: 0%
+                green: 20%
+                blue: 100%
+                brightness: 4%
+          else:
+            - if:
+                condition:
+                  lambda: |-
+                    return id(last_pms_update_ms) == 0 ||
+                           (uint32_t) (millis() - id(last_pms_update_ms)) > (${stale_seconds} * 1000UL);
+                then:
+                  - text_sensor.template.publish:
+                      id: air_quality_level
+                      state: SENSOR ERROR
+                  - light.turn_on:
+                      id: air_quality_led
+                      red: 70%
+                      green: 0%
+                      blue: 70%
+                      brightness: 4%

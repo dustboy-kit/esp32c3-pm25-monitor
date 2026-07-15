@@ -1,0 +1,49 @@
+i2c:
+  id: oled_bus
+  sda:
+    number: GPIO9
+    ignore_strapping_warning: true
+  scl: GPIO10
+  scan: true
+  frequency: 400kHz
+
+font:
+  - file: "gfonts://Roboto Mono"
+    id: font_small
+    size: 8
+  - file: "gfonts://Roboto Mono"
+    id: font_large
+    size: 22
+    glyphs: " 0123456789"
+
+display:
+  - platform: ssd1306_i2c
+    id: oled
+    i2c_id: oled_bus
+    model: SSD1306 128x32
+    address: 0x3C
+    update_interval: 1s
+    lambda: |-
+      if (millis() < (${warmup_seconds} * 1000UL)) {
+        it.print(64, 12, id(font_small), TextAlign::CENTER, "WARMING UP");
+        return;
+      }
+
+      const bool stale = id(last_pms_update_ms) == 0 ||
+                         (uint32_t) (millis() - id(last_pms_update_ms)) > (${stale_seconds} * 1000UL);
+      if (!id(pms_pm25).has_state() || stale) {
+        it.print(64, 12, id(font_small), TextAlign::CENTER, "SENSOR ERROR");
+        return;
+      }
+
+      it.vertical_line(78, 0, 32);
+      it.horizontal_line(80, 16, 48);
+
+      it.print(0, 0, id(font_small), "PM2.5");
+      it.print(0, 23, id(font_small), "ug/m3");
+      it.printf(76, 5, id(font_large), TextAlign::TOP_RIGHT, "%.0f", id(pms_pm25).state);
+
+      it.print(82, 0, id(font_small), "PM1.0");
+      it.printf(126, 0, id(font_small), TextAlign::TOP_RIGHT, "%.0f", id(pms_pm1).state);
+      it.print(82, 18, id(font_small), "PM10");
+      it.printf(126, 18, id(font_small), TextAlign::TOP_RIGHT, "%.0f", id(pms_pm10).state);

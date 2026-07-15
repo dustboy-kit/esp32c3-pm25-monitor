@@ -1,0 +1,32 @@
+sensor:
+  - platform: wifi_signal
+    name: Wi-Fi Signal
+    update_interval: 60s
+    entity_category: diagnostic
+
+  - platform: uptime
+    name: Uptime
+    update_interval: 60s
+    entity_category: diagnostic
+
+text_sensor:
+  - platform: version
+    name: ESPHome Version
+    entity_category: diagnostic
+
+  - platform: wifi_info
+    ip_address:
+      name: IP Address
+      entity_category: diagnostic
+    mac_address:
+      name: MAC Address
+      entity_category: diagnostic
+
+button:
+  - platform: restart
+    name: Restart
+    entity_category: diagnostic
+
+  - platform: safe_mode
+    name: Restart in Safe Mode
+    entity_category: diagnostic

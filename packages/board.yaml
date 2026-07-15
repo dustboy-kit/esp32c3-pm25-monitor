@@ -1,0 +1,28 @@
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+  name_add_mac_suffix: true
+  min_version: 2026.6.5
+  project:
+    name: dustboy-kit.esp32c3-pm25-monitor
+    version: ${project_version}
+  on_boot:
+    - priority: -100
+      then:
+        - light.turn_on:
+            id: air_quality_led
+            red: 0%
+            green: 20%
+            blue: 100%
+            brightness: 4%
+
+esp32:
+  board: esp32-c3-devkitm-1
+  variant: ESP32C3
+  flash_size: 4MB
+  framework:
+    type: esp-idf
+
+logger:
+  hardware_uart: USB_SERIAL_JTAG
+  level: INFO
