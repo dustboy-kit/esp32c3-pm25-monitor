@@ -4,7 +4,7 @@ esphome:
   name_add_mac_suffix: true
   min_version: 2026.6.5
   project:
-    name: dustboy-kit.esp32c3-pm25-monitor
+    name: dustboy-kit.dbk
     version: ${project_version}
   on_boot:
     - priority: -100
@@ -25,4 +25,4 @@ esp32:
 
 logger:
   hardware_uart: USB_SERIAL_JTAG
-  level: INFO
+  level: DEBUG

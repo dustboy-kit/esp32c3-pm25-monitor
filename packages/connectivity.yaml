@@ -19,5 +19,5 @@ web_server:
   include_internal: false
 
 dashboard_import:
-  package_import_url: github://dustboy-kit/esp32c3-pm25-monitor/dustboy-pm25.yaml@main
+  package_import_url: github://dustboy-kit/esp32c3-pm25-monitor/dbk.yaml@main
   import_full_config: false

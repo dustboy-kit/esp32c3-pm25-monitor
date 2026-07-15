@@ -4,12 +4,12 @@ mqtt:
   port: !secret mqtt_port
   username: !secret mqtt_username
   password: !secret mqtt_password
-  topic_prefix: dustboy/pm25/${name}
+  topic_prefix: DUSTBOY/DBK/WiFi/${name}
   birth_message:
-    topic: dustboy/pm25/${name}/status
+    topic: DUSTBOY/DBK/WiFi/${name}/status
     payload: online
     retain: true
   will_message:
-    topic: dustboy/pm25/${name}/status
+    topic: DUSTBOY/DBK/WiFi/${name}/status
     payload: offline
     retain: true

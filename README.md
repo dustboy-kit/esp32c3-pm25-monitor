@@ -1,4 +1,4 @@
-# DustBoy ESP32-C3 PM2.5 Monitor
+# DBK ESP32-C3 PM2.5 Monitor
 
 ESPHome firmware for a compact real-time particulate monitor built from an ESP32-C3 SuperMini, Plantower PMS7003, 0.91-inch SSD1306 OLED, and one WS2812 LED.
 
@@ -44,7 +44,7 @@ GPIO2, GPIO8, and GPIO9 are ESP32-C3 strapping pins. This firmware matches the p
 python3 -m venv .venv
 . .venv/bin/activate
 pip install -r requirements.txt
-esphome run dustboy-pm25.yaml
+esphome run dbk.yaml
 ```
 
 The first flash uses the ESP32-C3 native USB connection. Subsequent updates can use OTA.
@@ -54,7 +54,7 @@ The first flash uses the ESP32-C3 native USB connection. Subsequent updates can 
 Import this package URL:
 
 ```text
-github://dustboy-kit/esp32c3-pm25-monitor/dustboy-pm25.yaml@main
+github://dustboy-kit/esp32c3-pm25-monitor/dbk.yaml@main
 ```
 
 The generic firmware has no embedded Wi-Fi credentials. Provision it through Improv Serial, Improv BLE, or the fallback access point, then adopt it in Home Assistant or the ESPHome dashboard.
@@ -67,16 +67,18 @@ For DustBoy MQTT deployments, copy `secrets.yaml.example` to `secrets.yaml` and 
 
 ```yaml
 packages:
-  device: !include dustboy-pm25.yaml
+  device: !include dbk.yaml
   mqtt: !include packages/mqtt.yaml
 ```
+
+Set a unique `name` such as `dbk-001` for every MQTT-connected unit. Its MQTT root will be `DUSTBOY/DBK/WiFi/dbk-001`.
 
 Never commit `secrets.yaml`.
 
 ## Development
 
 ```bash
-esphome config dustboy-pm25.yaml
+esphome config dbk.yaml
 esphome compile factory.yaml
 ```
 

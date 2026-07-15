@@ -1,6 +1,6 @@
 substitutions:
-  name: dustboy-pm25
-  friendly_name: DustBoy PM2.5 Monitor
+  name: dbk
+  friendly_name: DBK
   project_version: "0.1.0"
   good_limit: "25"
   fair_limit: "50"

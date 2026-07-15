@@ -21,8 +21,8 @@ jobs:
       - name: Collect release files
         run: |
           mkdir -p release
-          cp .esphome/build/dustboy-pm25/.pioenvs/dustboy-pm25/firmware.factory.bin release/dustboy-pm25.factory.bin
-          cp .esphome/build/dustboy-pm25/.pioenvs/dustboy-pm25/firmware.ota.bin release/dustboy-pm25.ota.bin
+          cp .esphome/build/dbk/.pioenvs/dbk/firmware.factory.bin release/dbk.factory.bin
+          cp .esphome/build/dbk/.pioenvs/dbk/firmware.ota.bin release/dbk.ota.bin
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}

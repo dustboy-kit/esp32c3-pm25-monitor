@@ -18,12 +18,12 @@ jobs:
           python-version: "3.12"
           cache: pip
       - run: pip install -r requirements.txt
-      - run: esphome config dustboy-pm25.yaml
+      - run: esphome config dbk.yaml
       - run: esphome config factory.yaml
       - run: esphome compile factory.yaml
       - uses: actions/upload-artifact@v4
         with:
-          name: dustboy-pm25-firmware
+          name: dbk-firmware
           path: |
-            .esphome/build/dustboy-pm25/.pioenvs/dustboy-pm25/firmware.factory.bin
-            .esphome/build/dustboy-pm25/.pioenvs/dustboy-pm25/firmware.ota.bin
+            .esphome/build/dbk/.pioenvs/dbk/firmware.factory.bin
+            .esphome/build/dbk/.pioenvs/dbk/firmware.ota.bin
