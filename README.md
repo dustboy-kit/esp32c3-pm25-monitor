@@ -91,6 +91,21 @@ mqtt_password: your-mqtt-password
 
 When MQTT is connected, the device publishes its status and sensor values under the `DUSTBOY/DBK/<device-id>/` topic prefix. MQTT discovery is disabled; use the topics directly or configure your own dashboard.
 
+### OLED layout
+
+The display is a 128×32 pixel OLED. The normal screen is arranged like this:
+
+```text
+┌──────────────────────────────────────────────────────────────┐
+│ 12:34                 ●  Wi‑Fi                         DBK-001│
+├──────────────────────────────────────────────────────────────┤
+│       PM1              PM2.5                  PM10            │
+│        4                9                     11              │
+└──────────────────────────────────────────────────────────────┘
+```
+
+The left item shows the time when Wi‑Fi is connected, or the AP countdown when it is not. The filled circle indicates MQTT is connected; the outlined circle means MQTT is disconnected. The Wi‑Fi symbol shows the Wi‑Fi state.
+
 ## Hardware wiring
 
 | Device | Pin | ESP32-C3 |
