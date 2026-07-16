@@ -106,6 +106,13 @@ wifi_password: new-wifi-password
 - Open [http://192.168.4.1](http://192.168.4.1).
 - Turn the normal Wi‑Fi back on after configuration.
 
+### Open the DBK device page
+
+- Connect the computer to the same Wi‑Fi network as the DBK device.
+- Open `http://dbk-001.local/` in a browser.
+- Replace `dbk-001` with the device `name` if a different ID was configured.
+- The page shows device status and provides basic controls.
+
 ## Optional MQTT
 
 - The base `dbk.yaml` does not include MQTT.
