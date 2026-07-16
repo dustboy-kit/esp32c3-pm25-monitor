@@ -109,6 +109,7 @@ wifi_password: new-wifi-password
 ## Optional MQTT
 
 - The workshop configuration includes MQTT.
+- The base `dbk.yaml` does not include MQTT, so public validation needs no private credentials.
 - Ask the instructor for the current broker, port, username, and password.
 - Do not copy credentials from another project.
 
