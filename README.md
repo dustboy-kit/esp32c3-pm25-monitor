@@ -76,6 +76,11 @@ esphome run workshop.yaml
 
 ### Change the Wi‑Fi network
 
+- Two methods are available:
+
+  1. **Edit the code and flash by USB:** change `wifi_ssid` and `wifi_password` in `secrets.yaml`, then flash the device.
+  2. **Use the setup AP:** if the saved network cannot be reached, connect to `DBK-xxx` with password `12345678`, open [http://192.168.4.1](http://192.168.4.1), and enter the new Wi‑Fi details.
+
 - Edit `secrets.yaml`:
 
 ```yaml
