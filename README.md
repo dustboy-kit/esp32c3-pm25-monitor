@@ -93,30 +93,79 @@ When MQTT is connected, the device publishes its status and sensor values under 
 
 ### OLED layout
 
-The display is a 128×32 pixel OLED. The status row is always arranged with the connection indicators and device name on the right. The left side changes with the connection state:
+The display is a 128×32 pixel OLED. These diagrams show the complete screen in each state. The MQTT circle and Wi‑Fi symbol are grouped with the device name on the right.
 
 ```text
 ┌──────────────────────────────────────────────────────────────┐
-│ 12:34                              ●  Wi‑Fi          DBK-001 │  Wi‑Fi connected
+│                 Dustboy Kit For Kids                         │  Splash (3s)
+│              ┌────────────────────────┐                      │
+│              └────────────────────────┘                      │
+└──────────────────────────────────────────────────────────────┘
+```
+
+```text
+┌──────────────────────────────────────────────────────────────┐
+│ 12:34                              ●  Wi‑Fi          DBK-001 │  Wi‑Fi + MQTT
 ├──────────────────────────────────────────────────────────────┤
 │       PM1              PM2.5                  PM10            │
 │        4                9                     11              │
 └──────────────────────────────────────────────────────────────┘
 ```
 
-When Wi‑Fi is lost, the clock is replaced first by a 90-second setup countdown:
+If Wi‑Fi is connected but MQTT is not, only the MQTT circle changes to an outline:
 
 ```text
-│ (89s)                             ○  Wi‑Fi          DBK-001 │  Waiting for Wi‑Fi
+┌──────────────────────────────────────────────────────────────┐
+│ 12:34                              ○  Wi‑Fi          DBK-001 │  Wi‑Fi only
+├──────────────────────────────────────────────────────────────┤
+│       PM1              PM2.5                  PM10            │
+│        4                9                     11              │
+└──────────────────────────────────────────────────────────────┘
 ```
 
-After that countdown, the device starts its setup access point for 15 minutes:
+When Wi‑Fi is lost, the clock is replaced by a 90-second countdown:
 
 ```text
-│ (AP 15m)                          ○  Wi‑Fi          DBK-001 │  Setup AP active
+┌──────────────────────────────────────────────────────────────┐
+│ (89s)                             ○  Wi‑Fi          DBK-001 │  Waiting
+├──────────────────────────────────────────────────────────────┤
+│       PM1              PM2.5                  PM10            │
+│        4                9                     11              │
+└──────────────────────────────────────────────────────────────┘
 ```
 
-The filled circle indicates MQTT is connected; the outlined circle means MQTT is disconnected. The Wi‑Fi symbol shows the Wi‑Fi state. Once Wi‑Fi reconnects, the AP state disappears and the clock is shown again.
+After 90 seconds, the setup access point is active for 15 minutes:
+
+```text
+┌──────────────────────────────────────────────────────────────┐
+│ (AP 15m)                          ○  Wi‑Fi          DBK-001 │  Setup AP
+├──────────────────────────────────────────────────────────────┤
+│       PM1              PM2.5                  PM10            │
+│        4                9                     11              │
+└──────────────────────────────────────────────────────────────┘
+```
+
+During the first 30 seconds after boot, the sensor area shows:
+
+```text
+┌──────────────────────────────────────────────────────────────┐
+│ 12:34                              ●  Wi‑Fi          DBK-001 │
+├──────────────────────────────────────────────────────────────┤
+│                     CHECKING SENSOR...                       │
+└──────────────────────────────────────────────────────────────┘
+```
+
+If the sensor stops providing readings, it shows:
+
+```text
+┌──────────────────────────────────────────────────────────────┐
+│ 12:34                              ●  Wi‑Fi          DBK-001 │
+├──────────────────────────────────────────────────────────────┤
+│                       SENSOR ERROR                           │
+└──────────────────────────────────────────────────────────────┘
+```
+
+The filled MQTT circle means connected to the broker; the outlined circle means disconnected. The filled Wi‑Fi symbol means connected to Wi‑Fi; the crossed symbol means disconnected.
 
 ## Hardware wiring
 
