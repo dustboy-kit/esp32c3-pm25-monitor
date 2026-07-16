@@ -93,18 +93,30 @@ When MQTT is connected, the device publishes its status and sensor values under 
 
 ### OLED layout
 
-The display is a 128×32 pixel OLED. The normal screen is arranged like this:
+The display is a 128×32 pixel OLED. The status row is always arranged with the connection indicators and device name on the right. The left side changes with the connection state:
 
 ```text
 ┌──────────────────────────────────────────────────────────────┐
-│ 12:34                              ●  Wi‑Fi          DBK-001│
+│ 12:34                              ●  Wi‑Fi          DBK-001 │  Wi‑Fi connected
 ├──────────────────────────────────────────────────────────────┤
 │       PM1              PM2.5                  PM10            │
 │        4                9                     11              │
 └──────────────────────────────────────────────────────────────┘
 ```
 
-The left item shows the time when Wi‑Fi is connected, or the AP countdown when it is not. The filled circle indicates MQTT is connected; the outlined circle means MQTT is disconnected. The Wi‑Fi symbol shows the Wi‑Fi state.
+When Wi‑Fi is lost, the clock is replaced first by a 90-second setup countdown:
+
+```text
+│ (89s)                             ○  Wi‑Fi          DBK-001 │  Waiting for Wi‑Fi
+```
+
+After that countdown, the device starts its setup access point for 15 minutes:
+
+```text
+│ (AP 15m)                          ○  Wi‑Fi          DBK-001 │  Setup AP active
+```
+
+The filled circle indicates MQTT is connected; the outlined circle means MQTT is disconnected. The Wi‑Fi symbol shows the Wi‑Fi state. Once Wi‑Fi reconnects, the AP state disappears and the clock is shown again.
 
 ## Hardware wiring
 
