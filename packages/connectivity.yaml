@@ -9,6 +9,7 @@ wifi:
   reboot_timeout: ${wifi_reboot_timeout}
   ap:
     ssid: ${friendly_name}
+    password: "12345678"
     ap_timeout: ${wifi_ap_timeout_seconds}s
   on_connect:
     - globals.set:

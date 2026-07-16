@@ -88,6 +88,7 @@ mqtt_password: your-mqtt-password
 - When Wi‑Fi is connected, the top-left area shows the current time. When it is disconnected, it shows the remaining seconds before the setup access point appears, followed by the access-point countdown.
 - The MQTT circle is filled when the device is connected to the MQTT broker. An outlined circle means MQTT is not connected.
 - Wi‑Fi and MQTT are separate: the device can have Wi‑Fi while MQTT is still unavailable because the broker or credentials are incorrect.
+- If Wi‑Fi cannot be joined, the temporary setup AP is named `DBK-xxx` and uses password `12345678`. It appears after 90 seconds and remains available for 15 minutes.
 
 When MQTT is connected, the device publishes its status and sensor values under the `DUSTBOY/DBK/<device-id>/` topic prefix. MQTT discovery is disabled; use the topics directly or configure your own dashboard.
 
