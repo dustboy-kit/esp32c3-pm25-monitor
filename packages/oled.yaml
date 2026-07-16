@@ -95,7 +95,7 @@ display:
       } else {
         it.print(74, 0, id(font_icons), "\U000F05AA");
       }
-      it.print(127, -1, id(font_header), TextAlign::TOP_RIGHT, "${device_id}");
+      it.print(124, -1, id(font_header), TextAlign::TOP_RIGHT, "${device_id}");
       it.horizontal_line(0, 11, 128);
 
       if (millis() < (${warmup_seconds} * 1000UL)) {
