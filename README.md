@@ -72,13 +72,13 @@ esphome run workshop.yaml
 ```
 
 - Select the USB serial device when ESPHome asks.
-- Flash using USB.
+- Flash using USB with `esphome run workshop.yaml`.
 
 ### Change the Wi‑Fi network
 
 - Two methods are available:
 
-  1. **Edit the code and flash by USB:** change `wifi_ssid` and `wifi_password` in `secrets.yaml`, then flash the device.
+  1. **Edit the code and flash by USB:** change `wifi_ssid` and `wifi_password` in `secrets.yaml`, then run `esphome run workshop.yaml`.
   2. **Use the setup AP:** if the saved network cannot be reached, connect to `DBK-xxx` with password `12345678`, open [http://192.168.4.1](http://192.168.4.1), and enter the new Wi‑Fi details.
 
 - Edit `secrets.yaml`:
@@ -88,7 +88,7 @@ wifi_ssid: new-wifi-name
 wifi_password: new-wifi-password
 ```
 
-- Flash again by USB after changing the Wi‑Fi settings.
+- Flash again by USB with `esphome run workshop.yaml`.
 - If Wi‑Fi fails, connect to the temporary AP:
   - SSID: `DBK-xxx`
   - Password: `12345678`
@@ -126,7 +126,7 @@ mqtt_username: your-mqtt-username
 mqtt_password: your-mqtt-password
 ```
 
-- Flash the device by USB.
+- Flash the device by USB with `esphome run workshop.yaml`.
 - If MQTT is not needed, remove the `mqtt` package line from `workshop.yaml`.
 
 ### Wi‑Fi and MQTT status on the display
