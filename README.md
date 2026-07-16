@@ -8,7 +8,7 @@ ESPHome firmware for the Dustboy Kit: an ESP32-C3, PMS7003 particulate sensor, a
 
 Open the repository page, choose **Code → Download ZIP**, and extract the ZIP file. No GitHub account or Git installation is needed. Open a terminal in the extracted `esp32c3-pm25-monitor` folder.
 
-Install ESPHome:
+Install ESPHome by following the [official ESPHome installation guide](https://esphome.io/guides/installing_esphome/):
 
 ```bash
 python3 -m venv .venv
