@@ -40,7 +40,7 @@ substitutions:
   name_add_mac_suffix: "false"
 ```
 
-Use `DBK-002`, `DBK-003`, and so on for additional devices. Keep `name` lowercase; the other two values are shown as `DBK-xxx`.
+Use `DBK-002`, `DBK-003`, and so on for additional devices. Keep `name` lowercase; the other two values are shown as `DBK-xxx`. Keep the `DBK-` prefix in `device_id`; MQTT topics use it in `DUSTBOY/DBK/DBK-xxx/...`.
 
 ### 4. Set Wi-Fi
 
