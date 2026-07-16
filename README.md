@@ -97,6 +97,16 @@ wifi_password: new-wifi-password
   - AP remains available for 15 minutes.
 - Enter the new Wi‑Fi details and save.
 
+### Force the setup AP
+
+- Change `wifi_password` in `secrets.yaml` to an incorrect value.
+- Flash the device by USB.
+- Reboot the device.
+- Wait for the 90-second countdown.
+- Connect to `DBK-xxx` with password `12345678`.
+- Open [http://192.168.4.1](http://192.168.4.1).
+- Restore the correct Wi‑Fi settings after configuration.
+
 ## Optional MQTT
 
 - The workshop configuration includes MQTT.
