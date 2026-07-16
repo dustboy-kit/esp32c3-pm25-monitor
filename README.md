@@ -63,6 +63,17 @@ esphome run workshop.yaml
 
 Select the USB serial device when ESPHome asks. The first upload must use USB. Later updates can use USB or OTA after the device is on Wi-Fi.
 
+### Change the Wi‑Fi network
+
+For a normal firmware update, edit the local `secrets.yaml` and change:
+
+```yaml
+wifi_ssid: new-wifi-name
+wifi_password: new-wifi-password
+```
+
+Then flash again by USB or OTA. If the device cannot connect to the saved network, it starts a temporary setup access point (AP). An AP is a small Wi‑Fi network created by the device so a phone or laptop can configure it. Connect to `DBK-xxx` with password `12345678`, open [http://192.168.4.1](http://192.168.4.1), and enter the new Wi‑Fi name and password. The AP appears after the 90-second countdown and remains available for 15 minutes. After saving, the device restarts and tries the new network.
+
 ## Optional MQTT
 
 The example workshop configuration includes the DBK MQTT package. Ask the workshop instructor for the current broker address, port, DBK username, and DBK password. Do not guess these values or copy credentials from another project.
