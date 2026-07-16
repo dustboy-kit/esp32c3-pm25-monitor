@@ -108,18 +108,16 @@ wifi_password: new-wifi-password
 
 ## Optional MQTT
 
-- The workshop configuration includes MQTT.
-- The base `dbk.yaml` does not include MQTT, so public validation needs no private credentials.
-- Ask the instructor for the current broker, port, username, and password.
-- Do not copy credentials from another project.
-
-- If MQTT is not needed, remove this line from `workshop.yaml`:
+- The base `dbk.yaml` does not include MQTT.
+- To use MQTT, open `workshop.yaml`.
+- Under `packages:`, add:
 
 ```yaml
-mqtt: !include packages/mqtt.yaml
+  mqtt: !include packages/mqtt.yaml
 ```
 
-- If MQTT is enabled, enter the instructor-provided values in `secrets.yaml`:
+- Ask the instructor for the current broker, port, username, and password.
+- Enter those values in `secrets.yaml`:
 
 ```yaml
 mqtt_broker: mqtt.example.com
@@ -127,6 +125,9 @@ mqtt_port: "1883"
 mqtt_username: your-mqtt-username
 mqtt_password: your-mqtt-password
 ```
+
+- Flash the device by USB.
+- If MQTT is not needed, remove the `mqtt` package line from `workshop.yaml`.
 
 ### Wi‑Fi and MQTT status on the display
 
