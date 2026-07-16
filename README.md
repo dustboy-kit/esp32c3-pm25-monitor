@@ -72,8 +72,7 @@ esphome run workshop.yaml
 ```
 
 - Select the USB serial device when ESPHome asks.
-- First upload: USB required.
-- Later uploads: USB or Wi‑Fi OTA.
+- Flash using USB.
 
 ### Change the Wi‑Fi network
 
@@ -84,7 +83,7 @@ wifi_ssid: new-wifi-name
 wifi_password: new-wifi-password
 ```
 
-- Flash by USB or OTA.
+- Flash again by USB after changing the Wi‑Fi settings.
 - If Wi‑Fi fails, connect to the temporary AP:
   - SSID: `DBK-xxx`
   - Password: `12345678`
@@ -124,7 +123,7 @@ mqtt_password: your-mqtt-password
 
 - Topic prefix: `DUSTBOY/DBK/<device-id>/`
 - MQTT discovery: disabled
-- Use the topics directly or configure a dashboard.
+- Use the topics directly if MQTT is enabled.
 
 ### OLED layout
 
