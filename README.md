@@ -70,7 +70,7 @@ The example workshop configuration includes the DBK MQTT package. Ask the worksh
 If your workshop does not use MQTT, remove this line from `workshop.yaml`:
 
 ```yaml
-  mqtt: !include packages/mqtt.yaml
+mqtt: !include packages/mqtt.yaml
 ```
 
 If MQTT is enabled, ask the workshop instructor for the current MQTT broker, port, username, and password. Enter the values they provide in `secrets.yaml`:
@@ -93,94 +93,78 @@ When MQTT is connected, the device publishes its status and sensor values under 
 
 ### OLED layout
 
-The display is a 128×32 pixel OLED. These diagrams show the complete screen in each state. The MQTT circle and Wi‑Fi symbol are grouped with the device name on the right.
+The display is a 128×32 pixel OLED. The MQTT circle, Wi‑Fi symbol, and device name are grouped on the right.
 
+#### 1. Splash screen
 ```text
 ┌──────────────────────────────────────────────────────────────┐
-│                 Dustboy Kit For Kids                         │  Splash (3s)
+│                 Dustboy Kit For Kids                         │
 │              ┌────────────────────────┐                      │
 │              └────────────────────────┘                      │
 └──────────────────────────────────────────────────────────────┘
 ```
 
+#### 2. Wi‑Fi and MQTT not connected
+After power-on, while Wi‑Fi is not connected, the left side shows the 90-second countdown:
 ```text
 ┌──────────────────────────────────────────────────────────────┐
-│ 12:34                              ●  Wi‑Fi          DBK-001 │  Wi‑Fi + MQTT
+│ (89s)                             ○  Wi‑Fi          DBK-001  │
 ├──────────────────────────────────────────────────────────────┤
-│       PM1              PM2.5                  PM10            │
-│        4                9                     11              │
+│       PM1              PM2.5                  PM10           │
+│        4                9                     11             │
 └──────────────────────────────────────────────────────────────┘
 ```
 
-If Wi‑Fi is connected but MQTT is not, only the MQTT circle changes to an outline:
-
-```text
-┌──────────────────────────────────────────────────────────────┐
-│ 12:34                              ○  Wi‑Fi          DBK-001 │  Wi‑Fi only
-├──────────────────────────────────────────────────────────────┤
-│       PM1              PM2.5                  PM10            │
-│        4                9                     11              │
-└──────────────────────────────────────────────────────────────┘
-```
-
-When Wi‑Fi is lost, the clock is replaced by a 90-second countdown:
-
-```text
-┌──────────────────────────────────────────────────────────────┐
-│ (89s)                             ○  Wi‑Fi          DBK-001 │  Waiting
-├──────────────────────────────────────────────────────────────┤
-│       PM1              PM2.5                  PM10            │
-│        4                9                     11              │
-└──────────────────────────────────────────────────────────────┘
-```
-
+#### 3. Wi‑Fi lost or still not connected after power
 After 90 seconds, the setup access point is active for 15 minutes:
-
 ```text
 ┌──────────────────────────────────────────────────────────────┐
-│ (AP 15m)                          ○  Wi‑Fi          DBK-001 │  Setup AP
+│ (AP 15m)                          ○  Wi‑Fi          DBK-001  │
 ├──────────────────────────────────────────────────────────────┤
-│       PM1              PM2.5                  PM10            │
-│        4                9                     11              │
+│       PM1              PM2.5                  PM10           │
+│        4                9                     11             │
 └──────────────────────────────────────────────────────────────┘
 ```
 
-During the first 30 seconds after boot, the sensor area shows:
+#### 4. Wi‑Fi connected, MQTT not connected
+```text
+┌──────────────────────────────────────────────────────────────┐
+│ 12:34                              ○  Wi‑Fi          DBK-001 │
+├──────────────────────────────────────────────────────────────┤
+│       PM1              PM2.5                  PM10           │
+│        4                9                     11             │
+└──────────────────────────────────────────────────────────────┘
+```
 
+#### 5. Wi‑Fi and MQTT connected
 ```text
 ┌──────────────────────────────────────────────────────────────┐
 │ 12:34                              ●  Wi‑Fi          DBK-001 │
 ├──────────────────────────────────────────────────────────────┤
-│                     CHECKING SENSOR...                       │
+│       PM1              PM2.5                  PM10           │
+│        4                9                     11             │
 └──────────────────────────────────────────────────────────────┘
 ```
 
-If the sensor stops providing readings, it shows:
-
-```text
-┌──────────────────────────────────────────────────────────────┐
-│ 12:34                              ●  Wi‑Fi          DBK-001 │
-├──────────────────────────────────────────────────────────────┤
-│                       SENSOR ERROR                           │
-└──────────────────────────────────────────────────────────────┘
-```
+#### 6. Checking sensor and sensor error
+During the first 30 seconds, the values are replaced by `CHECKING SENSOR...`. If readings stop, the display shows `SENSOR ERROR`.
 
 The filled MQTT circle means connected to the broker; the outlined circle means disconnected. The filled Wi‑Fi symbol means connected to Wi‑Fi; the crossed symbol means disconnected.
 
 ## Hardware wiring
 
-| Device | Pin | ESP32-C3 |
-|---|---|---:|
-| PMS7003 VCC pins 1/2 | 5V | 5V |
-| PMS7003 GND pins 3/4 | GND | GND |
-| PMS7003 TX pin 9 | GPIO6 | GPIO6 |
-| PMS7003 RX pin 7 | GPIO7 | GPIO7 |
-| PMS7003 SET pin 10 | GPIO5 | GPIO5 |
-| PMS7003 RESET pin 5 | GPIO8 | GPIO8 |
-| SSD1306 VCC | 3V3 | 3V3 |
-| SSD1306 GND | GND | GND |
-| SSD1306 SDA | GPIO9 | GPIO9 |
-| SSD1306 SCL | GPIO10 | GPIO10 |
+| Device               | Pin    | ESP32-C3 |
+| -------------------- | ------ | -------: |
+| PMS7003 VCC pins 1/2 | 5V     |       5V |
+| PMS7003 GND pins 3/4 | GND    |      GND |
+| PMS7003 TX pin 9     | GPIO6  |    GPIO6 |
+| PMS7003 RX pin 7     | GPIO7  |    GPIO7 |
+| PMS7003 SET pin 10   | GPIO5  |    GPIO5 |
+| PMS7003 RESET pin 5  | GPIO8  |    GPIO8 |
+| SSD1306 VCC          | 3V3    |      3V3 |
+| SSD1306 GND          | GND    |      GND |
+| SSD1306 SDA          | GPIO9  |    GPIO9 |
+| SSD1306 SCL          | GPIO10 |   GPIO10 |
 
 The PMS7003 needs a stable 5V supply. Disconnect power before changing wiring.
 
