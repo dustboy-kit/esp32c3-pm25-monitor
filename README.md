@@ -35,7 +35,7 @@ Both files are local-only and are ignored by Git.
 ### 3. Set the device ID
 
 - Open `workshop.yaml`.
-- Use the same device number in all three settings.
+- Use the same device number in these three settings: `name`, `friendly_name`, and `device_id`.
 - Example for device 001:
 
 ```yaml
