@@ -30,7 +30,7 @@ font:
   - file: "gfonts://Roboto Mono"
     id: font_label
     size: 7
-  - file: "gfonts://Roboto Mono"
+  - file: "gfonts://Roboto"
     id: font_value
     size: 10
     glyphs: " 0123456789"

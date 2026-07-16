@@ -82,6 +82,15 @@ mqtt_username: your-mqtt-username
 mqtt_password: your-mqtt-password
 ```
 
+### Wi‑Fi and MQTT status on the display
+
+- The Wi‑Fi symbol is filled when the device is connected to Wi‑Fi. An outlined or crossed symbol means it is disconnected.
+- When Wi‑Fi is connected, the top-left area shows the current time. When it is disconnected, it shows the remaining seconds before the setup access point appears, followed by the access-point countdown.
+- The MQTT circle is filled when the device is connected to the MQTT broker. An outlined circle means MQTT is not connected.
+- Wi‑Fi and MQTT are separate: the device can have Wi‑Fi while MQTT is still unavailable because the broker or credentials are incorrect.
+
+When MQTT is connected, the device publishes its status and sensor values under the `DUSTBOY/DBK/<device-id>/` topic prefix. MQTT discovery is disabled; use the topics directly or configure your own dashboard.
+
 ## Hardware wiring
 
 | Device | Pin | ESP32-C3 |
