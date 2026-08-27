@@ -23,7 +23,12 @@ jobs:
           mkdir -p release
           cp .esphome/build/dbk/.pioenvs/dbk/firmware.factory.bin release/dbk.factory.bin
           cp .esphome/build/dbk/.pioenvs/dbk/firmware.ota.bin release/dbk.ota.bin
-      - name: Create GitHub release
+      - name: Create or update GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" release/*.bin --generate-notes --verify-tag
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" release/*.bin --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" release/*.bin --generate-notes --verify-tag
+          fi
