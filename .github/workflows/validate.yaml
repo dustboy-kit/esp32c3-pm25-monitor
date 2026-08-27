@@ -25,9 +25,16 @@ jobs:
       - run: esphome config dbk.yaml
       - run: esphome config factory.yaml
       - run: esphome compile factory.yaml
+      - run: esphome compile sim/pomodoro.yaml
       - uses: actions/upload-artifact@v5
         with:
           name: dbk-firmware
           path: |
             .esphome/build/dbk/.pioenvs/dbk/firmware.factory.bin
             .esphome/build/dbk/.pioenvs/dbk/firmware.ota.bin
+      - uses: actions/upload-artifact@v5
+        with:
+          name: dbk-pomodoro-firmware
+          path: |
+            sim/.esphome/build/dbk-pomodoro/.pioenvs/dbk-pomodoro/firmware.factory.bin
+            sim/.esphome/build/dbk-pomodoro/.pioenvs/dbk-pomodoro/firmware.ota.bin
