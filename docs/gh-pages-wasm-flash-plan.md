@@ -45,7 +45,7 @@ Working copy: `/opt/Code/github.com/dustboy-kit/esp32c3-pm25-monitor`
 
 ### A. Data and source alignment
 - [x] Import/adapt the simulator YAML set (`sim/gallery.yaml`, `sim/dbk-sim.yaml`, `sim/sim_shim.h`, `sim/README.md`).
-- [ ] Import `tools/lab-sim.py` and add a repo-local `just lab-sim` target.
+- [x] Import `tools/lab-sim.py` and add repo-local `just lab-sim` / `just lab-sim-build` targets; `python3 tools/lab-sim.py gallery --build-only` passes.
 - [ ] Compare every imported lambda with the real `packages/oled.yaml`; document intentional differences.
 - [ ] Add a `docs/evidence/` record containing commit SHA, binary checksums, and hardware test notes.
 
