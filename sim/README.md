@@ -237,3 +237,11 @@ reason: `it.print` cannot knock text out of a filled block.
 The public GitHub Pages copy is a static archive. Its native ESPHome build controls are intentionally disabled because Pages cannot run the localhost build server. Use the release flasher from the main site for USB flashing, or run `tools/esphome-web-server.py` locally when you need compile/flash controls.
 
 ![Static archive build panel](assets/static-archive-build-panel.png)
+
+## Captured 30-screen gallery
+
+This is the archived simulator view showing all thirty original DBK OLED designs, the editable ESPHome `display:` lambda panel, and the live 128×32 preview. The same gallery is available at the deployed Pages archive:
+
+https://dustboy-kit.github.io/esp32c3-pm25-monitor/tools/esphome-canvas-simulator.html
+
+![Captured 30-screen OLED Canvas Simulator gallery](assets/oled-canvas-gallery.png)
