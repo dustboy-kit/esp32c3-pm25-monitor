@@ -65,6 +65,14 @@ ota:
 # persisted by ESPHome and used again after reboot.
 wifi:
   id: wifi_component
+  # Proven on the target ESP32-C3: the default 20 dBm repeatedly timed out
+  # during WPA authentication, while 8.5 dBm associated immediately.
+  output_power: 8.5dBm
+  power_save_mode: none
+  passive_scan: false
+  fast_connect: true
+  # Accept WPA/WPA2/WPA3 so field devices can join older 2.4 GHz routers.
+  min_auth_mode: WPA
   ap:
     ssid: DBK-Canvas Setup
   on_connect:
@@ -92,7 +100,8 @@ wifi:
 # error and had the unplanned benefit that Improv reaches AUTHORIZED with no
 # physical button press — which matters on a board whose only button is the
 # strapping pin.
-improv_serial: {}
+improv_serial:
+  next_url: "https://dustboy-kit.github.io/esp32c3-pm25-monitor/dashboard/?host={{device_name}}.local"
 esp32_improv:
   authorizer: none
   identify_duration: 10s

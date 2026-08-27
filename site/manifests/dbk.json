@@ -1,12 +1,16 @@
 {
   "name": "DustBoy PM2.5 Monitor",
-  "version": "2026.6.5-local-telemetry",
+  "version": "2026.6.5-c3-wifi-compat",
   "new_install_prompt_erase": false,
-  "builds": [{
-    "chipFamily": "ESP32-C3",
-    "parts": [{
-      "path": "../firmware/dbk.factory.bin",
-      "offset": 0
-    }]
-  }]
+  "builds": [
+    {
+      "chipFamily": "ESP32-C3",
+      "parts": [
+        {
+          "path": "../firmware/dbk.factory.bin",
+          "offset": 0
+        }
+      ]
+    }
+  ]
 }

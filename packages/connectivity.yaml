@@ -8,7 +8,13 @@ ota:
 
 wifi:
   id: wifi_component
+  # Proven on the target ESP32-C3: the default 20 dBm repeatedly timed out
+  # during WPA authentication, while 8.5 dBm associated immediately.
   output_power: 8.5dBm
+  power_save_mode: none
+  passive_scan: false
+  fast_connect: true
+  min_auth_mode: WPA
   reboot_timeout: ${wifi_reboot_timeout}
   ap:
     ssid: ${friendly_name}
@@ -32,6 +38,7 @@ time:
     timezone: ${timezone}
 
 improv_serial:
+  next_url: "https://dustboy-kit.github.io/esp32c3-pm25-monitor/dashboard/?host={{device_name}}.local"
 
 esp32_improv:
   authorizer: none

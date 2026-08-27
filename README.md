@@ -101,6 +101,13 @@ For a factory image that has no credentials, use the Thai/English
 [USB Wi‑Fi setup page](https://dustboy-kit.github.io/esp32c3-pm25-monitor/wifi/).
 It follows the KRU32 flow: choose the settled Serial port first, then launch
 Improv Serial and send the SSID/password without editing YAML.
+If provisioning times out, open the bilingual
+[Wi‑Fi recovery guide](https://dustboy-kit.github.io/esp32c3-pm25-monitor/wifi/recovery/).
+The published ESP32-C3 images use the hardware-tested compatibility settings
+`output_power: 8.5dBm`, `power_save_mode: none`, and `fast_connect: true`.
+On the target SuperMini board, the ESPHome default 20 dBm repeatedly returned
+`Auth Expired`; the same board, router, and credentials connected immediately
+at 8.5 dBm.
 
 ### Force the setup AP
 

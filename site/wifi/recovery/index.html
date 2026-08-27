@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#040818">
+  <title>DustBoy Wi-Fi Recovery</title>
+  <link rel="stylesheet" href="../../styles.css">
+  <style>
+    .recovery-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.route{padding:18px;border:1px solid rgba(88,137,226,.55);border-radius:14px;background:#071126}.route h3{margin:0 0 8px;color:#fff0a6}.route p,.route li{color:var(--muted)}.route ol{padding-left:20px}.route code{white-space:nowrap}.button-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.diagnosis{margin:16px 0;padding:14px;border-left:3px solid var(--gold);background:#071126;color:#c2d2ef}@media(max-width:720px){.recovery-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<main class="app">
+  <header class="hero">
+    <div><p class="eyebrow" data-i18n="eyebrow">วงจรแห่งดวงดาว · กู้คืนการเชื่อมต่อ</p><h1>DustBoy <em>Wi‑Fi Recovery</em></h1><p class="lede" data-i18n="lede">ถ้า Improv มองเห็นบอร์ดและรายชื่อเครือข่าย แต่ขึ้น Unable to connect แปลว่า USB ใช้งานได้แล้ว ปัญหาอยู่ในช่วงเชื่อมต่อเราเตอร์</p></div>
+    <div class="hero-tools"><div class="lang-switch" aria-label="Language"><button type="button" data-lang="th">ไทย</button><button type="button" data-lang="en">EN</button></div><span class="badge">ESP32‑C3 · 2.4 GHz</span></div>
+  </header>
+
+  <section class="feature">
+    <div class="section-head"><div><span class="kicker" data-i18n="statusKicker">วินิจฉัยจากอาการ</span><h2 data-i18n="statusTitle">Serial สำเร็จ แต่ Wi‑Fi ยังไม่สำเร็จ</h2></div></div>
+    <div class="diagnosis" data-i18n="diagnosis">หากหน้าต่างแสดงชื่อ dbk-canvas-xxxxxx และสแกน SSID ได้ แสดงว่า Improv Serial, สาย USB และเฟิร์มแวร์ทำงานแล้ว ไม่ต้องเปลี่ยนเบราว์เซอร์</div>
+    <div class="recovery-grid">
+      <article class="route">
+        <h3 data-i18n="retryTitle">1 · ลองใหม่ด้วยเงื่อนไขที่ถูกต้อง</h3>
+        <ol><li data-i18n="band">เลือก SSID 2.4 GHz เท่านั้น</li><li data-i18n="password">พิมพ์รหัสผ่านใหม่ ระวัง O/0, I/l และตัวพิมพ์ใหญ่</li><li data-i18n="distance">วางบอร์ดใกล้เราเตอร์ แล้วปิด VPN/Private Relay ชั่วคราว</li><li data-i18n="security">ใช้ WPA/WPA2 Personal; หลีกเลี่ยง captive-login หรือ enterprise Wi‑Fi</li></ol>
+        <div class="button-row"><a class="action secondary" href="../" data-i18n="retry">↻ เปิด Improv อีกครั้ง</a></div>
+      </article>
+      <article class="route">
+        <h3 data-i18n="portalTitle">2 · ใช้ Captive Portal โดยไม่ผ่าน USB</h3>
+        <ol><li data-i18n="wait">ถอด/เสียบบอร์ด แล้วรอประมาณ 90 วินาที</li><li data-i18n="join">เชื่อม Wi‑Fi ชื่อ DBK‑Canvas Setup หรือ DBK</li><li data-i18n="portal">เปิด 192.168.4.1 แล้วเลือก SSID/ใส่รหัสผ่าน</li><li data-i18n="return">กลับมาเปิด Dashboard เมื่อบอร์ดออนไลน์</li></ol>
+        <div class="button-row"><a class="action gold" href="http://192.168.4.1/" data-i18n="openPortal">เปิด 192.168.4.1 ↗</a><a class="action secondary" href="../../dashboard/" data-i18n="dashboard">Dashboard</a></div>
+      </article>
+    </div>
+  </section>
+  <footer><span data-i18n="footer">DustBoy Kit · รหัส Wi‑Fi ส่งตรงไปยังบอร์ด</span><nav><a href="../../" data-i18n="home">หน้าติดตั้ง</a><a href="../" data-i18n="wifi">ตั้งค่า Wi‑Fi</a></nav></footer>
+</main>
+<script>
+const copy={
+th:{eyebrow:'วงจรแห่งดวงดาว · กู้คืนการเชื่อมต่อ',lede:'ถ้า Improv มองเห็นบอร์ดและรายชื่อเครือข่าย แต่ขึ้น Unable to connect แปลว่า USB ใช้งานได้แล้ว ปัญหาอยู่ในช่วงเชื่อมต่อเราเตอร์',statusKicker:'วินิจฉัยจากอาการ',statusTitle:'Serial สำเร็จ แต่ Wi‑Fi ยังไม่สำเร็จ',diagnosis:'หากหน้าต่างแสดงชื่อ dbk-canvas-xxxxxx และสแกน SSID ได้ แสดงว่า Improv Serial, สาย USB และเฟิร์มแวร์ทำงานแล้ว ไม่ต้องเปลี่ยนเบราว์เซอร์',retryTitle:'1 · ลองใหม่ด้วยเงื่อนไขที่ถูกต้อง',band:'เลือก SSID 2.4 GHz เท่านั้น',password:'พิมพ์รหัสผ่านใหม่ ระวัง O/0, I/l และตัวพิมพ์ใหญ่',distance:'วางบอร์ดใกล้เราเตอร์ แล้วปิด VPN/Private Relay ชั่วคราว',security:'ใช้ WPA/WPA2 Personal; หลีกเลี่ยง captive-login หรือ enterprise Wi‑Fi',retry:'↻ เปิด Improv อีกครั้ง',portalTitle:'2 · ใช้ Captive Portal โดยไม่ผ่าน USB',wait:'ถอด/เสียบบอร์ด แล้วรอประมาณ 90 วินาที',join:'เชื่อม Wi‑Fi ชื่อ DBK‑Canvas Setup หรือ DBK',portal:'เปิด 192.168.4.1 แล้วเลือก SSID/ใส่รหัสผ่าน',return:'กลับมาเปิด Dashboard เมื่อบอร์ดออนไลน์',openPortal:'เปิด 192.168.4.1 ↗',dashboard:'Dashboard',footer:'DustBoy Kit · รหัส Wi‑Fi ส่งตรงไปยังบอร์ด',home:'หน้าติดตั้ง',wifi:'ตั้งค่า Wi‑Fi'},
+en:{eyebrow:'THE STARRY CIRCUIT · CONNECTION RECOVERY',lede:'If Improv identifies the board and lists networks but reports Unable to connect, USB already works; the failure is during router association.',statusKicker:'Symptom diagnosis',statusTitle:'Serial succeeded; Wi-Fi did not',diagnosis:'If the dialog shows dbk-canvas-xxxxxx and scans SSIDs, Improv Serial, the USB cable, and firmware are working. Changing browsers will not fix the router connection.',retryTitle:'1 · Retry with compatible settings',band:'Choose a 2.4 GHz SSID only.',password:'Retype the password; check O/0, I/l, and letter case.',distance:'Move the board near the router and temporarily disable VPN/Private Relay.',security:'Use WPA/WPA2 Personal; avoid captive-login or enterprise Wi-Fi.',retry:'↻ Open Improv again',portalTitle:'2 · Use Captive Portal without USB',wait:'Reconnect power and wait about 90 seconds.',join:'Join DBK-Canvas Setup or DBK Wi-Fi.',portal:'Open 192.168.4.1, choose the SSID, and enter its password.',return:'Return to Dashboard after the board comes online.',openPortal:'Open 192.168.4.1 ↗',dashboard:'Dashboard',footer:'DustBoy Kit · Wi-Fi credentials go directly to the board',home:'Installer',wifi:'Wi-Fi setup'}};
+let lang='th';function setLang(next){lang=next==='en'?'en':'th';document.documentElement.lang=lang;localStorage.setItem('dbk-lang',lang);document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=copy[lang][el.dataset.i18n]||el.dataset.i18n);document.querySelectorAll('[data-lang]').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang))}setLang(new URLSearchParams(location.search).get('lang')||localStorage.getItem('dbk-lang')||'th');document.querySelectorAll('[data-lang]').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
+</script>
+</body>
+</html>
