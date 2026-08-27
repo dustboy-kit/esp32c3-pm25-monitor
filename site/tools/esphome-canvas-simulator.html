@@ -519,7 +519,7 @@
 
   <section class="card firmware-card" aria-labelledby="firmwareTitle">
     <div class="card-head">
-      <strong id="firmwareTitle">Real ESPHome build &amp; flash</strong>
+      <strong id="firmwareTitle">Real ESPHome build &amp; flash (local lab)</strong>
       <span class="badge" id="firmwareBadge">backend checking…</span>
     </div>
     <div class="firmware-body">
@@ -1186,7 +1186,30 @@
       return actual.every(function (pixel, index) { return pixel === expectedBuffer.px[index]; });
     }
   };
-  refreshFirmware();
+  // GitHub Pages is a static archive: there is no local ESPHome HTTP backend.
+  // Keep the full controls available when this file is served by
+  // tools/esphome-web-server.py, but replace them with an actionable link on
+  // the public archive instead of showing a misleading JSON/backend error.
+  var isStaticArchive = window.location.protocol === "https:" &&
+    /(^|\.)github\.io$/.test(window.location.hostname);
+  if (isStaticArchive) {
+    document.getElementById("firmwareBadge").textContent = "static archive";
+    document.getElementById("firmwareVersion").textContent = "ESPHome: validated in CI";
+    document.getElementById("firmwarePath").textContent = "Build backend: not hosted on Pages";
+    document.getElementById("firmwarePortState").textContent = "Flash: use the release flasher";
+    document.getElementById("firmwareNotice").innerHTML =
+      "<strong>Public archive:</strong> edit and preview lambdas here. " +
+      "For USB flashing, use <a href=\"../\">the release flasher</a> " +
+      "or run <code>python3 tools/esphome-web-server.py</code> locally.";
+    document.getElementById("firmwareLog").textContent =
+      "This GitHub Pages copy has no build server by design.\n\n" +
+      "Native validation: just lab-sim-build gallery\n" +
+      "Release flashing: open the release flasher from the link above.";
+    document.querySelector(".firmware-controls").style.display = "none";
+    document.querySelector("#firmwareCancel").style.display = "none";
+  } else {
+    refreshFirmware();
+  }
   requestAnimationFrame(frame);
 })();
 </script>
