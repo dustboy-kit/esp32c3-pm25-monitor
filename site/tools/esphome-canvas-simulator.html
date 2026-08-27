@@ -437,6 +437,7 @@
     .gallery-grid { grid-template-columns: repeat(2, minmax(120px, 1fr)); }
   }
 </style>
+  <script type="module" src="https://unpkg.com/esp-web-tools@10.2.1/dist/web/install-button.js?module"></script>
 </head>
 <body>
 <main class="app">
@@ -1194,17 +1195,20 @@
     /(^|\.)github\.io$/.test(window.location.hostname);
   if (isStaticArchive) {
     document.getElementById("firmwareBadge").textContent = "static archive";
-    document.getElementById("firmwareVersion").textContent = "ESPHome: validated in CI";
+    document.getElementById("firmwareVersion").textContent = "ESPHome: locally compiled 2026.6.5";
     document.getElementById("firmwarePath").textContent = "Build backend: not hosted on Pages";
     document.getElementById("firmwarePortState").textContent = "Flash: use the release flasher";
     document.getElementById("firmwareNotice").innerHTML =
-      "<strong>Public archive:</strong> edit and preview lambdas here. " +
-      "For USB flashing, use <a href=\"../\">the release flasher</a> " +
-      "or run <code>python3 tools/esphome-web-server.py</code> locally.";
+      "<strong>Pomodoro Dial is ready:</strong> the ESP32-C3 factory image was compiled locally with ESPHome 2026.6.5. " +
+      "<esp-web-install-button manifest=\"../manifests/pomodoro.json\">" +
+      "<button slot=\"activate\" type=\"button\">Flash Pomodoro Dial</button>" +
+      "</esp-web-install-button> " +
+      "Use Chrome or Edge on a computer with a data-capable USB cable.";
     document.getElementById("firmwareLog").textContent =
       "This GitHub Pages copy has no build server by design.\n\n" +
-      "Native validation: just lab-sim-build gallery\n" +
-      "Release flashing: open the release flasher from the link above.";
+      "Local build: ESPHome 2026.6.5 — success\n" +
+      "Factory image: firmware/pomodoro.factory.bin\n" +
+      "Click Flash Pomodoro Dial above to install over Web Serial.";
     document.querySelector(".firmware-controls").style.display = "none";
     document.querySelector("#firmwareCancel").style.display = "none";
   } else {
