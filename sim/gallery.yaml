@@ -1,0 +1,1363 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# DBK SCREEN GALLERY — one firmware, all 30 designs, cycling every 5 seconds.
+#
+# The point of this file is that a SINGLE compile proves every lambda and a
+# SINGLE flash puts the whole gallery on real glass. A design that only ever
+# ran in the simulator has not been proven: the failure this gallery exists to
+# catch — a character outside a font's glyph set — renders as a hollow box on
+# hardware, silently, with no error and no log.
+#
+# Hardware: ESP32-C3 + SSD1306 128x32 mono OLED (i2c sda 9 / scl 10, addr 0x3C)
+#           + optional PMS7003 on uart rx 6 / tx 7. Same pinout as `dbk`.
+#
+# ⚠ NO CREDENTIALS LIVE HERE, BY DESIGN.
+#   ~/.haos-oracle/lab/dbk.yaml is a RESOLVED config with real WiFi/API/OTA
+#   secrets inlined. Nothing was copied from it except hardware blocks. There is
+#   no wifi network, no api and no ota in this file, so it is safe to commit and
+#   safe to share. See sim/README.md for how to add credentials locally if you
+#   want the gallery on the network.
+#
+# ⚠ NO SENSOR REQUIRED. Every lambda was audited for the NaN case, so a bare
+#   ESP32-C3 + OLED with no PMS7003 attached renders all 30 screens with zeros
+#   rather than the hollow boxes "nan" would produce in font_value.
+# ─────────────────────────────────────────────────────────────────────────────
+
+esphome:
+  name: dbk-gallery
+  friendly_name: DBK Gallery
+  min_version: 2026.6.5
+  project:
+    name: dustboy-kit.dbk-gallery
+    version: 0.1.0
+
+esp32:
+  board: esp32-c3-devkitm-1
+  variant: ESP32C3
+  flash_size: 4MB
+  framework:
+    type: arduino
+
+# USB_SERIAL_JTAG keeps the hardware UART free for the PMS7003 on GPIO6/7.
+logger:
+  hardware_uart: USB_SERIAL_JTAG
+  # DEBUG, not INFO: the serial->MQTT bridge on the host greps
+  # 'PM2.5 Concentration: N', which pmsx003 only emits at DEBUG. At INFO a
+  # board running the gallery goes quietly stale in Home Assistant while the
+  # bridge sits there looking perfectly healthy. ESPHome also refuses a
+  # per-component level more verbose than the global one, so it has to be here.
+  level: DEBUG
+  baud_rate: 115200
+
+# Declared, but never switched on. Four screens call
+# id(wifi_component).is_connected(), so the component has to EXIST — and a
+# `wifi:` block will not validate without either a network or an AP, while a
+# network would mean credentials in a committed file. So: an AP to satisfy the
+# schema, plus enable_on_boot:false so no radio ever comes up and no open access
+# point is broadcast from a device that sits in a classroom. is_connected() is
+# therefore always false, which is honest — this board has no uplink.
+# ESPHome will warn that the AP is unusable without captive_portal. Expected:
+# it is not meant to be used.
+wifi:
+  id: wifi_component
+  enable_on_boot: false
+  ap:
+    ssid: DBK-GALLERY
+  on_connect:
+    then:
+    - globals.set:
+        id: wifi_disconnected_since_ms
+        value: '0'
+  on_disconnect:
+    then:
+    - lambda: |-
+        if (id(wifi_disconnected_since_ms) == 0) {
+          id(wifi_disconnected_since_ms) = millis();
+        }
+
+# Wi-Fi provisioning from a browser, over the same USB cable used to flash.
+#
+# This was in dbk.yaml all along and got dropped when the gallery was assembled
+# from its hardware blocks — silently, because nothing fails and the screen
+# still draws. Flashing a gallery build without this REMOVES the ability to set
+# the board's Wi-Fi without already knowing the password, which is exactly the
+# situation DBK-002 has been stuck in: its stored credential is stale, the radio
+# is fine, and only authentication fails.
+#
+# authorizer: none is deliberate. It was originally set to clear a validation
+# error and had the unplanned benefit that Improv reaches AUTHORIZED with no
+# physical button press — which matters on a board whose only button is the
+# strapping pin.
+improv_serial: {}
+esp32_improv:
+  authorizer: none
+  identify_duration: 10s
+  authorized_duration: 1min
+  wifi_timeout: 90s
+
+# Screens 0 and 4 read the clock. With no uplink it never syncs, and both fall
+# back to their designed constants (09:41 and WED 26 AUG 2026) rather than
+# blanking — that fallback path is exactly what this gallery should show.
+time:
+- platform: sntp
+  id: network_time
+  timezone: Asia/Bangkok
+  update_interval: 15min
+
+i2c:
+  id: oled_bus
+  sda: 9
+  scl: 10
+  frequency: 400kHz
+  scan: true
+
+uart:
+- id: pms_uart
+  rx_pin: 6
+  tx_pin: 7
+  baud_rate: 9600
+  data_bits: 8
+  parity: NONE
+  stop_bits: 1
+  rx_buffer_size: 256
+
+# The PMS7003 sleeps unless SET is held high; RESET high keeps it out of reset.
+switch:
+- platform: gpio
+  id: pms_set
+  name: PMS7003 Set
+  internal: true
+  restore_mode: ALWAYS_ON
+  pin: 5
+- platform: gpio
+  id: pms_reset
+  name: PMS7003 Reset
+  internal: true
+  restore_mode: ALWAYS_ON
+  pin:
+    number: 8
+    ignore_strapping_warning: true
+
+globals:
+# Which of the 30 designs is on the panel. Not restored: a gallery should always
+# open on screen 0 so a demo is reproducible.
+- id: screen_idx
+  type: int
+  restore_value: false
+  initial_value: '0'
+# Screens 12 and 19 read this one.
+- id: mqtt_connected
+  type: bool
+  restore_value: false
+  initial_value: 'false'
+# Carried at parity with dbk.yaml so a lambda can move between the two configs
+# without edits. No screen in this gallery reads them today.
+- id: last_pms_update_ms
+  type: uint32_t
+  restore_value: false
+  initial_value: '0'
+- id: wifi_disconnected_since_ms
+  type: uint32_t
+  restore_value: false
+  initial_value: '0'
+
+sensor:
+- platform: pmsx003
+  type: PMSX003
+  uart_id: pms_uart
+  update_interval: 0s
+  pm_1_0:
+    id: pms_pm1
+    name: PM1.0
+    accuracy_decimals: 0
+    unit_of_measurement: "µg/m³"
+    device_class: pm1
+    state_class: measurement
+  pm_2_5:
+    id: pms_pm25
+    name: PM2.5
+    accuracy_decimals: 0
+    unit_of_measurement: "µg/m³"
+    device_class: pm25
+    state_class: measurement
+    on_value:
+    - then:
+      - lambda: 'id(last_pms_update_ms) = millis();'
+  pm_10_0:
+    id: pms_pm10
+    name: PM10
+    accuracy_decimals: 0
+    unit_of_measurement: "µg/m³"
+    device_class: pm10
+    state_class: measurement
+
+interval:
+# The gallery itself: advance one design every 5 seconds, wrap at 30.
+- interval: 5s
+  then:
+  - lambda: 'id(screen_idx) = (id(screen_idx) + 1) % 30;'
+
+# GALLERY ONLY — delete this block to make the gallery purely passive.
+# There is no mqtt: client in this firmware, so mqtt_connected would sit false
+# forever and the connected branches of screens 12 (Three Columns) and 19 (Eight
+# Up Board) would never appear on real glass. Toggling it every ~17s makes both
+# branches observable. The shipped DBK firmware does nothing like this.
+- interval: 1s
+  then:
+  - lambda: 'id(mqtt_connected) = ((millis() / 17000UL) % 2) == 0;'
+
+# ─────────────────────────────────────────────────────────────────────────────
+# THE FOUR FONTS — glyph coverage is a hard limit, not a suggestion.
+# A character outside these sets renders as a hollow missing-glyph box, with no
+# error and no log. ignore_missing_glyphs stays false everywhere so a bad glyph
+# is caught at COMPILE time instead of on a child's desk.
+#
+#   font_header  Roboto Mono 10px  116 glyphs, full ASCII + typographic extras
+#   font_label   Roboto Mono  7px  116 glyphs, full ASCII + typographic extras
+#   font_icons   Material Design Icons 10px  ONLY U+F05A9 / U+F05AA (wifi)
+#   font_value   Open Sans   10px  ONLY " 0123456789" — no '.', '-', ':', '%',
+#                                  no letters. Everything else is a primitive.
+#
+# Reproduced from the resolved dbk.yaml so the gallery's pixels are the shipped
+# device's pixels.
+# ─────────────────────────────────────────────────────────────────────────────
+font:
+- file:
+    url: https://raw.githubusercontent.com/Templarian/MaterialDesign-Webfont/v7.4.47/fonts/materialdesignicons-webfont.ttf
+    type: web
+    refresh: 1d
+  id: font_icons
+  size: 10
+  bpp: 1
+  ignore_missing_glyphs: false
+  glyphs:
+  - "󰖩"
+  - "󰖪"
+- file:
+    family: Roboto Mono
+    weight: 400
+    type: gfonts
+    refresh: 1d
+  id: font_header
+  size: 10
+  bpp: 1
+  ignore_missing_glyphs: false
+  glyphs:
+  - " "
+  - "!"
+  - "\""
+  - "#"
+  - "$"
+  - "%"
+  - "&"
+  - "'"
+  - "("
+  - ")"
+  - "*"
+  - "+"
+  - ","
+  - "-"
+  - "."
+  - "/"
+  - "0"
+  - "1"
+  - "2"
+  - "3"
+  - "4"
+  - "5"
+  - "6"
+  - "7"
+  - "8"
+  - "9"
+  - ":"
+  - ";"
+  - "<"
+  - "="
+  - ">"
+  - "?"
+  - "@"
+  - "A"
+  - "B"
+  - "C"
+  - "D"
+  - "E"
+  - "F"
+  - "G"
+  - "H"
+  - "I"
+  - "J"
+  - "K"
+  - "L"
+  - "M"
+  - "N"
+  - "O"
+  - "P"
+  - "Q"
+  - "R"
+  - "S"
+  - "T"
+  - "U"
+  - "V"
+  - "W"
+  - "X"
+  - "Y"
+  - "Z"
+  - "["
+  - "\\"
+  - "]"
+  - "^"
+  - "_"
+  - "`"
+  - "a"
+  - "b"
+  - "c"
+  - "d"
+  - "e"
+  - "f"
+  - "g"
+  - "h"
+  - "i"
+  - "j"
+  - "k"
+  - "l"
+  - "m"
+  - "n"
+  - "o"
+  - "p"
+  - "q"
+  - "r"
+  - "s"
+  - "t"
+  - "u"
+  - "v"
+  - "w"
+  - "x"
+  - "y"
+  - "z"
+  - "{"
+  - "|"
+  - "}"
+  - "~"
+  - " "
+  - "¢"
+  - "£"
+  - "¥"
+  - "©"
+  - "®"
+  - "°"
+  - "·"
+  - "×"
+  - "÷"
+  - "–"
+  - "—"
+  - "‘"
+  - "’"
+  - "“"
+  - "”"
+  - "•"
+  - "…"
+  - "€"
+  - "™"
+  - "−"
+- file:
+    family: Roboto Mono
+    weight: 400
+    type: gfonts
+    refresh: 1d
+  id: font_label
+  size: 7
+  bpp: 1
+  ignore_missing_glyphs: false
+  glyphs:
+  - " "
+  - "!"
+  - "\""
+  - "#"
+  - "$"
+  - "%"
+  - "&"
+  - "'"
+  - "("
+  - ")"
+  - "*"
+  - "+"
+  - ","
+  - "-"
+  - "."
+  - "/"
+  - "0"
+  - "1"
+  - "2"
+  - "3"
+  - "4"
+  - "5"
+  - "6"
+  - "7"
+  - "8"
+  - "9"
+  - ":"
+  - ";"
+  - "<"
+  - "="
+  - ">"
+  - "?"
+  - "@"
+  - "A"
+  - "B"
+  - "C"
+  - "D"
+  - "E"
+  - "F"
+  - "G"
+  - "H"
+  - "I"
+  - "J"
+  - "K"
+  - "L"
+  - "M"
+  - "N"
+  - "O"
+  - "P"
+  - "Q"
+  - "R"
+  - "S"
+  - "T"
+  - "U"
+  - "V"
+  - "W"
+  - "X"
+  - "Y"
+  - "Z"
+  - "["
+  - "\\"
+  - "]"
+  - "^"
+  - "_"
+  - "`"
+  - "a"
+  - "b"
+  - "c"
+  - "d"
+  - "e"
+  - "f"
+  - "g"
+  - "h"
+  - "i"
+  - "j"
+  - "k"
+  - "l"
+  - "m"
+  - "n"
+  - "o"
+  - "p"
+  - "q"
+  - "r"
+  - "s"
+  - "t"
+  - "u"
+  - "v"
+  - "w"
+  - "x"
+  - "y"
+  - "z"
+  - "{"
+  - "|"
+  - "}"
+  - "~"
+  - " "
+  - "¢"
+  - "£"
+  - "¥"
+  - "©"
+  - "®"
+  - "°"
+  - "·"
+  - "×"
+  - "÷"
+  - "–"
+  - "—"
+  - "‘"
+  - "’"
+  - "“"
+  - "”"
+  - "•"
+  - "…"
+  - "€"
+  - "™"
+  - "−"
+- file:
+    family: Open Sans
+    weight: 400
+    type: gfonts
+    refresh: 1d
+  id: font_value
+  size: 10
+  bpp: 1
+  ignore_missing_glyphs: false
+  glyphs:
+  - " 0123456789"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# THE PANEL.
+#
+# flip_x / flip_y match dbk.yaml — the DBK enclosure mounts the SSD1306 upside
+# down. On a bare breadboard board the gallery will read upside down; drop both
+# lines in that case. They are a hardware remap, so no lambda coordinate moves.
+#
+# The real panel refreshes at 20 FPS so millis()-driven motion matches the HTML
+# gallery instead of stepping once per second. The logical surface remains the
+# native 128x32 buffer: no scaling, offset, or hidden software margin.
+# ─────────────────────────────────────────────────────────────────────────────
+display:
+- platform: ssd1306_i2c
+  id: oled
+  i2c_id: oled_bus
+  model: SSD1306_128X32
+  address: 0x3C
+  update_interval: 50ms
+  flip_x: true
+  flip_y: true
+  lambda: |-
+    switch (id(screen_idx)) {
+
+    // -- 0 - seg-clock - Segment Clock ----------------------------------------
+    case 0: {
+      const char *SEG[10] = {"1111110","0110000","1101101","1111001","0110011","1011011","1011111","1110000","1111111","1111011"};
+      const int xs[4] = {2, 28, 62, 88};
+      const int th = 4, w = 24, h = 28, vh = (28 - 3 * 4) / 2;
+      int hh = 9, mi = 41;
+      const auto tn = id(network_time).now();
+      if (tn.is_valid()) { hh = tn.hour; mi = tn.minute; }
+      const int dg[4] = {hh / 10, hh % 10, mi / 10, mi % 10};
+      for (int i = 0; i < 4; i++) {
+        const char *s = SEG[dg[i] % 10];
+        const int x = xs[i], y = 2;
+        if (s[0] == '1') it.filled_rectangle(x + th, y, w - 2 * th, th);
+        if (s[1] == '1') it.filled_rectangle(x + w - th, y + th, th, vh);
+        if (s[2] == '1') it.filled_rectangle(x + w - th, y + 2 * th + vh, th, vh);
+        if (s[3] == '1') it.filled_rectangle(x + th, y + h - th, w - 2 * th, th);
+        if (s[4] == '1') it.filled_rectangle(x, y + 2 * th + vh, th, vh);
+        if (s[5] == '1') it.filled_rectangle(x, y + th, th, vh);
+        if (s[6] == '1') it.filled_rectangle(x + th, y + th + vh, w - 2 * th, th);
+      }
+      const uint32_t t = millis();
+      if (t % 1000 < 700) { it.filled_rectangle(53, 8, 4, 4); it.filled_rectangle(53, 20, 4, 4); }
+      it.rectangle(116, 2, 10, 28);
+      const int fh = (int) floorf(24.0f * fmodf(t / 1000.0f, 60.0f) / 60.0f + 0.5f);
+      if (fh > 0) it.filled_rectangle(118, 28 - fh, 6, fh);
+    } break;
+
+    // -- 1 - outdoor-countdown - Outdoor Window -------------------------------
+    case 1: {
+      const uint32_t t = millis();
+      const int total = 1500;
+      const int left = total - (int) ((t / 100) % 1500);
+      const int mm = left / 60, ss = left % 60;
+      const float pm = id(pms_pm25).state;
+      it.print(0, 0, id(font_label), TextAlign::TOP_LEFT, "OUTDOOR OK");
+      it.printf(127, 0, id(font_label), TextAlign::TOP_RIGHT, "PM2.5 %.0f", std::isnan(pm) ? 12.0f : pm);
+      it.horizontal_line(0, 9, 128);
+      it.printf(61, 18, id(font_value), TextAlign::CENTER_RIGHT, "%02d", mm);
+      it.printf(68, 18, id(font_value), TextAlign::CENTER_LEFT, "%02d", ss);
+      it.filled_rectangle(63, 14, 3, 3);
+      it.filled_rectangle(63, 21, 3, 3);
+      const bool urgent = left <= 60;
+      if (urgent && (t % 600) < 300) {
+        it.filled_rectangle(0, 26, 128, 6);
+      } else {
+        it.rectangle(0, 26, 128, 6);
+        const int w = (int) floorf(126.0f * left / total + 0.5f);
+        if (w > 0) it.filled_rectangle(1, 27, w, 4);
+      }
+    } break;
+
+    // -- 2 - pomo-dial - Pomodoro Dial ----------------------------------------
+    case 2: {
+      const uint32_t t = millis();
+      const double p = (t % 30000) / 30000.0;
+      const bool focus = p < 0.8333;
+      const double phase = focus ? (p / 0.8333) : ((p - 0.8333) / 0.1667);
+      int secs = (int) ceil((focus ? 1500.0 : 300.0) * (1.0 - phase));
+      if (secs < 0) secs = 0;
+      const int mm = secs / 60, ss = secs % 60;
+      const int done = (int) ((t / 30000) % 4);
+      const int lit = (int) floor(24.0 * phase + 0.5);
+      const double PI_D = 3.141592653589793;
+      for (int i = 0; i < 24; i++) {
+        const double a = -PI_D / 2.0 + i * PI_D / 12.0;
+        const int cx = 16 + (int) floor(13.0 * cos(a) + 0.5);
+        const int cy = 16 + (int) floor(13.0 * sin(a) + 0.5);
+        if (i < lit) it.filled_circle(cx, cy, 1); else it.draw_pixel_at(cx, cy);
+      }
+      const double ha = -PI_D / 2.0 + 2.0 * PI_D * phase;
+      it.line(16, 16, 16 + (int) floor(9.0 * cos(ha) + 0.5), 16 + (int) floor(9.0 * sin(ha) + 0.5));
+      it.print(36, 0, id(font_header), TextAlign::TOP_LEFT, focus ? "FOCUS" : "BREAK");
+      it.printf(60, 21, id(font_value), TextAlign::CENTER_RIGHT, "%02d", mm);
+      it.printf(67, 21, id(font_value), TextAlign::CENTER_LEFT, "%02d", ss);
+      it.filled_rectangle(62, 17, 3, 3);
+      it.filled_rectangle(62, 24, 3, 3);
+      for (int k = 0; k < 4; k++) {
+        if (k < done) it.filled_rectangle(97 + k * 8, 2, 7, 7);
+        else it.rectangle(97 + k * 8, 2, 7, 7);
+      }
+    } break;
+
+    // -- 3 - ota-marching - Marching Progress ---------------------------------
+    case 3: {
+      const uint32_t t = millis();
+      const int pct = (int) ((t / 100) % 101);
+      it.print(0, 0, id(font_label), TextAlign::TOP_LEFT, "OTA  dbk-c3-01");
+      it.print(113, 1, id(font_label), TextAlign::TOP_RIGHT, pct < 100 ? "FLASHING" : "VERIFY");
+      it.print(127, 0, id(font_icons), TextAlign::TOP_RIGHT,
+               id(wifi_component).is_connected() ? "\U000F05A9" : "\U000F05AA");
+      it.rectangle(0, 12, 84, 18);
+      const int ix = 2, iy = 14, iw = 80, ih = 13;
+      const int fw = (int) floorf(iw * pct / 100.0f + 0.5f);
+      const int ph = (int) ((t / 60) % 6);
+      for (int k = -ih + ph; k < fw; k += 6) {
+        int ax = k, ay = 0, ex = k + ih, ey = ih;
+        if (ax < 0) { ay = -ax; ax = 0; }
+        if (ex > fw) { ey = fw - k; ex = fw; }
+        if (ey > ay) it.line(ix + ax, iy + ay, ix + ex, iy + ey);
+      }
+      it.printf(114, 20, id(font_value), TextAlign::CENTER_RIGHT, "%d", pct);
+      it.rectangle(117, 15, 3, 3);
+      it.line(117, 24, 123, 16);
+      it.rectangle(121, 22, 3, 3);
+    } break;
+
+    // -- 4 - week-and-day - Week and Day --------------------------------------
+    case 4: {
+      const char *DAYS[7] = {"SUN","MON","TUE","WED","THU","FRI","SAT"};
+      const char *INI[7] = {"S","M","T","W","T","F","S"};
+      const char *MON[12] = {"JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"};
+      const auto tn = id(network_time).now();
+      int today = 3, dom = 26, mon = 7, yr = 2026, base = 581;
+      if (tn.is_valid()) {
+        today = (tn.day_of_week >= 1 && tn.day_of_week <= 7) ? (tn.day_of_week - 1) : 3;
+        mon = (tn.month >= 1 && tn.month <= 12) ? (tn.month - 1) : 7;
+        dom = tn.day_of_month; yr = tn.year; base = tn.hour * 60 + tn.minute;
+      }
+      it.print(2, 0, id(font_header), TextAlign::TOP_LEFT, DAYS[today]);
+      it.printf(43, 1, id(font_label), TextAlign::TOP_RIGHT, "%d", yr);
+      it.printf(2, 12, id(font_value), TextAlign::TOP_LEFT, "%02d", dom);
+      it.print(22, 17, id(font_label), TextAlign::TOP_LEFT, MON[mon]);
+      it.vertical_line(45, 0, 26);
+      for (int i = 0; i < 7; i++) {
+        const int cx = 48 + i * 11;
+        it.print(cx + 5, 0, id(font_label), TextAlign::TOP_CENTER, INI[i]);
+        const int dn = dom - today + i;
+        if (dn >= 1 && dn <= 31) it.printf(cx + 5, 11, id(font_label), TextAlign::TOP_CENTER, "%d", dn);
+        if (i == today) it.rectangle(cx, 0, 11, 21);
+      }
+      const uint32_t t = millis();
+      const int mins = (base + (int) ((t / 100) % 1440)) % 1440;
+      it.horizontal_line(0, 29, 128);
+      for (int h = 0; h <= 24; h += 6) { const int vx = h * 127 / 24; it.vertical_line(vx > 126 ? 126 : vx, 27, 3); }
+      const int mx = (int) floorf(124.0f * mins / 1440.0f + 0.5f);
+      if (mx > 0) it.horizontal_line(0, 31, mx + 3);
+      it.filled_rectangle(mx, 26, 3, 6);
+    } break;
+
+    // -- 5 - mood-face - Air Face ---------------------------------------------
+    case 5: {
+      const uint32_t t = millis();
+      float pmf = id(pms_pm25).state;
+      if (std::isnan(pmf) || pmf < 0.0f) pmf = 0.0f;
+      float m = 1.0f - pmf / 35.0f;
+      if (m > 1.0f) m = 1.0f;
+      if (m < -1.0f) m = -1.0f;
+      it.circle(16, 16, 15);
+      const int gx = (int) roundf(1.4f * sinf(t / 900.0f));
+      const int gy = (int) roundf(1.2f * sinf(t / 1300.0f));
+      if ((t % 3400) < 150) {
+        it.horizontal_line(8, 12, 7); it.horizontal_line(18, 12, 7);
+      } else {
+        it.circle(11, 12, 3); it.circle(21, 12, 3);
+        it.filled_circle(11 + gx, 12 + gy, 1); it.filled_circle(21 + gx, 12 + gy, 1);
+      }
+      for (int x = 9; x <= 23; x++) {
+        const float dx = (x - 16) / 7.0f;
+        const int y = (int) roundf(21.0f + m * 3.0f * (1.0f - dx * dx));
+        it.draw_pixel_at(x, y); it.draw_pixel_at(x, y + 1);
+      }
+      it.vertical_line(34, 0, 32);
+      const char *verdict = "YUCK";
+      if (m > 0.55f) verdict = "YAY"; else if (m > 0.0f) verdict = "OK";
+      else if (m > -0.6f) verdict = "HMM";
+      it.print(38, 0, id(font_label), TextAlign::TOP_LEFT, "PM2.5");
+      it.printf(38, 8, id(font_value), TextAlign::TOP_LEFT, "%.0f", pmf);
+      it.print(38, 22, id(font_label), TextAlign::TOP_LEFT, "ug/m3");
+      it.print(126, 9, id(font_header), TextAlign::TOP_RIGHT, verdict);
+    } break;
+
+    // -- 6 - dust-bug - Dust Bug ----------------------------------------------
+    case 6: {
+      const uint32_t t = millis();
+      float pmf = id(pms_pm25).state;
+      if (std::isnan(pmf) || pmf < 0.0f) pmf = 0.0f;
+      it.horizontal_line(0, 31, 128);
+      for (int g = 2; g < 128; g += 12) {
+        it.vertical_line(g, 28, 3);
+        it.draw_pixel_at(g - 1, 29); it.draw_pixel_at(g + 1, 29);
+      }
+      const float head = (float) (t % 7920UL) / 45.0f - 24.0f;
+      for (int i = 0; i < 6; i++) {
+        const int cx = (int) roundf(head - i * 7.0f);
+        if (cx < 4 || cx > 123) continue;
+        const int cy = 24 + (int) roundf(2.0f * sinf(t / 130.0f - i * 0.9f));
+        if (i != 0) { it.filled_circle(cx, cy, 2); continue; }
+        it.circle(cx, cy, 3); it.draw_pixel_at(cx + 1, cy - 1);
+        it.line(cx + 2, cy - 4, cx + 3, cy - 6);
+        it.line(cx - 1, cy - 4, cx - 2, cy - 6);
+      }
+      int n = (int) roundf(pmf / 7.0f);
+      if (n > 7) n = 7;
+      for (int k = 0; k < n; k++) {
+        const int mx = 48 + ((int) ((k * 13 + (t + 14) / 28) % 56UL));
+        const int my = 2 + ((int) ((k * 5 + (t + 95) / 190) % 13UL));
+        it.draw_pixel_at(mx, my); if (k % 2) it.draw_pixel_at(mx + 1, my + 1);
+      }
+      it.printf(2, 1, id(font_value), TextAlign::TOP_LEFT, "%.0f", pmf);
+      it.print(24, 6, id(font_label), TextAlign::TOP_LEFT, "ug/m3");
+      it.print(126, 0, id(font_icons), TextAlign::TOP_RIGHT,
+               id(wifi_component).is_connected() ? "\U000F05A9" : "\U000F05AA");
+    } break;
+
+    // -- 7 - haze-pong - Haze Pong --------------------------------------------
+    case 7: {
+      const uint32_t t = millis();
+      auto tri = [](float p, float span) -> float {
+        float q = fmodf(p, 2.0f * span);
+        if (q < 0.0f) q += 2.0f * span;
+        return span - fabsf(q - span);
+      };
+      auto cl = [](int v) -> int { return v < 17 ? 17 : (v > 24 ? 24 : v); };
+      float pmf = id(pms_pm25).state;
+      if (std::isnan(pmf) || pmf < 0.0f) pmf = 0.0f;
+      const float speed = 1.0f + pmf / 60.0f;
+      const float ts = (float) t * speed;
+      it.rectangle(0, 0, 128, 32);
+      for (int y = 2; y < 30; y += 5) it.vertical_line(64, y, 2);
+      const int bx = 6 + (int) roundf(tri(ts / 9.0f, 113.0f));
+      const int by = 18 + (int) roundf(tri(ts / 13.0f, 10.0f));
+      const int lag = 18 + (int) roundf(tri(((float) t - 160.0f) * speed / 13.0f, 10.0f));
+      it.filled_rectangle(bx, by, 3, 3);
+      it.filled_rectangle(2, cl(by - 3), 3, 7);
+      it.filled_rectangle(123, cl(lag - 3), 3, 7);
+      const int a = ((int) (ts / 2034.0f)) % 10;
+      const int b = ((int) ((ts + 1017.0f) / 2034.0f)) % 10;
+      it.printf(58, 1, id(font_value), TextAlign::TOP_RIGHT, "%d", a);
+      it.printf(70, 1, id(font_value), TextAlign::TOP_LEFT, "%d", b);
+      it.print(2, 2, id(font_label), TextAlign::TOP_LEFT, "RALLY");
+      it.printf(126, 2, id(font_label), TextAlign::TOP_RIGHT, "PM%.0f", pmf);
+    } break;
+
+    // -- 8 - air-news-ticker - Air News ---------------------------------------
+    case 8: {
+      const uint32_t t = millis();
+      float pmf = id(pms_pm25).state;
+      if (std::isnan(pmf) || pmf < 0.0f) pmf = 0.0f;
+      char msg[80];
+      int len = snprintf(msg, sizeof(msg),
+                         "  CHIANG MAI AIR CLUB  <>  PM2.5 IS %.0f  <>  BREATHE EASY  ", pmf);
+      if (len < 1 || len > (int) sizeof(msg) - 1) len = (int) sizeof(msg) - 1;
+      const int W = 6;
+      const int span = len * W;
+      const int shift = (int) (((t + 15) / 30) % (uint32_t) span);
+      it.horizontal_line(4, 0, 120); it.horizontal_line(4, 31, 120);
+      it.vertical_line(2, 2, 28); it.vertical_line(125, 2, 28);
+      it.draw_pixel_at(3, 2); it.draw_pixel_at(3, 29);
+      it.draw_pixel_at(124, 2); it.draw_pixel_at(124, 29);
+      for (int k = 0; k < 14; k++) {
+        const int rx = 6 + ((((k * 8 - shift) % 112) + 112) % 112);
+        it.draw_pixel_at(rx, 2); it.draw_pixel_at(rx, 29);
+      }
+      char ch[2]; ch[1] = '\0';
+      for (int i = 0; i < len; i++) {
+        const int gx = (((i * W - shift) % span) + span) % span;
+        if (gx < 6 || gx > 114) continue;
+        ch[0] = msg[i];
+        it.print(gx, 9, id(font_header), TextAlign::TOP_LEFT, ch);
+      }
+    } break;
+
+    // -- 9 - dust-cube - Dust Cube --------------------------------------------
+    case 9: {
+      const uint32_t t = millis();
+      float pmf = id(pms_pm25).state;
+      if (std::isnan(pmf) || pmf < 0.0f) pmf = 0.0f;
+      const float sp = 0.0006f + pmf * 0.00004f;
+      const float a = (float) t * sp;
+      const float b = a * 0.62f;
+      const float ca = cosf(a), sa = sinf(a), cb = cosf(b), sb = sinf(b);
+      int vx[8], vy[8];
+      for (int i = 0; i < 8; i++) {
+        const float x = (i & 1) ? 1.0f : -1.0f;
+        const float y = (i & 2) ? 1.0f : -1.0f;
+        const float z = (i & 4) ? 1.0f : -1.0f;
+        const float x1 = x * ca + z * sa;
+        const float z1 = z * ca - x * sa;
+        const float y1 = y * cb - z1 * sb;
+        const float z2 = z1 * cb + y * sb;
+        const float s = 28.0f / (z2 + 5.0f);
+        int px = (int) roundf(28.0f + x1 * s);
+        int py = (int) roundf(16.0f + y1 * s);
+        vx[i] = px < 0 ? 0 : (px > 50 ? 50 : px);
+        vy[i] = py < 0 ? 0 : (py > 31 ? 31 : py);
+      }
+      const uint8_t E[24] = {0,1, 1,3, 3,2, 2,0, 4,5, 5,7, 7,6, 6,4, 0,4, 1,5, 2,6, 3,7};
+      for (int e = 0; e < 24; e += 2)
+        it.line(vx[E[e]], vy[E[e]], vx[E[e + 1]], vy[E[e + 1]]);
+      it.vertical_line(52, 0, 32);
+      it.print(58, 0, id(font_label), TextAlign::TOP_LEFT, "SPIN=DUST");
+      it.printf(58, 8, id(font_value), TextAlign::TOP_LEFT, "%.0f", pmf);
+      it.print(58, 22, id(font_label), TextAlign::TOP_LEFT, "ug/m3");
+    } break;
+
+    // -- 10 - hero-pm25 - Hero Number ------------------------------------------
+    case 10: {
+      static const char *const SEG[10] = {"1111110","0110000","1101101","1111001","0110011",
+                                          "1011011","1011111","1110000","1111111","1111011"};
+      char s[8];
+      int n = snprintf(s, sizeof(s), "%.0f", id(pms_pm25).state);
+      if (n > 7) n = 7;
+      for (int i = 0; i < n; i++) {
+        const int v = s[i] - '0';
+        if (v < 0 || v > 9) continue;
+        const char *m = SEG[v];
+        const int x = 58 - (n - i) * 20 + 4, y = 3, w = 16, h = 22, kk = 4, mid = y + 9, half = 13;
+        if (m[0] == '1') it.filled_rectangle(x, y, w, kk);
+        if (m[1] == '1') it.filled_rectangle(x + w - kk, y, kk, half);
+        if (m[2] == '1') it.filled_rectangle(x + w - kk, mid, kk, half);
+        if (m[3] == '1') it.filled_rectangle(x, y + h - kk, w, kk);
+        if (m[4] == '1') it.filled_rectangle(x, mid, kk, half);
+        if (m[5] == '1') it.filled_rectangle(x, y, kk, half);
+        if (m[6] == '1') it.filled_rectangle(x, mid, w, kk);
+      }
+      it.vertical_line(61, 2, 26);
+      it.print(64, 2, id(font_header), TextAlign::TOP_LEFT, "PM2.5");
+      it.print(64, 17, id(font_label), TextAlign::TOP_LEFT, "ug/m3");
+      for (int x = 0; x < 128; x += 3) it.draw_pixel_at(x, 30);
+      it.filled_rectangle(0, 29, (int) roundf(128.0f * (millis() % 1000UL) / 1000.0f), 2);
+    } break;
+
+    // -- 11 - aqi-band - Density Scale -----------------------------------------
+    case 11: {
+      static const float BP[7] = {0.0f, 9.0f, 35.4f, 55.4f, 125.4f, 225.4f, 325.4f};
+      static const int AQ[7] = {0, 50, 100, 150, 200, 300, 500};
+      static const char *const NM[6] = {"GOOD", "MODERATE", "SENSITIVE",
+                                        "UNHEALTHY", "V.UNHEALTHY", "HAZARDOUS"};
+      const float c = id(pms_pm25).state;
+      int i = 0;
+      while (i < 5 && c > BP[i + 1]) i++;
+      float f = (c - BP[i]) / (BP[i + 1] - BP[i]);
+      if (!(f >= 0.0f)) f = 0.0f;
+      if (f > 1.0f) f = 1.0f;
+      it.print(0, 0, id(font_header), TextAlign::TOP_LEFT, NM[i]);
+      it.printf(127, 0, id(font_value), TextAlign::TOP_RIGHT, "%.0f", AQ[i] + f * (AQ[i + 1] - AQ[i]));
+      it.rectangle(4, 19, 120, 11);
+      for (int b = 0; b < 6; b++) {
+        const int x0 = 4 + b * 20, pad = (b == i) ? 3 : 1;
+        if (b) it.vertical_line(x0, 19, 11);
+        if (b == i) it.rectangle(x0 + 1, 20, 18, 9);
+        if (b == 0) continue;
+        for (int ix = x0 + pad; ix <= x0 + 19 - pad; ix++)
+          for (int iy = 19 + pad; iy <= 29 - pad; iy++) {
+            bool on = true;
+            if (b == 1) on = (ix % 4 == 0 && iy % 4 == 0);
+            else if (b == 2) on = (ix % 2 == 0 && iy % 2 == 0);
+            else if (b == 3) on = ((ix + iy) % 2 == 0);
+            else if (b == 4) on = !((ix % 2) && (iy % 2));
+            if (on) it.draw_pixel_at(ix, iy);
+          }
+      }
+      const int pt = (int) roundf(4.0f + i * 20.0f + f * 19.0f);
+      if (millis() % 1000UL < 620UL)
+        for (int k = 0; k < 4; k++) it.horizontal_line(pt - 3 + k, 14 + k, 7 - 2 * k);
+    } break;
+
+    // -- 12 - triple-metric - Three Columns ------------------------------------
+    case 12: {
+      const uint32_t ph = millis() % 4000UL;
+      it.print(0, 0, id(font_label), TextAlign::TOP_LEFT, "ug/m3");
+      it.print(127, 0, id(font_icons), TextAlign::TOP_RIGHT,
+               id(wifi_component).is_connected() ? "\U000F05A9" : "\U000F05AA");
+      it.filled_circle(107, 5, 1);
+      if (id(mqtt_connected)) {
+        if (ph < 600UL) it.circle(107, 5, 2 + (int) (ph / 200UL));
+      } else {
+        it.line(103, 1, 111, 9);
+      }
+      it.horizontal_line(0, 10, 128);
+      it.vertical_line(42, 12, 20);
+      it.vertical_line(85, 12, 20);
+      const int cx[3] = {21, 64, 107};
+      const float vs[3] = {id(pms_pm1).state, id(pms_pm25).state, id(pms_pm10).state};
+      static const char *const nm[3] = {"PM1", "PM2.5", "PM10"};
+      for (int i = 0; i < 3; i++) {
+        const float v = (vs[i] >= 0.0f) ? vs[i] : 0.0f;
+        it.printf(cx[i], 12, id(font_value), TextAlign::TOP_CENTER, "%.0f", v);
+        it.print(cx[i], 22, id(font_label), TextAlign::TOP_CENTER, nm[i]);
+      }
+    } break;
+
+    // -- 13 - trend-strip - Trend Strip ----------------------------------------
+    case 13: {
+      const uint32_t k = millis() / 400UL;
+      const float base = id(pms_pm25).state;
+      auto samp = [base](uint32_t j) -> float {
+        const float v = base + 14.0f * sinf(j * 0.31f) + 7.0f * sinf(j * 0.13f + 1.1f)
+                      + 3.0f * sinf(j * 0.77f);
+        return v > 0.0f ? v : 0.0f;
+      };
+      it.print(0, 0, id(font_label), TextAlign::TOP_LEFT, "PM2.5");
+      it.printf(0, 9, id(font_value), TextAlign::TOP_LEFT, "%.0f", samp(44UL + k));
+      it.print(0, 22, id(font_label), TextAlign::TOP_LEFT, "ug/m3");
+      it.vertical_line(35, 0, 32);
+      it.horizontal_line(38, 30, 90);
+      int hn = 1;
+      for (int i = 0; i < 45; i++) {
+        int h = (int) roundf(samp((uint32_t) i + k) / 80.0f * 26.0f);
+        if (h > 26) h = 26;
+        if (h < 1) h = 1;
+        it.vertical_line(38 + i * 2, 30 - h, h);
+        if (i == 44) hn = h;
+      }
+      for (int x = 38; x < 128; x += 3) it.draw_pixel_at(x, 18);
+      it.horizontal_line(36, 18, 2);
+      it.draw_pixel_at(126, 30 - hn - 2 < 0 ? 0 : 30 - hn - 2);
+    } break;
+
+    // -- 14 - sensor-stale - Stale Reading -------------------------------------
+    case 14: {
+      const uint32_t age = 14UL + (millis() / 8000UL) % 46UL;
+      it.line(13, 3, 1, 28);
+      it.line(13, 3, 25, 28);
+      it.horizontal_line(1, 28, 25);
+      if (millis() % 1200UL < 800UL) {
+        it.filled_rectangle(12, 12, 2, 9);
+        it.filled_rectangle(12, 23, 2, 2);
+      }
+      it.print(30, 0, id(font_header), TextAlign::TOP_LEFT, "SENSOR FAIL");
+      for (int x = 30; x < 128; x += 2) it.draw_pixel_at(x, 14);
+      float v = id(pms_pm25).state;
+      if (!(v >= 0.0f)) v = 0.0f;
+      char s[8];
+      int n = snprintf(s, sizeof(s), "%.0f", v);
+      if (n > 7) n = 7;
+      const int w = n * 6;
+      it.print(30, 16, id(font_value), TextAlign::TOP_LEFT, s);
+      it.horizontal_line(28, 22, w + 4);
+      it.print(38 + w, 21, id(font_label), TextAlign::TOP_LEFT, "ug/m3");
+      it.printf(127, 21, id(font_label), TextAlign::TOP_RIGHT, "STALE %um", (unsigned) age);
+    } break;
+
+    // -- 15 - link-state - Link State ------------------------------------------
+    case 15: {
+      const uint32_t t = millis();
+      const bool linked = (t / 3500) % 3 < 2;
+      const char *word = linked ? "ONLINE" : "NO LINK";
+      // font_icons has ONLY these two glyphs: U+F05A9 wifi, U+F05AA wifi-off.
+      it.print(1, 1, id(font_icons), TextAlign::TOP_LEFT, linked ? "\U000F05A9" : "\U000F05AA");
+      it.print(14, 0, id(font_header), TextAlign::TOP_LEFT, word);
+      for (int i = 0; i < 4; i++) {          // all four slots always drawn
+        const int h = 3 + i * 3;             // 3,6,9,12 - bottoms flush at y=11
+        if (linked && i < 3) it.filled_rectangle(104 + i * 6, 12 - h, 4, h);
+        else it.rectangle(104 + i * 6, 12 - h, 4, h);   // hollow slot = headroom, countable
+      }
+      it.horizontal_line(0, 14, 128);
+      if (linked) {
+        it.print(2, 19, id(font_label), TextAlign::TOP_LEFT, "CH6  -58dBm");   // '-' + letters: label
+        it.print(126, 19, id(font_label), TextAlign::TOP_RIGHT, "MQTT OK");
+      } else {
+        it.print(2, 19, id(font_label), TextAlign::TOP_LEFT, "SCANNING");
+        it.rectangle(38, 19, 88, 9);
+        it.filled_rectangle(40 + (int)((t / 25) % 78), 21, 8, 5);
+      }
+    } break;
+
+    // -- 16 - cell-gauge - Cell Gauge ------------------------------------------
+    case 16: {
+      const uint32_t t = millis();
+      const int pct = 100 - (int)((t / 90) % 101);      // slow drain, loops
+      const int f = (pct * 8 + 50) / 100;               // JS Math.round - int div alone truncates
+      it.print(2, 0, id(font_label), TextAlign::TOP_LEFT, "PACK");
+      it.print(126, 0, id(font_label), TextAlign::TOP_RIGHT, pct <= 20 ? "LOW" : "RUN");
+      it.rectangle(2, 11, 68, 18);                      // body
+      it.filled_rectangle(70, 16, 3, 8);                // terminal nub
+      for (int i = 0; i < 8; i++) {
+        const int cx = 4 + i * 8;
+        if (i < f) it.filled_rectangle(cx, 14, 7, 12);  // countable cell, not a smooth bar
+        else it.vertical_line(cx + 3, 19, 2);           // ghost tick: empty slot still visible
+      }
+      if (pct <= 20) it.rectangle(0, 9, 75, 22);        // doubled outline = LOW, no blink
+      it.printf(112, 13, id(font_value), TextAlign::TOP_RIGHT, "%d", pct);  // digits only
+      it.rectangle(114, 17, 3, 3);                      // font_value has no '%' - build it
+      it.line(114, 23, 123, 17);
+      it.rectangle(121, 21, 3, 3);
+    } break;
+
+    // -- 17 - cold-start - Cold Start ------------------------------------------
+    case 17: {
+      const uint32_t t = millis();
+      const uint32_t T = t % 6400;                       // boot clock
+      if (T < 900) {                    // every pixel lit, then parted - boldest 1-bit move
+        const int w = (int)(T * 64 / 900);
+        it.filled_rectangle(0, 0, 64 - w, 32);
+        it.filled_rectangle(64 + w, 0, 64 - w, 32);
+      } else if (T < 2200) {
+        int k = (int)((T - 900) / 300); if (k > 3) k = 3;
+        const char *wm[4] = {"", "D", "DB", "DBK"};      // stands in for 'DBK'.substring(0,k)
+        if (k > 0) it.print(55, 6, id(font_header), TextAlign::TOP_LEFT, wm[k]);
+        int w = (int)((T - 900) / 12); if (w > 52) w = 52;
+        if (w > 0) it.horizontal_line(64 - w, 21, w * 2);
+      } else if (T < 4900) {
+        const char *names[3] = {"PMS7003", "WIFI", "MQTT"};
+        const int k = (int)((T - 2200) / 850);
+        for (int i = 0; i < 3 && i <= k; i++) {
+          const int y = 1 + i * 10;
+          it.print(14, y, id(font_label), TextAlign::TOP_LEFT, names[i]);
+          if (i < k) { it.line(3, y + 5, 6, y + 8); it.line(6, y + 8, 11, y + 2); }  // tick
+          else it.filled_rectangle(3 + (int)((t / 160) % 3) * 4, y + 4, 3, 3);       // waiting
+        }
+      } else {
+        it.print(64, 2, id(font_header), TextAlign::TOP_CENTER, "DBK READY");
+        it.rectangle(10, 20, 108, 8);
+        int w = (int)((T - 4900) / 13); if (w > 106) w = 106;
+        if (w > 0) it.filled_rectangle(11, 21, w, 6);
+      }
+    } break;
+
+    // -- 18 - hard-alert - Hard Alert ------------------------------------------
+    case 18: {
+      const uint32_t t = millis();
+      const int off = (int)((t / 55) % 8);   // ants crawl; the message never moves
+      for (int i = 0; i < 128; i++) if ((i + off) % 8 < 4) { it.draw_pixel_at(i, 0); it.draw_pixel_at(127 - i, 31); }
+      for (int i = 0; i < 32; i++) if ((i + off) % 8 < 4) { it.draw_pixel_at(127, i); it.draw_pixel_at(0, 31 - i); }
+      it.line(16, 4, 5, 27);                 // warning triangle - no such icon exists
+      it.line(16, 4, 27, 27);
+      it.horizontal_line(5, 27, 23);
+      it.filled_rectangle(15, 11, 3, 7);     // bang stroke
+      it.filled_rectangle(15, 20, 3, 3);     // bang dot
+      it.print(34, 2, id(font_label), TextAlign::TOP_LEFT, "PM2.5");   // '.' needs label
+      const float pm = id(pms_pm25).state;
+      if (id(pms_pm25).has_state() && !std::isnan(pm))
+        it.printf(34, 12, id(font_value), TextAlign::TOP_LEFT, "%.0f", pm);
+      else
+        it.print(34, 12, id(font_label), TextAlign::TOP_LEFT, "----");  // NEVER let "nan" reach font_value
+      it.print(60, 15, id(font_label), TextAlign::TOP_LEFT, "UG/M3");
+      it.print(122, 3, id(font_header), TextAlign::TOP_RIGHT, "DANGER");
+      it.horizontal_line(86, 17, 36);        // double rule = emphasis without colour
+      it.horizontal_line(86, 20, 36);
+    } break;
+
+    // -- 19 - eight-up-board - Eight Up Board ----------------------------------
+    case 19: {
+      const uint32_t t = millis();
+      const char *names[8] = {"DBK1", "DBK2", "ANCS", "HALL", "GATE", "LOFT", "CAFE", "MAKR"};
+      int st[8] = {id(wifi_component).is_connected() ? 2 : 0, id(mqtt_connected) ? 2 : 1,
+                   2, 1, 2, 2, 0, 2};                    // 2 solid, 1 dashed, 0 hollow
+      st[6] = ((t / 1900) % 2) ? 1 : 0;                  // this one really is flapping
+      it.vertical_line(31, 0, 32); it.vertical_line(63, 0, 32); it.vertical_line(95, 0, 32);
+      for (int k = 0; k < 8; k++) {
+        const int cx = (k % 4) * 32;
+        const int cy = k < 4 ? 0 : 16;
+        it.print(cx + 2, cy + 1, id(font_label), TextAlign::TOP_LEFT, names[k]);  // 4 chars x adv 4
+        if (st[k] == 2) {
+          it.filled_rectangle(cx + 2, cy + 10, 26, 3);   // ONLINE  - solid
+        } else if (st[k] == 1) {
+          for (int j = 0; j < 26; j += 4) it.filled_rectangle(cx + 2 + j, cy + 10, 2, 3);
+        } else {
+          it.rectangle(cx + 2, cy + 10, 26, 3);          // OFFLINE - hollow
+        }
+      }
+      const int c = (int)((t / 450) % 8);                // poll cursor
+      it.horizontal_line((c % 4) * 32 + 2, (c < 4 ? 0 : 16) + 14, 26);
+    } break;
+
+    // -- 20 - flip-alarm - Panel Flip Alarm ------------------------------------
+    case 20: {
+      static uint8_t M[512]; for (int i = 0; i < 512; i++) M[i] = 0;
+      static const uint8_t SEG[10] = {0x7E,0x30,0x6D,0x79,0x33,0x5B,0x5F,0x70,0x7F,0x7B};
+      static const uint8_t GL[4][3] = {{31,5,2},{31,2,31},{29,21,23},{23,21,29}};
+      auto st = [&](int x, int y) { if (x >= 0 && x < 128 && y >= 0 && y < 32) M[(y * 128 + x) >> 3] |= (1 << (x & 7)); };
+      auto rct = [&](int a, int b, int w, int h) { for (int p = 0; p < h; p++) for (int k = 0; k < w; k++) st(a + k, b + p); };
+      auto mg = [&](int g, int a, int b) { for (int c = 0; c < 3; c++) for (int r = 0; r < 5; r++) if ((GL[g][c] >> r) & 1) st(a + c, b + r); };
+      auto seg = [&](int d, int a, int b, int w, int h, int k) { const uint8_t s = SEG[d]; const int vh = (h - 3 * k) / 2;
+        if (s & 0x40) rct(a + k, b, w - 2 * k, k);          if (s & 0x20) rct(a + w - k, b + k, k, vh);
+        if (s & 0x10) rct(a + w - k, b + 2 * k + vh, k, vh); if (s & 0x08) rct(a + k, b + h - k, w - 2 * k, k);
+        if (s & 0x04) rct(a, b + 2 * k + vh, k, vh);        if (s & 0x02) rct(a, b + k, k, vh);
+        if (s & 0x01) rct(a + k, b + k + vh, w - 2 * k, k); };
+      for (int i = 0; i < 26; i++) { const int q = (24 * i + 25) / 50; rct(16 - q, 3 + i, 2, 1); rct(15 + q, 3 + i, 2, 1); }
+      rct(4, 27, 25, 2); rct(15, 11, 3, 7); rct(15, 21, 3, 3);
+      const float f25 = id(pms_pm25).state;
+      int val = (f25 > 0.0f) ? (int)(f25 + 0.5f) : 0; if (val > 999) val = 999;
+      const int n = (val > 99) ? 3 : ((val > 9) ? 2 : 1);
+      char v[4]; v[0] = '0' + val / 100; v[1] = '0' + (val / 10) % 10; v[2] = '0' + val % 10; v[3] = 0;
+      const char *ds = v + (3 - n); const int x0 = 70 - (24 * n - 4) / 2;
+      for (int i = 0; i < n; i++) seg(ds[i] - '0', x0 + i * 24, 4, 20, 24, 4);
+      mg(0, 112, 4); mg(1, 116, 4); mg(2, 112, 12); mg(3, 116, 12);
+      const bool inv = (millis() % 1400) < 700;
+      if (inv) it.filled_rectangle(0, 0, 128, 32, COLOR_ON);
+      for (int y = 0; y < 32; y++) for (int x = 0; x < 128; x++)
+        if ((M[(y * 128 + x) >> 3] >> (x & 7)) & 1) it.draw_pixel_at(x, y, inv ? COLOR_OFF : COLOR_ON);
+    } break;
+
+    // -- 21 - split-polarity - Split Polarity ----------------------------------
+    case 21: {
+      static uint8_t M[512]; for (int i = 0; i < 512; i++) M[i] = 0;
+      static const uint8_t SEG[10] = {0x7E,0x30,0x6D,0x79,0x33,0x5B,0x5F,0x70,0x7F,0x7B};
+      static const char K[] = "PM2510";
+      static const uint8_t GL[6][3] = {{31,5,2},{31,2,31},{29,21,23},{23,21,29},{18,31,16},{31,17,31}};
+      auto st = [&](int x, int y) { if (x >= 0 && x < 128 && y >= 0 && y < 32) M[(y * 128 + x) >> 3] |= (1 << (x & 7)); };
+      auto rct = [&](int a, int b, int w, int h) { for (int p = 0; p < h; p++) for (int k = 0; k < w; k++) st(a + k, b + p); };
+      auto mtx = [&](const char *s, int a, int b) { for (int m = 0; s[m]; m++) for (int q = 0; q < 6; q++) if (K[q] == s[m]) {
+        for (int c = 0; c < 3; c++) for (int r = 0; r < 5; r++) if ((GL[q][c] >> r) & 1) st(a + m * 4 + c, b + r); break; } };
+      auto seg = [&](int d, int a, int b, int w, int h, int k) { const uint8_t s = SEG[d]; const int vh = (h - 3 * k) / 2;
+        if (s & 0x40) rct(a + k, b, w - 2 * k, k);          if (s & 0x20) rct(a + w - k, b + k, k, vh);
+        if (s & 0x10) rct(a + w - k, b + 2 * k + vh, k, vh); if (s & 0x08) rct(a + k, b + h - k, w - 2 * k, k);
+        if (s & 0x04) rct(a, b + 2 * k + vh, k, vh);        if (s & 0x02) rct(a, b + k, k, vh);
+        if (s & 0x01) rct(a + k, b + k + vh, w - 2 * k, k); };
+      const float raw[2] = {id(pms_pm25).state, id(pms_pm10).state};
+      for (int i = 0; i < 2; i++) {
+        int val = (raw[i] > 0.0f) ? (int)(raw[i] + 0.5f) : 0; if (val > 999) val = 999;
+        const int bx = i * 64, n = (val > 99) ? 3 : ((val > 9) ? 2 : 1);
+        char v[4]; v[0] = '0' + val / 100; v[1] = '0' + (val / 10) % 10; v[2] = '0' + val % 10; v[3] = 0;
+        const char *ds = v + (3 - n); const int x0 = bx + 32 - (17 * n - 3) / 2;
+        int w = (int)(val * 56.0f / 150.0f + 0.5f); if (w > 56) w = 56;
+        mtx(i ? "PM10" : "PM25", bx + 4, 2);
+        for (int j = 0; j < n; j++) seg(ds[j] - '0', x0 + j * 17, 8, 14, 19, 3);
+        if (w > 0) rct(bx + 4, 29, w, 2);
+      }
+      const int flip = (int) ((millis() / 2600) % 2);
+      it.filled_rectangle(flip ? 64 : 0, 0, 64, 32, COLOR_ON);
+      for (int y = 0; y < 32; y++) for (int x = 0; x < 128; x++)
+        if ((M[(y * 128 + x) >> 3] >> (x & 7)) & 1) it.draw_pixel_at(x, y, ((x < 64) == (flip == 0)) ? COLOR_OFF : COLOR_ON);
+    } break;
+
+    // -- 22 - menu-cursor - Menu Cursor ----------------------------------------
+    case 22: {
+      static uint8_t M[512]; for (int i = 0; i < 512; i++) M[i] = 0;
+      static const char K[] = "PMAX0123456789";
+      static const uint8_t GL[14][3] = {{31,5,2},{31,2,31},{30,5,30},{27,4,27},{31,17,31},{18,31,16},{29,21,23},
+        {17,21,31},{7,4,31},{23,21,29},{31,21,29},{1,1,31},{31,21,31},{23,21,31}};
+      auto st = [&](int x, int y) { if (x >= 0 && x < 128 && y >= 0 && y < 32) M[(y * 128 + x) >> 3] |= (1 << (x & 7)); };
+      auto rct = [&](int a, int b, int w, int h) { for (int p = 0; p < h; p++) for (int k = 0; k < w; k++) st(a + k, b + p); };
+      auto mtx = [&](const char *s, int a, int b) { for (int m = 0; s[m]; m++) for (int q = 0; q < 14; q++) if (K[q] == s[m]) {
+        for (int c = 0; c < 3; c++) for (int r = 0; r < 5; r++) if ((GL[q][c] >> r) & 1) st(a + m * 4 + c, b + r); break; } };
+      const float p25 = id(pms_pm25).state;
+      const float vl[4] = {id(pms_pm1).state, p25, id(pms_pm10).state, p25 * 1.9f};
+      const char *nm[4] = {"PM1", "PM25", "PM10", "MAX"};
+      const uint32_t t = millis();
+      const int k = (int) ((t / 900) % 4), ph = (int) (t % 900);
+      const int bw = (ph < 140) ? (int) (124.0f * ph / 140.0f + 0.5f) : 124;
+      for (int i = 0; i < 4; i++) {
+        int val = (vl[i] > 0.0f) ? (int)(vl[i] + 0.5f) : 0; if (val > 999) val = 999;
+        const int ry = i * 8, n = (val > 99) ? 3 : ((val > 9) ? 2 : 1);
+        char v[4]; v[0] = '0' + val / 100; v[1] = '0' + (val / 10) % 10; v[2] = '0' + val % 10; v[3] = 0;
+        int w = (int)(val * 64.0f / 150.0f + 0.5f); if (w > 64) w = 64;
+        mtx(nm[i], 4, ry + 1); mtx(v + (3 - n), 120 - 4 * n, ry + 1);
+        if (w > 0) rct(24, ry + 6, w, 1);
+      }
+      rct(126, 0, 1, 32); rct(124, k * 8 + 1, 4, 6);
+      if (bw > 0) it.filled_rectangle(0, k * 8, bw, 8, COLOR_ON);
+      for (int y = 0; y < 32; y++) for (int x = 0; x < 128; x++)
+        if ((M[(y * 128 + x) >> 3] >> (x & 7)) & 1)
+          it.draw_pixel_at(x, y, (y >= k * 8 && y < k * 8 + 8 && x < bw) ? COLOR_OFF : COLOR_ON);
+    } break;
+
+    // -- 23 - carve-bar - Carved Bar -------------------------------------------
+    case 23: {
+      static uint8_t M[512]; for (int i = 0; i < 512; i++) M[i] = 0;
+      static const uint8_t SEG[10] = {0x7E,0x30,0x6D,0x79,0x33,0x5B,0x5F,0x70,0x7F,0x7B};
+      auto st = [&](int x, int y) { if (x >= 0 && x < 128 && y >= 0 && y < 32) M[(y * 128 + x) >> 3] |= (1 << (x & 7)); };
+      auto rct = [&](int a, int b, int w, int h) { for (int p = 0; p < h; p++) for (int k = 0; k < w; k++) st(a + k, b + p); };
+      auto seg = [&](int d, int a, int b, int w, int h, int k) { const uint8_t s = SEG[d]; const int vh = (h - 3 * k) / 2;
+        if (s & 0x40) rct(a + k, b, w - 2 * k, k);          if (s & 0x20) rct(a + w - k, b + k, k, vh);
+        if (s & 0x10) rct(a + w - k, b + 2 * k + vh, k, vh); if (s & 0x08) rct(a + k, b + h - k, w - 2 * k, k);
+        if (s & 0x04) rct(a, b + 2 * k + vh, k, vh);        if (s & 0x02) rct(a, b + k, k, vh);
+        if (s & 0x01) rct(a + k, b + k + vh, w - 2 * k, k); };
+      const float p2 = (millis() % 14000) / 14000.0f;
+      int val = (int) (150.0f * (1.0f - fabsf(2.0f * p2 - 1.0f)) + 0.5f);
+      if (val < 0) val = 0; if (val > 999) val = 999;
+      const int n = (val > 99) ? 3 : ((val > 9) ? 2 : 1);
+      char v[4]; v[0] = '0' + val / 100; v[1] = '0' + (val / 10) % 10; v[2] = '0' + val % 10; v[3] = 0;
+      const char *ds = v + (3 - n);
+      const int x0 = 64 - (16 * n - 3) / 2, bw = (int) (val * 125.0f / 150.0f + 0.5f);
+      for (int i = 0; i < n; i++) seg(ds[i] - '0', x0 + i * 16, 11, 13, 17, 3);
+      it.print(0, 0, id(font_label), TextAlign::TOP_LEFT, "PM2.5");
+      it.print(127, 0, id(font_label), TextAlign::TOP_RIGHT, "ug/m3");
+      if (bw > 0) it.filled_rectangle(1, 11, bw, 18, COLOR_ON);
+      for (int y = 11; y < 29; y++) for (int x = 1; x < 127; x++)
+        if ((M[(y * 128 + x) >> 3] >> (x & 7)) & 1) it.draw_pixel_at(x, y, (x < 1 + bw) ? COLOR_OFF : COLOR_ON);
+      it.rectangle(0, 10, 128, 20);
+      it.vertical_line(31, 30, 2); it.vertical_line(47, 30, 2); it.vertical_line(105, 30, 2);
+    } break;
+
+    // -- 24 - wipe-invert - Polarity Wipe --------------------------------------
+    case 24: {
+      static uint8_t A[512], B[512]; for (int i = 0; i < 512; i++) { A[i] = 0; B[i] = 0; }
+      static const uint8_t SEG[10] = {0x7E,0x30,0x6D,0x79,0x33,0x5B,0x5F,0x70,0x7F,0x7B};
+      static const char K[] = "PMUG01235";
+      static const uint8_t GL[9][3] = {{31,5,2},{31,2,31},{31,16,31},{14,17,29},{31,17,31},{18,31,16},{29,21,23},{17,21,31},{23,21,29}};
+      auto st = [&](uint8_t *H, int x, int y) { if (x >= 0 && x < 128 && y >= 0 && y < 32) H[(y * 128 + x) >> 3] |= (1 << (x & 7)); };
+      auto rct = [&](uint8_t *H, int a, int b, int w, int h) { for (int p = 0; p < h; p++) for (int c = 0; c < w; c++) st(H, a + c, b + p); };
+      auto mt = [&](uint8_t *H, const char *s, int a, int b) { for (int m = 0; s[m]; m++) for (int q = 0; q < 9; q++) if (K[q] == s[m]) {
+        for (int c = 0; c < 3; c++) for (int r = 0; r < 5; r++) if ((GL[q][c] >> r) & 1) st(H, a + m * 4 + c, b + r); break; } };
+      auto seg = [&](uint8_t *H, int d, int a, int b, int w, int h, int k) { const uint8_t s = SEG[d]; const int vh = (h - 3 * k) / 2;
+        if (s & 0x40) rct(H, a + k, b, w - 2 * k, k);          if (s & 0x20) rct(H, a + w - k, b + k, k, vh);
+        if (s & 0x10) rct(H, a + w - k, b + 2 * k + vh, k, vh); if (s & 0x08) rct(H, a + k, b + h - k, w - 2 * k, k);
+        if (s & 0x04) rct(H, a, b + 2 * k + vh, k, vh);        if (s & 0x02) rct(H, a, b + k, k, vh);
+        if (s & 0x01) rct(H, a + k, b + k + vh, w - 2 * k, k); };
+      auto page = [&](uint8_t *H, const char *lbl, float raw) {
+        int val = (raw > 0.0f) ? (int)(raw + 0.5f) : 0; if (val > 999) val = 999;
+        const int n = (val > 99) ? 3 : ((val > 9) ? 2 : 1);
+        char v[4]; v[0] = '0' + val / 100; v[1] = '0' + (val / 10) % 10; v[2] = '0' + val % 10; v[3] = 0;
+        const char *ds = v + (3 - n); const int x0 = 64 - (22 * n - 4) / 2;
+        mt(H, lbl, 4, 3); mt(H, "UGM3", 108, 3);
+        for (int m = 0; m < n; m++) seg(H, ds[m] - '0', x0 + m * 22, 8, 18, 21, 3); };
+      page(A, "PM25", id(pms_pm25).state); page(B, "PM10", id(pms_pm10).state);
+      const uint32_t t = millis(), T = t % 2600;
+      const int cur = (int) ((t / 2600) % 2), prv = 1 - cur;
+      const int f = (T < 900) ? (int) (T * 159.0f / 900.0f + 0.5f) : 159;
+      for (int y = 0; y < 32; y++) { int e = f - y; if (e < 0) e = 0; if (e > 128) e = 128;
+        if (cur == 1 && e > 0) it.filled_rectangle(0, y, e, 1, COLOR_ON);
+        if (prv == 1 && e < 128) it.filled_rectangle(e, y, 128 - e, 1, COLOR_ON);
+        for (int x = 0; x < 128; x++) { const int pg = (x < e) ? cur : prv; const uint8_t *H = pg ? B : A;
+          if ((H[(y * 128 + x) >> 3] >> (x & 7)) & 1) it.draw_pixel_at(x, y, pg ? COLOR_OFF : COLOR_ON); } }
+    } break;
+
+    // -- 25 - grey-ladder - Grey Ladder ----------------------------------------
+    case 25: {
+      static const uint8_t B[16] = {0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5};
+      static const uint8_t LV[6] = {1,2,4,8,12,16};
+      static const char *const NM[6] = {"1/16","1/8","1/4","1/2","3/4","ALL"};
+      static const char *const VD[5] = {"MUSH","FAINT","CLEAR","CLEAR","MUSH"};
+      const int p = (int) ((millis() / 1500UL) % 5UL);
+      it.printf(0, 0, id(font_label), TextAlign::TOP_LEFT, "%s v %s", NM[p], NM[p + 1]);
+      it.print(127, 0, id(font_label), TextAlign::TOP_RIGHT, VD[p]);
+      for (int i = 0; i < 6; i++) {
+        const int x0 = 2 + i * 21;
+        for (int x = x0; x < x0 + 19; x++)
+          for (int y = 10; y < 26; y++)
+            if (B[(y & 3) * 4 + (x & 3)] < LV[i]) it.draw_pixel_at(x, y);
+      }
+      const int bx = 2 + p * 21;
+      it.horizontal_line(bx, 29, 40);
+      it.vertical_line(bx, 27, 3);
+      it.vertical_line(bx + 39, 27, 3);
+      it.vertical_line(bx + 20, 27, 2);
+    } break;
+
+    // -- 26 - lifted-card - Lifted Card ----------------------------------------
+    case 26: {
+      static const uint8_t B[16] = {0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5};
+      const int o = 2 + (int) roundf(1.5f * (1.0f + sinf(millis() / 1100.0f)));
+      const int L = (int) roundf(15.0f - 2.2f * (float) o);
+      float v = id(pms_pm25).state;
+      if (std::isnan(v) || v < 0.0f) v = 0.0f;
+      if (v > 999.0f) v = 999.0f;
+      for (int x = 4 + o; x <= 81 + o; x++)
+        for (int y = 1 + o; y <= 26 + o; y++) {
+          if (x <= 81 && y <= 26) continue;
+          if (B[(y & 3) * 4 + (x & 3)] < L) it.draw_pixel_at(x, y);
+        }
+      it.rectangle(4, 1, 78, 26);
+      it.print(9, 3, id(font_label), TextAlign::TOP_LEFT, "PM2.5");
+      it.printf(9, 13, id(font_value), TextAlign::TOP_LEFT, "%.0f", v);
+      it.print(36, 16, id(font_label), TextAlign::TOP_LEFT, "ug/m3");
+      for (int x = 93; x <= 104; x++)
+        for (int y = 6; y <= 17; y++) {
+          if (x <= 101 && y <= 14) continue;
+          if (B[(y & 3) * 4 + (x & 3)] < 8) it.draw_pixel_at(x, y);
+        }
+      it.rectangle(90, 3, 12, 12);
+      it.filled_rectangle(122, 6, 3, 12);
+      it.filled_rectangle(113, 15, 9, 3);
+      it.rectangle(110, 3, 12, 12);
+      it.print(89, 20, id(font_label), TextAlign::TOP_LEFT, "SOFT");
+      it.print(109, 20, id(font_label), TextAlign::TOP_LEFT, "HARD");
+    } break;
+
+    // -- 27 - smoke-plate - Smoke Plate ----------------------------------------
+    case 27: {
+      static const uint8_t B[16] = {0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5};
+      static const uint8_t LV[6] = {1,2,4,8,12,16};
+      static const char *const NM[6] = {"1/16","1/8","1/4","1/2","3/4","ALL"};
+      const int i = (int) ((millis() / 1600UL) % 6UL);
+      const int L = LV[i];
+      float v = id(pms_pm25).state;
+      if (std::isnan(v) || v < 0.0f) v = 0.0f;
+      if (v > 999.0f) v = 999.0f;
+      for (int x = 0; x < 128; x++)
+        for (int y = 0; y < 32; y++) {
+          if (x > 18 && x < 109 && y > 5 && y < 26) continue;
+          if (B[(y & 3) * 4 + (x & 3)] < L) it.draw_pixel_at(x, y);
+        }
+      it.rectangle(20, 7, 88, 18);
+      it.printf(24, 9, id(font_value), TextAlign::TOP_LEFT, "%.0f", v);
+      it.print(50, 8, id(font_label), TextAlign::TOP_LEFT, "PM2.5");
+      it.print(50, 15, id(font_label), TextAlign::TOP_LEFT, "ug/m3");
+      it.printf(104, 13, id(font_label), TextAlign::TOP_RIGHT, "BG %s", NM[i]);
+    } break;
+
+    // -- 28 - haze-horizon - Haze Horizon --------------------------------------
+    case 28: {
+      static const uint8_t B[16] = {0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5};
+      float pmf = id(pms_pm25).state;
+      if (std::isnan(pmf) || pmf < 0.0f) pmf = 0.0f;
+      if (pmf > 999.0f) pmf = 999.0f;
+      const int pm = (int) roundf(pmf);
+      int lmax = (int) roundf(4.0f + pmf / 5.0f);
+      if (lmax > 16) lmax = 16;
+      const int hc = 12 + (int) roundf(2.0f * sinf(millis() / 2600.0f));
+      it.printf(2, 0, id(font_label), TextAlign::TOP_LEFT, "PM2.5 %d", pm);
+      it.print(126, 0, id(font_label), TextAlign::TOP_RIGHT, "INVERSION");
+      for (int x = 0; x < 128; x++) {
+        const float h1 = (x > 12 && x < 64) ? 9.0f * (0.5f + 0.5f * cosf((x - 38) / 26.0f * 3.14159265f)) : 0.0f;
+        const float h2 = (x > 68 && x < 112) ? 5.0f * (0.5f + 0.5f * cosf((x - 90) / 22.0f * 3.14159265f)) : 0.0f;
+        const int ry = 27 - (int) roundf(h1 + h2);
+        for (int y = hc; y < ry; y++) {
+          const int lv = (int) roundf(lmax * (float) (y - hc) / (float) (27 - hc));
+          if (lv > 0 && B[(y & 3) * 4 + (x & 3)] < lv) it.draw_pixel_at(x, y);
+        }
+        it.vertical_line(x, ry, 32 - ry);
+        if (x % 4 == 0) it.draw_pixel_at(x, hc - 1);
+      }
+    } break;
+
+    // -- 29 - moving-weave - Moving Weave --------------------------------------
+    case 29: {
+      static const int K[3] = {8, 4, 2};
+      static const int W[3] = {2, 2, 1};
+      static const int YB[3] = {1, 12, 23};
+      static const char *const NM[3] = {"8PX", "4PX", "2PX"};
+      float pmf = id(pms_pm25).state;
+      if (std::isnan(pmf) || pmf < 0.0f) pmf = 0.0f;
+      if (pmf > 999.0f) pmf = 999.0f;
+      const float spd = 1.0f + pmf / 40.0f;
+      const int ph = (int) ((uint32_t) ((double) millis() * (double) spd / 90.0) % 8UL);
+      for (int b = 0; b < 3; b++) {
+        const int y0 = YB[b];
+        const int k = K[b];
+        const int w = W[b];
+        it.print(0, y0 + 4, id(font_label), TextAlign::CENTER_LEFT, NM[b]);
+        for (int x = 16; x < 128; x++)
+          for (int y = y0; y < y0 + 9; y++)
+            if (((x + y + ph) % k) < w) it.draw_pixel_at(x, y);
+      }
+    } break;
+
+    // -- default - index out of range ------------------------------
+    default: {
+      // Out of range. font_value carries only " 0123456789" - no '-', no letters -
+      // so the caption goes to font_label and the number is clamped non-negative
+      // before it is printed. A blank panel would look like a dead board.
+      int bad = id(screen_idx);
+      if (bad < 0) bad = 0;
+      if (bad > 9999) bad = 9999;
+      it.rectangle(0, 0, 128, 32);
+      it.print(64, 4, id(font_label), TextAlign::TOP_CENTER, "SCREEN INDEX");
+      it.printf(64, 14, id(font_value), TextAlign::TOP_CENTER, "%d", bad);
+    } break;
+    }
