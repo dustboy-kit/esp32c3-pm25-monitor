@@ -1,6 +1,6 @@
 (() => {
   const root = document.documentElement;
-  const themes = new Set(["minimal", "starry"]);
+  const themes = new Set(["plain", "starry"]);
   const params = new URLSearchParams(location.search);
 
   const readStoredTheme = () => {
@@ -19,25 +19,26 @@
     }
   };
 
-  const requestedTheme = params.get("theme");
-  const storedTheme = readStoredTheme();
+  const normalizeTheme = (value) => value === "minimal" ? "plain" : value;
+  const requestedTheme = normalizeTheme(params.get("theme"));
+  const storedTheme = normalizeTheme(readStoredTheme());
   let theme = themes.has(requestedTheme)
     ? requestedTheme
     : themes.has(storedTheme)
       ? storedTheme
-      : "minimal";
+      : "plain";
 
   const copy = {
     th: {
-      minimal: "ธีมเรียบง่าย",
+      plain: "ธีมเรียบง่าย",
       starry: "ธีมดวงดาว",
-      switchToMinimal: "เปลี่ยนเป็นธีมเรียบง่าย",
+      switchToPlain: "เปลี่ยนเป็นธีมเรียบง่าย",
       switchToStarry: "เปลี่ยนเป็นธีมดวงดาว",
     },
     en: {
-      minimal: "Minimal theme",
+      plain: "Plain theme",
       starry: "Starry theme",
-      switchToMinimal: "Switch to minimal theme",
+      switchToPlain: "Switch to plain theme",
       switchToStarry: "Switch to starry theme",
     },
   };
@@ -49,18 +50,18 @@
   function syncControls() {
     const lang = language();
     document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
-      const next = theme === "minimal" ? "starry" : "minimal";
+      const next = theme === "plain" ? "starry" : "plain";
       button.dataset.theme = theme;
       button.setAttribute("aria-label", copy[lang][`switchTo${next[0].toUpperCase()}${next.slice(1)}`]);
       button.setAttribute("title", copy[lang][theme]);
-      button.setAttribute("aria-pressed", String(theme === "minimal"));
+      button.setAttribute("aria-pressed", String(theme === "plain"));
       const icon = button.querySelector("[data-theme-icon]");
-      if (icon) icon.textContent = theme === "minimal" ? "◐" : "✦";
+      if (icon) icon.textContent = theme === "plain" ? "◐" : "✦";
     });
   }
 
   function applyTheme(next, persist = true) {
-    theme = themes.has(next) ? next : "minimal";
+    theme = themes.has(normalizeTheme(next)) ? normalizeTheme(next) : "plain";
     root.dataset.theme = theme;
     if (persist) writeStoredTheme(theme);
     let meta = document.querySelector('meta[name="theme-color"]');
@@ -69,7 +70,7 @@
       meta.name = "theme-color";
       document.head.appendChild(meta);
     }
-    meta.content = theme === "minimal" ? "#090d15" : "#040818";
+    meta.content = theme === "plain" ? "#090d15" : "#040818";
     syncControls();
     window.dispatchEvent(new CustomEvent("dbk-theme-change", { detail: { theme } }));
   }
@@ -78,7 +79,7 @@
 
   function mount() {
     document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
-      button.addEventListener("click", () => applyTheme(theme === "minimal" ? "starry" : "minimal"));
+      button.addEventListener("click", () => applyTheme(theme === "plain" ? "starry" : "plain"));
     });
     syncControls();
     new MutationObserver(syncControls).observe(root, { attributes: true, attributeFilter: ["lang"] });

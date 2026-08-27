@@ -45,7 +45,7 @@
   outline-offset: 2px;
 }
 
-html[data-theme="minimal"] {
+html[data-theme="plain"] {
   color-scheme: dark;
   --bg: #090d15;
   --panel: #111927;
@@ -55,58 +55,58 @@ html[data-theme="minimal"] {
   --muted: #aeb8c8;
 }
 
-html[data-theme="minimal"] body {
+html[data-theme="plain"] body {
   background: #090d15 !important;
 }
 
-html[data-theme="minimal"] body::before,
-html[data-theme="minimal"] body::after {
+html[data-theme="plain"] body::before,
+html[data-theme="plain"] body::after {
   display: none !important;
   animation: none !important;
 }
 
-html[data-theme="minimal"] .hero h1,
-html[data-theme="minimal"] header h1 {
+html[data-theme="plain"] .hero h1,
+html[data-theme="plain"] header h1 {
   text-shadow: none !important;
 }
 
-html[data-theme="minimal"] .feature,
-html[data-theme="minimal"] .panel,
-html[data-theme="minimal"] .card,
-html[data-theme="minimal"] .gallery-browser,
-html[data-theme="minimal"] .firmware-card,
-html[data-theme="minimal"] .route,
-html[data-theme="minimal"] .metric {
+html[data-theme="plain"] .feature,
+html[data-theme="plain"] .panel,
+html[data-theme="plain"] .card,
+html[data-theme="plain"] .gallery-browser,
+html[data-theme="plain"] .firmware-card,
+html[data-theme="plain"] .route,
+html[data-theme="plain"] .metric {
   border-color: #2f3b4e !important;
   border-radius: 12px !important;
   background: #111927 !important;
   box-shadow: none !important;
 }
 
-html[data-theme="minimal"] .feature::before {
+html[data-theme="plain"] .feature::before {
   display: none !important;
 }
 
-html[data-theme="minimal"] .badge,
-html[data-theme="minimal"] .status,
-html[data-theme="minimal"] .lang-switch button.active {
+html[data-theme="plain"] .badge,
+html[data-theme="plain"] .status,
+html[data-theme="plain"] .lang-switch button.active {
   background: #1a2433 !important;
   box-shadow: none !important;
 }
 
-html[data-theme="minimal"] button,
-html[data-theme="minimal"] .action {
+html[data-theme="plain"] button,
+html[data-theme="plain"] .action {
   box-shadow: none !important;
 }
 
-html[data-theme="minimal"] .notice,
-html[data-theme="minimal"] .artifact,
-html[data-theme="minimal"] .connection-status,
-html[data-theme="minimal"] .explain,
-html[data-theme="minimal"] .diagnosis,
-html[data-theme="minimal"] .rpc-output,
-html[data-theme="minimal"] .example-info,
-html[data-theme="minimal"] .firmware-log {
+html[data-theme="plain"] .notice,
+html[data-theme="plain"] .artifact,
+html[data-theme="plain"] .connection-status,
+html[data-theme="plain"] .explain,
+html[data-theme="plain"] .diagnosis,
+html[data-theme="plain"] .rpc-output,
+html[data-theme="plain"] .example-info,
+html[data-theme="plain"] .firmware-log {
   background: #0d1420 !important;
 }
 
