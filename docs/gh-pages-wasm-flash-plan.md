@@ -86,7 +86,8 @@ Generate manifests from the tagged release, deploy Pages, and validate the brows
 Harden `/wifi/` and Improv/AP instructions. Only after C3 is stable, add a separate JC3248W535 ESP32-S3 profile using validated KRU32/ESP32 Oracle firmware. **Exit:** no cross-flashing risk and separate artifacts/manifests.
 
 ## Current status and blockers
-- Scaffold files are present but uncommitted: `site/`, `site/wifi/`, `site/manifests/dbk.json`, `.github/workflows/pages.yaml`.
+- Pages scaffold is committed in `3fd07e6` and deployed successfully. Verified HTTP 200 for `/`, `/wifi/`, and `/manifests/dbk.json`.
+- The first firmware validation run is currently compiling `factory.yaml`; release publication remains gated on its result.
 - Pages is not enabled yet (API returned 404); enabling/configuring it requires repository admin/write authority.
 - No public source repository for the Cloudflare `dbk-oled-studio` project was confirmed; use it as a canonical reference/link until source is provided.
 - Full flashing validation requires physical hardware and a known-good factory binary.
