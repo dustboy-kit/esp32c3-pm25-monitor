@@ -44,7 +44,8 @@ Working copy: `/opt/Code/github.com/dustboy-kit/esp32c3-pm25-monitor`
 ## 3. Step-by-step TODO checklist
 
 ### A. Data and source alignment
-- [ ] Import/adapt `sim/gallery.yaml`, `tools/lab-sim.py`, and required `justfile` target from the haos-oracle workspace.
+- [x] Import/adapt the simulator YAML set (`sim/gallery.yaml`, `sim/dbk-sim.yaml`, `sim/sim_shim.h`, `sim/README.md`).
+- [ ] Import `tools/lab-sim.py` and add a repo-local `just lab-sim` target.
 - [ ] Compare every imported lambda with the real `packages/oled.yaml`; document intentional differences.
 - [ ] Add a `docs/evidence/` record containing commit SHA, binary checksums, and hardware test notes.
 
