@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="th">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,48 +12,54 @@
   <main class="app">
     <header class="hero">
       <div>
-        <p class="eyebrow">THE STARRY CIRCUIT · DUSTBOY KIT · ESP32-C3</p>
+        <p class="eyebrow" data-i18n="eyebrow">วงจรแห่งดวงดาว · DUSTBOY KIT · ESP32-C3</p>
         <h1><em>DustBoy</em> OLED Studio</h1>
-        <p class="lede">Preview the original 128×32 display collection, then install a locally compiled ESPHome image directly from a Chromium browser.</p>
+        <p class="lede" data-i18n="lede">ดูตัวอย่างหน้าจอ 128×32 ต้นฉบับ แล้วติดตั้งเฟิร์มแวร์ ESPHome ที่คอมไพล์ในเครื่องผ่านเบราว์เซอร์ Chromium ได้โดยตรง</p>
       </div>
-      <span class="badge">30 originals · 2 flash images</span>
+      <div class="hero-tools"><div class="lang-switch" aria-label="Language"><button type="button" data-lang="th">ไทย</button><button type="button" data-lang="en">EN</button></div><span class="badge" data-i18n="badge">30 แบบต้นฉบับ · 2 เฟิร์มแวร์</span></div>
     </header>
 
     <section class="feature simulator-card">
-      <div class="section-head">
-        <div><span class="kicker">✦ Design laboratory</span><h2>ESPHome Canvas Simulator</h2></div>
-        <span class="status">128×32 · 20 FPS</span>
-      </div>
-      <p>Explore all thirty DBK screens, edit the ESPHome-style <code>display:</code> lambda, and render it through the same one-bit OLED buffer and glyph engine used by the gallery.</p>
-      <a class="action secondary" href="./tools/esphome-canvas-simulator.html">Open OLED Canvas Simulator <span>↗</span></a>
+      <div class="section-head"><div><span class="kicker" data-i18n="labKicker">✦ ห้องทดลองออกแบบ</span><h2>ESPHome Canvas Simulator</h2></div><span class="status">128×32 · 20 FPS</span></div>
+      <p data-i18n="labBody">สำรวจหน้าจอ DBK ทั้ง 30 แบบ แก้ไข lambda แบบ ESPHome <code>display:</code> และเรนเดอร์ผ่านบัฟเฟอร์ OLED ขาวดำและเอนจินฟอนต์เดียวกับแกลเลอรี</p>
+      <a class="action secondary" href="./tools/esphome-canvas-simulator.html" data-i18n="openSimulator">เปิด OLED Canvas Simulator ↗</a>
     </section>
 
     <div class="flash-grid">
       <section class="feature flash-card">
-        <div class="section-head"><div><span class="kicker">01 · Monitor</span><h2>DustBoy PM2.5</h2></div><span class="status ready">ready</span></div>
-        <p>The complete ESP32-C3 monitor firmware for PMS7003 and the SSD1306 128×32 display.</p>
-        <div class="notice">Chrome or Edge · HTTPS · data-capable USB cable · supported ESP32-C3 only</div>
-        <esp-web-install-button manifest="./manifests/dbk.json"><button class="action" slot="activate">Connect &amp; flash DBK</button></esp-web-install-button>
+        <div class="section-head"><div><span class="kicker" data-i18n="monitorKicker">01 · เครื่องวัด</span><h2>DustBoy PM2.5</h2></div><span class="status ready" data-i18n="ready">พร้อมใช้</span></div>
+        <p data-i18n="monitorBody">เฟิร์มแวร์เครื่องวัด ESP32-C3 สำหรับ PMS7003 และหน้าจอ SSD1306 ขนาด 128×32</p>
+        <div class="notice" data-i18n="usbNotice">Chrome หรือ Edge · HTTPS · สาย USB ที่ส่งข้อมูลได้ · ใช้กับ ESP32-C3 ที่รองรับเท่านั้น</div>
+        <esp-web-install-button manifest="./manifests/dbk.json"><button class="action" slot="activate" data-i18n="flashDbk">เชื่อมต่อและแฟลช DBK</button></esp-web-install-button>
       </section>
 
       <section class="feature flash-card pomodoro">
-        <div class="section-head"><div><span class="kicker">02 · Focus timer</span><h2>Pomodoro Dial</h2></div><span class="status local">local build</span></div>
-        <p>The locally compiled 25-minute focus / 5-minute break dial shown in the Canvas Simulator.</p>
-        <div class="artifact"><strong>ESPHome 2026.6.5</strong><span>factory image · 1.34 MiB · ESP32-C3</span></div>
-        <esp-web-install-button manifest="./manifests/pomodoro.json"><button class="action gold" slot="activate">Flash Pomodoro Dial</button></esp-web-install-button>
+        <div class="section-head"><div><span class="kicker" data-i18n="pomoKicker">02 · ตัวจับเวลาโฟกัส</span><h2>Pomodoro Dial</h2></div><span class="status local" data-i18n="localBuild">คอมไพล์ในเครื่อง</span></div>
+        <p data-i18n="pomoBody">หน้าปัดโฟกัส 25 นาที / พัก 5 นาที ที่คอมไพล์ในเครื่องและแสดงใน Canvas Simulator</p>
+        <div class="artifact"><strong>ESPHome 2026.6.5</strong><span data-i18n="artifact">factory image · 1.34 MiB · ESP32-C3</span></div>
+        <esp-web-install-button manifest="./manifests/pomodoro.json"><button class="action gold" slot="activate" data-i18n="flashPomo">แฟลช Pomodoro Dial</button></esp-web-install-button>
       </section>
     </div>
 
     <section class="feature aftercare">
-      <div class="section-head"><div><span class="kicker">✦ After installation</span><h2>Connect Wi-Fi</h2></div></div>
-      <p>Unplug and reconnect the board after flashing. If it cannot join a network, wait for the <code>DBK-xxx</code> fallback access point and follow the separate setup guide.</p>
-      <a class="text-link" href="./wifi/">Open Wi-Fi setup <span>→</span></a>
+      <div class="section-head"><div><span class="kicker" data-i18n="afterKicker">✦ หลังติดตั้ง</span><h2 data-i18n="wifiTitle">เชื่อมต่อ Wi-Fi</h2></div></div>
+      <p data-i18n="wifiBody">ถอดและเสียบบอร์ดใหม่หลังแฟลช หากบอร์ดเชื่อมต่อเครือข่ายไม่ได้ ให้รอจุดเชื่อมต่อสำรอง <code>DBK-xxx</code> แล้วทำตามคู่มือตั้งค่า</p>
+      <a class="text-link" href="./wifi/" data-i18n="wifiLink">เปิดคู่มือตั้งค่า Wi-Fi →</a>
     </section>
 
-    <footer>
-      <span>DustBoy Kit · Starry Circuit archive</span>
-      <nav><a href="https://github.com/dustboy-kit/esp32c3-pm25-monitor">Source on GitHub</a><a href="https://the-oracle-keeps-the-human-human.github.io/kru32-oracle/">KRU32 reference</a></nav>
-    </footer>
+    <footer><span data-i18n="footer">DustBoy Kit · คลัง Starry Circuit</span><nav><a href="https://github.com/dustboy-kit/esp32c3-pm25-monitor" data-i18n="source">ซอร์สบน GitHub</a><a href="https://the-oracle-keeps-the-human-human.github.io/kru32-oracle/" data-i18n="kru32">อ้างอิง KRU32</a></nav></footer>
   </main>
+<script>
+(function(){
+  const copy={
+    th:{eyebrow:'วงจรแห่งดวงดาว · DUSTBOY KIT · ESP32-C3',lede:'ดูตัวอย่างหน้าจอ 128×32 ต้นฉบับ แล้วติดตั้งเฟิร์มแวร์ ESPHome ที่คอมไพล์ในเครื่องผ่านเบราว์เซอร์ Chromium ได้โดยตรง',badge:'30 แบบต้นฉบับ · 2 เฟิร์มแวร์',labKicker:'✦ ห้องทดลองออกแบบ',labBody:'สำรวจหน้าจอ DBK ทั้ง 30 แบบ แก้ไข lambda แบบ ESPHome display: และเรนเดอร์ผ่านบัฟเฟอร์ OLED ขาวดำและเอนจินฟอนต์เดียวกับแกลเลอรี',openSimulator:'เปิด OLED Canvas Simulator ↗',monitorKicker:'01 · เครื่องวัด',ready:'พร้อมใช้',monitorBody:'เฟิร์มแวร์เครื่องวัด ESP32-C3 สำหรับ PMS7003 และหน้าจอ SSD1306 ขนาด 128×32',usbNotice:'Chrome หรือ Edge · HTTPS · สาย USB ที่ส่งข้อมูลได้ · ใช้กับ ESP32-C3 ที่รองรับเท่านั้น',flashDbk:'เชื่อมต่อและแฟลช DBK',pomoKicker:'02 · ตัวจับเวลาโฟกัส',localBuild:'คอมไพล์ในเครื่อง',pomoBody:'หน้าปัดโฟกัส 25 นาที / พัก 5 นาที ที่คอมไพล์ในเครื่องและแสดงใน Canvas Simulator',artifact:'factory image · 1.34 MiB · ESP32-C3',flashPomo:'แฟลช Pomodoro Dial',afterKicker:'✦ หลังติดตั้ง',wifiTitle:'เชื่อมต่อ Wi-Fi',wifiBody:'ถอดและเสียบบอร์ดใหม่หลังแฟลช หากบอร์ดเชื่อมต่อเครือข่ายไม่ได้ ให้รอจุดเชื่อมต่อสำรอง DBK-xxx แล้วทำตามคู่มือตั้งค่า',wifiLink:'เปิดคู่มือตั้งค่า Wi-Fi →',footer:'DustBoy Kit · คลัง Starry Circuit',source:'ซอร์สบน GitHub',kru32:'อ้างอิง KRU32'},
+    en:{eyebrow:'THE STARRY CIRCUIT · DUSTBOY KIT · ESP32-C3',lede:'Preview the original 128×32 display collection, then install a locally compiled ESPHome image directly from a Chromium browser.',badge:'30 originals · 2 flash images',labKicker:'✦ Design laboratory',labBody:'Explore all thirty DBK screens, edit the ESPHome-style display: lambda, and render it through the same one-bit OLED buffer and glyph engine used by the gallery.',openSimulator:'Open OLED Canvas Simulator ↗',monitorKicker:'01 · Monitor',ready:'ready',monitorBody:'The complete ESP32-C3 monitor firmware for PMS7003 and the SSD1306 128×32 display.',usbNotice:'Chrome or Edge · HTTPS · data-capable USB cable · supported ESP32-C3 only',flashDbk:'Connect & flash DBK',pomoKicker:'02 · Focus timer',localBuild:'local build',pomoBody:'The locally compiled 25-minute focus / 5-minute break dial shown in the Canvas Simulator.',artifact:'factory image · 1.34 MiB · ESP32-C3',flashPomo:'Flash Pomodoro Dial',afterKicker:'✦ After installation',wifiTitle:'Connect Wi-Fi',wifiBody:'Unplug and reconnect the board after flashing. If it cannot join a network, wait for the DBK-xxx fallback access point and follow the setup guide.',wifiLink:'Open Wi-Fi setup →',footer:'DustBoy Kit · Starry Circuit archive',source:'Source on GitHub',kru32:'KRU32 reference'}
+  };
+  let currentLang='th';
+  window.t=function(key){return copy[currentLang][key]||copy.th[key]||key;};
+  function setLang(lang){currentLang=lang==='en'?'en':'th';document.documentElement.lang=currentLang;localStorage.setItem('dbk-lang',currentLang);document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=window.t(el.dataset.i18n)});document.querySelectorAll('[data-lang]').forEach(b=>b.classList.toggle('active',b.dataset.lang===currentLang));}
+  const q=new URLSearchParams(location.search).get('lang');setLang(q==='en'||q==='th'?q:(localStorage.getItem('dbk-lang')||'th'));document.querySelectorAll('[data-lang]').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
+})();
+</script>
 </body>
 </html>

@@ -422,6 +422,11 @@
   button.danger { border-color: #b96066; background: linear-gradient(145deg, #66243b, #2e1631); }
   input[type="checkbox"], input[type="range"] { accent-color: var(--gold); }
   ::selection { color: #071127; background: var(--gold); }
+
+  .header-tools { display:flex; flex-direction:column; align-items:flex-end; gap:10px; }
+  .lang-switch { display:inline-flex; padding:3px; border:1px solid rgba(88,137,226,.72); border-radius:999px; background:rgba(4,12,31,.82); }
+  .lang-switch button { min-width:46px; padding:4px 9px; border:0; border-radius:999px; background:transparent; color:var(--muted); box-shadow:none; }
+  .lang-switch button.active { color:#fff0a6; background:linear-gradient(135deg,#174baf,#73500f); }
   @media (prefers-reduced-motion: reduce) {
     body::before, body::after { animation: none; }
     .gallery-item { transition: none; }
@@ -443,19 +448,19 @@
 <main class="app">
   <header>
     <div>
-      <div class="eyebrow">The Starry Circuit · OLED study no. 128×32</div>
+      <div class="eyebrow" data-sim-i18n="eyebrow">วงจรแห่งดวงดาว · การศึกษา OLED หมายเลข 128×32</div>
       <h1><em>ESPHome</em> Canvas Simulator</h1>
-      <p>Write an ESPHome-style <code>display.lambda</code>, compile its supported C++-like subset to JavaScript, and render it through the same one-bit OLED buffer and firmware glyph engine used by the DBK gallery.</p>
+      <p data-sim-i18n="intro">เขียน <code>display.lambda</code> แบบ ESPHome แปลงชุดคำสั่ง C++ ที่รองรับเป็น JavaScript และเรนเดอร์ด้วยบัฟเฟอร์ OLED ขาวดำกับเอนจินฟอนต์เดียวกับแกลเลอรี DBK</p>
     </div>
-    <div class="badge" id="engineBadge">engine loading…</div>
+    <div class="header-tools"><div class="lang-switch" aria-label="Language"><button type="button" data-lang="th">ไทย</button><button type="button" data-lang="en">EN</button></div><div class="badge" id="engineBadge">กำลังโหลดเอนจิน…</div></div>
   </header>
 
   <section class="gallery-browser" aria-labelledby="galleryTitle">
     <div class="gallery-browser-head">
-      <strong id="galleryTitle">Original DBK display gallery</strong>
+      <strong id="galleryTitle" data-sim-i18n="galleryTitle">แกลเลอรีหน้าจอ DBK ต้นฉบับ</strong>
       <div class="gallery-browser-actions">
-        <span>Click any 128×32 display to render it and reveal its editable code.</span>
-        <label><input id="galleryAnimateToggle" type="checkbox" checked> animate · 20 FPS</label>
+        <span data-sim-i18n="galleryHint">คลิกหน้าจอ 128×32 เพื่อเรนเดอร์และดูโค้ดที่แก้ไขได้</span>
+        <label><input id="galleryAnimateToggle" type="checkbox" checked> <span data-sim-i18n="animate20">เคลื่อนไหว · 20 FPS</span></label>
       </div>
     </div>
     <div id="galleryGrid" class="gallery-grid"></div>
@@ -464,7 +469,7 @@
   <div class="layout" id="workspace">
     <section class="card">
       <div class="card-head">
-        <strong>ESPHome YAML / display lambda</strong>
+        <strong data-sim-i18n="yamlTitle">ESPHome YAML / display lambda</strong>
         <div class="actions">
           <select id="exampleSelect" aria-label="Example">
             <optgroup label="Simulator basics">
@@ -474,8 +479,8 @@
             </optgroup>
             <optgroup id="galleryOptions" label="Original gallery — 30 displays"></optgroup>
           </select>
-          <button id="resetButton" type="button">Reload selected</button>
-          <button id="compileButton" class="primary" type="button">Compile &amp; render</button>
+          <button id="resetButton" type="button" data-sim-i18n="reload">โหลดที่เลือกใหม่</button>
+          <button id="compileButton" class="primary" type="button" data-sim-i18n="compileRender">คอมไพล์และเรนเดอร์</button>
         </div>
       </div>
       <textarea id="source" spellcheck="false" aria-label="ESPHome YAML source"></textarea>
@@ -483,20 +488,20 @@
 
     <section class="card">
       <div class="card-head">
-        <strong>OLED preview</strong>
+        <strong data-sim-i18n="previewTitle">ตัวอย่าง OLED</strong>
         <span id="dimensionLabel">128×32 → 512×128</span>
       </div>
       <div class="preview-body">
         <div class="controls">
-          <label>Scale <input id="scale" type="range" min="1" max="10" step="1" value="4"> <output id="scaleValue">4×</output></label>
-          <label><input id="fitWidthToggle" type="checkbox" checked> fit width</label>
-          <label><input id="gridToggle" type="checkbox" checked> pixel grid</label>
-          <label><input id="bloomToggle" type="checkbox" checked> bloom</label>
-          <label><input id="animateToggle" type="checkbox" checked> animate</label>
-          <label><input id="panelOnlyToggle" type="checkbox" checked> full panel / no bezel</label>
+          <label><span data-sim-i18n="scale">ขนาด</span> <input id="scale" type="range" min="1" max="10" step="1" value="4"> <output id="scaleValue">4×</output></label>
+          <label><input id="fitWidthToggle" type="checkbox" checked> <span data-sim-i18n="fitWidth">พอดีความกว้าง</span></label>
+          <label><input id="gridToggle" type="checkbox" checked> <span data-sim-i18n="pixelGrid">ตารางพิกเซล</span></label>
+          <label><input id="bloomToggle" type="checkbox" checked> <span data-sim-i18n="bloom">แสงฟุ้ง</span></label>
+          <label><input id="animateToggle" type="checkbox" checked> <span data-sim-i18n="animate">เคลื่อนไหว</span></label>
+          <label><input id="panelOnlyToggle" type="checkbox" checked> <span data-sim-i18n="fullPanel">เต็มจอ / ไม่มีขอบ</span></label>
         </div>
 
-        <div id="exampleInfo" class="example-info">Choose one of the 30 DBK gallery displays or edit the lambda directly.</div>
+        <div id="exampleInfo" class="example-info" data-sim-i18n="exampleInfo">เลือกหนึ่งใน 30 หน้าจอ DBK หรือแก้ไข lambda โดยตรง</div>
 
         <div class="state-grid" aria-label="Simulated ESPHome state">
           <label>PM1<input id="pm1" type="number" value="7" step="1"></label>
@@ -509,9 +514,9 @@
         <div class="stage panel-only" id="previewStage">
           <div class="bezel"><canvas id="oled" role="img" aria-label="128 by 32 monochrome OLED simulation"></canvas></div>
         </div>
-        <div id="status" class="status">Waiting for engine…</div>
+        <div id="status" class="status" data-sim-i18n="waiting">กำลังรอเอนจิน…</div>
         <details>
-          <summary>Translated JavaScript</summary>
+          <summary data-sim-i18n="translated">JavaScript ที่แปลงแล้ว</summary>
           <pre id="translated"></pre>
         </details>
       </div>
@@ -520,35 +525,46 @@
 
   <section class="card firmware-card" aria-labelledby="firmwareTitle">
     <div class="card-head">
-      <strong id="firmwareTitle">Real ESPHome build &amp; flash (local lab)</strong>
-      <span class="badge" id="firmwareBadge">backend checking…</span>
+      <strong id="firmwareTitle" data-sim-i18n="firmwareTitle">คอมไพล์และแฟลช ESPHome จริง (เครื่องท้องถิ่น)</strong>
+      <span class="badge" id="firmwareBadge">กำลังตรวจ backend…</span>
     </div>
     <div class="firmware-body">
       <div class="firmware-controls">
-        <label>Device configuration<select id="firmwareConfig" aria-label="ESPHome configuration"></select></label>
-        <label>Flash target<select id="firmwareTarget" aria-label="Flash target"></select></label>
-        <button id="firmwareRefresh" type="button">Refresh</button>
-        <button id="firmwareCompile" class="primary" type="button">Compile firmware</button>
-        <button id="firmwareFlash" class="danger" type="button">Compile &amp; flash</button>
+        <label><span data-sim-i18n="deviceConfig">การตั้งค่าอุปกรณ์</span><select id="firmwareConfig" aria-label="ESPHome configuration"></select></label>
+        <label><span data-sim-i18n="flashTarget">เป้าหมายการแฟลช</span><select id="firmwareTarget" aria-label="Flash target"></select></label>
+        <button id="firmwareRefresh" type="button" data-sim-i18n="refresh">รีเฟรช</button>
+        <button id="firmwareCompile" class="primary" type="button" data-sim-i18n="compileFirmware">คอมไพล์เฟิร์มแวร์</button>
+        <button id="firmwareFlash" class="danger" type="button" data-sim-i18n="compileFlash">คอมไพล์และแฟลช</button>
       </div>
       <div class="firmware-meta">
-        <span id="firmwareVersion">ESPHome: checking…</span>
-        <span id="firmwarePath">Configuration directory: checking…</span>
-        <span id="firmwarePortState">Serial port: checking…</span>
+        <span id="firmwareVersion">ESPHome: กำลังตรวจ…</span>
+        <span id="firmwarePath">โฟลเดอร์การตั้งค่า: กำลังตรวจ…</span>
+        <span id="firmwarePortState">พอร์ตอนุกรม: กำลังตรวจ…</span>
       </div>
-      <div id="firmwareNotice" class="example-info">Select a configuration to see its flashing scope.</div>
-      <pre id="firmwareLog" class="firmware-log" aria-live="polite">The build service is available only from the localhost Python server.</pre>
+      <div id="firmwareNotice" class="example-info">เลือกการตั้งค่าเพื่อดูขอบเขตการแฟลช</div>
+      <pre id="firmwareLog" class="firmware-log" aria-live="polite">บริการ build ใช้งานได้จากเซิร์ฟเวอร์ Python บน localhost เท่านั้น</pre>
       <div class="actions" style="margin-top:10px">
-        <button id="firmwareCancel" type="button" disabled>Cancel active job</button>
+        <button id="firmwareCancel" type="button" disabled data-sim-i18n="cancel">ยกเลิกงานที่กำลังทำ</button>
       </div>
     </div>
   </section>
 
-  <aside class="notes">
-    <strong>Supported subset:</strong> ESPHome drawing calls such as <code>print</code>, <code>printf</code>, <code>strftime</code>, lines, rectangles, circles, and pixels; <code>id(font_*)</code>; common DBK sensor IDs; <code>TextAlign::*</code>; numeric declarations; <code>millis()</code>; and basic JavaScript-compatible expressions. The 30 gallery examples run through a trusted <code>d / t / S</code> compatibility surface and remain editable in the lambda panel. This is a local design simulator, not a full C++ compiler or ESPHome validator. Use <code>just lab-sim</code> for authoritative ESPHome compilation.
+  <aside class="notes" data-sim-i18n="supportedNote">
+    ชุดคำสั่งที่รองรับ: คำสั่งวาดภาพของ ESPHome เช่น print, printf, strftime, เส้น, สี่เหลี่ยม, วงกลมและพิกเซล; id(font_*); sensor ID ของ DBK; TextAlign::*; ตัวแปรตัวเลข; millis(); และนิพจน์พื้นฐานที่ใช้ร่วมกับ JavaScript ได้ ตัวอย่างทั้ง 30 แบบยังแก้ไขในแผง lambda ได้ นี่คือ simulator สำหรับออกแบบในเครื่อง ไม่ใช่ C++ compiler หรือ ESPHome validator แบบเต็ม ใช้ just lab-sim เพื่อคอมไพล์ด้วย ESPHome จริง
   </aside>
 </main>
 
+<script>
+(function(){
+  var C={
+    th:{eyebrow:'วงจรแห่งดวงดาว · การศึกษา OLED หมายเลข 128×32',intro:'เขียน display.lambda แบบ ESPHome แปลงชุดคำสั่ง C++ ที่รองรับเป็น JavaScript และเรนเดอร์ด้วยบัฟเฟอร์ OLED ขาวดำกับเอนจินฟอนต์เดียวกับแกลเลอรี DBK',galleryTitle:'แกลเลอรีหน้าจอ DBK ต้นฉบับ',galleryHint:'คลิกหน้าจอ 128×32 เพื่อเรนเดอร์และดูโค้ดที่แก้ไขได้',animate20:'เคลื่อนไหว · 20 FPS',yamlTitle:'ESPHome YAML / display lambda',reload:'โหลดที่เลือกใหม่',compileRender:'คอมไพล์และเรนเดอร์',previewTitle:'ตัวอย่าง OLED',scale:'ขนาด',fitWidth:'พอดีความกว้าง',pixelGrid:'ตารางพิกเซล',bloom:'แสงฟุ้ง',animate:'เคลื่อนไหว',fullPanel:'เต็มจอ / ไม่มีขอบ',exampleInfo:'เลือกหนึ่งใน 30 หน้าจอ DBK หรือแก้ไข lambda โดยตรง',waiting:'กำลังรอเอนจิน…',translated:'JavaScript ที่แปลงแล้ว',firmwareTitle:'คอมไพล์และแฟลช ESPHome จริง (เครื่องท้องถิ่น)',deviceConfig:'การตั้งค่าอุปกรณ์',flashTarget:'เป้าหมายการแฟลช',refresh:'รีเฟรช',compileFirmware:'คอมไพล์เฟิร์มแวร์',compileFlash:'คอมไพล์และแฟลช',cancel:'ยกเลิกงานที่กำลังทำ',supportedNote:'ชุดคำสั่งที่รองรับ: คำสั่งวาดภาพของ ESPHome เช่น print, printf, strftime, เส้น, สี่เหลี่ยม, วงกลมและพิกเซล; id(font_*); sensor ID ของ DBK; TextAlign::*; ตัวแปรตัวเลข; millis(); และนิพจน์พื้นฐานที่ใช้ร่วมกับ JavaScript ได้ ตัวอย่างทั้ง 30 แบบยังแก้ไขในแผง lambda ได้ นี่คือ simulator สำหรับออกแบบในเครื่อง ไม่ใช่ C++ compiler หรือ ESPHome validator แบบเต็ม ใช้ just lab-sim เพื่อคอมไพล์ด้วย ESPHome จริง'},
+    en:{eyebrow:'The Starry Circuit · OLED study no. 128×32',intro:'Write an ESPHome-style display.lambda, compile its supported C++-like subset to JavaScript, and render it through the same one-bit OLED buffer and firmware glyph engine used by the DBK gallery.',galleryTitle:'Original DBK display gallery',galleryHint:'Click any 128×32 display to render it and reveal its editable code.',animate20:'animate · 20 FPS',yamlTitle:'ESPHome YAML / display lambda',reload:'Reload selected',compileRender:'Compile & render',previewTitle:'OLED preview',scale:'Scale',fitWidth:'fit width',pixelGrid:'pixel grid',bloom:'bloom',animate:'animate',fullPanel:'full panel / no bezel',exampleInfo:'Choose one of the 30 DBK gallery displays or edit the lambda directly.',waiting:'Waiting for engine…',translated:'Translated JavaScript',firmwareTitle:'Real ESPHome build & flash (local lab)',deviceConfig:'Device configuration',flashTarget:'Flash target',refresh:'Refresh',compileFirmware:'Compile firmware',compileFlash:'Compile & flash',cancel:'Cancel active job',supportedNote:'Supported subset: ESPHome drawing calls such as print, printf, strftime, lines, rectangles, circles, and pixels; id(font_*); common DBK sensor IDs; TextAlign::*; numeric declarations; millis(); and basic JavaScript-compatible expressions. All 30 examples remain editable in the lambda panel. This is a local design simulator, not a full C++ compiler or ESPHome validator. Use just lab-sim for authoritative ESPHome compilation.'}
+  };
+  window.t=function(key){return C[window.DBK_LANG||'th'][key]||C.th[key]||key;};
+  window.setDbkLanguage=function(lang){lang=lang==='en'?'en':'th';window.DBK_LANG=lang;document.documentElement.lang=lang;localStorage.setItem('dbk-lang',lang);document.querySelectorAll('[data-sim-i18n]').forEach(function(el){el.textContent=window.t(el.dataset.simI18n)});document.querySelectorAll('[data-lang]').forEach(function(b){b.classList.toggle('active',b.dataset.lang===lang)});window.dispatchEvent(new CustomEvent('dbk-language-change',{detail:{lang:lang}}));};
+  var q=new URLSearchParams(location.search).get('lang');setDbkLanguage(q==='en'||q==='th'?q:(localStorage.getItem('dbk-lang')||'th'));document.querySelectorAll('[data-lang]').forEach(function(b){b.addEventListener('click',function(){setDbkLanguage(b.dataset.lang)})});
+})();
+</script>
 <script src="oled-canvas-engine.js"></script>
 <script src="oled-gallery-screens.js"></script>
 <script>
@@ -795,7 +811,12 @@
   var buffer = new OLED.Buf(W, H);
   var gallerySurface = new GallerySurface(buffer, F);
   var selfTest = OLED.selfTest(F);
-  document.getElementById("engineBadge").textContent = "engine " + selfTest.pass + "/" + selfTest.total + " · " + GALLERY_SCREENS.length + " originals";
+  function updateEngineBadge(lang) {
+    document.getElementById("engineBadge").textContent = lang === "en"
+      ? "engine " + selfTest.pass + "/" + selfTest.total + " · " + GALLERY_SCREENS.length + " originals"
+      : "เอนจิน " + selfTest.pass + "/" + selfTest.total + " · ต้นฉบับ " + GALLERY_SCREENS.length + " แบบ";
+  }
+  updateEngineBadge(window.DBK_LANG);
 
   function createThumbnailView(target, screen) {
     var thumbBuffer = new OLED.Buf(W, H);
@@ -1193,27 +1214,30 @@
   // the public archive instead of showing a misleading JSON/backend error.
   var isStaticArchive = window.location.protocol === "https:" &&
     /(^|\.)github\.io$/.test(window.location.hostname);
+  function applyStaticArchiveLanguage(lang) {
+    var en = lang === "en";
+    document.getElementById("firmwareBadge").textContent = en ? "static archive" : "คลังแบบ static";
+    document.getElementById("firmwareVersion").textContent = en ? "ESPHome: locally compiled 2026.6.5" : "ESPHome: คอมไพล์ในเครื่องด้วย 2026.6.5";
+    document.getElementById("firmwarePath").textContent = en ? "Build backend: not hosted on Pages" : "Build backend: ไม่ได้โฮสต์บน Pages";
+    document.getElementById("firmwarePortState").textContent = en ? "Flash: use the release flasher" : "การแฟลช: ใช้ปุ่มติดตั้งเฟิร์มแวร์";
+    document.getElementById("firmwareNotice").innerHTML = en
+      ? "<strong>Pomodoro Dial is ready:</strong> the ESP32-C3 factory image was compiled locally with ESPHome 2026.6.5. <esp-web-install-button manifest=\"../manifests/pomodoro.json\"><button slot=\"activate\" type=\"button\">Flash Pomodoro Dial</button></esp-web-install-button> Use Chrome or Edge on a computer with a data-capable USB cable."
+      : "<strong>Pomodoro Dial พร้อมติดตั้ง:</strong> factory image สำหรับ ESP32-C3 คอมไพล์ในเครื่องด้วย ESPHome 2026.6.5 แล้ว <esp-web-install-button manifest=\"../manifests/pomodoro.json\"><button slot=\"activate\" type=\"button\">แฟลช Pomodoro Dial</button></esp-web-install-button> ใช้ Chrome หรือ Edge บนคอมพิวเตอร์และสาย USB ที่ส่งข้อมูลได้";
+    document.getElementById("firmwareLog").textContent = en
+      ? "This GitHub Pages copy has no build server by design.\n\nLocal build: ESPHome 2026.6.5 — success\nFactory image: firmware/pomodoro.factory.bin\nClick Flash Pomodoro Dial above to install over Web Serial."
+      : "GitHub Pages ชุดนี้ไม่มี build server ตามการออกแบบ\n\nการ build ในเครื่อง: ESPHome 2026.6.5 — สำเร็จ\nFactory image: firmware/pomodoro.factory.bin\nคลิก แฟลช Pomodoro Dial ด้านบนเพื่อติดตั้งผ่าน Web Serial";
+  }
   if (isStaticArchive) {
-    document.getElementById("firmwareBadge").textContent = "static archive";
-    document.getElementById("firmwareVersion").textContent = "ESPHome: locally compiled 2026.6.5";
-    document.getElementById("firmwarePath").textContent = "Build backend: not hosted on Pages";
-    document.getElementById("firmwarePortState").textContent = "Flash: use the release flasher";
-    document.getElementById("firmwareNotice").innerHTML =
-      "<strong>Pomodoro Dial is ready:</strong> the ESP32-C3 factory image was compiled locally with ESPHome 2026.6.5. " +
-      "<esp-web-install-button manifest=\"../manifests/pomodoro.json\">" +
-      "<button slot=\"activate\" type=\"button\">Flash Pomodoro Dial</button>" +
-      "</esp-web-install-button> " +
-      "Use Chrome or Edge on a computer with a data-capable USB cable.";
-    document.getElementById("firmwareLog").textContent =
-      "This GitHub Pages copy has no build server by design.\n\n" +
-      "Local build: ESPHome 2026.6.5 — success\n" +
-      "Factory image: firmware/pomodoro.factory.bin\n" +
-      "Click Flash Pomodoro Dial above to install over Web Serial.";
+    applyStaticArchiveLanguage(window.DBK_LANG);
     document.querySelector(".firmware-controls").style.display = "none";
     document.querySelector("#firmwareCancel").style.display = "none";
   } else {
     refreshFirmware();
   }
+  window.addEventListener("dbk-language-change", function (event) {
+    updateEngineBadge(event.detail.lang);
+    if (isStaticArchive) applyStaticArchiveLanguage(event.detail.lang);
+  });
   requestAnimationFrame(frame);
 })();
 </script>
