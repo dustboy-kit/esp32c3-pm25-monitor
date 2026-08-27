@@ -348,6 +348,22 @@
     margin-top: 8px;
   }
   .selected-flash-actions esp-web-install-button { display: inline-flex; }
+  .selected-flash-button {
+    min-width: 220px;
+    min-height: 44px;
+    padding: 10px 18px;
+    border: 1px solid #ffe487;
+    border-radius: 9px;
+    color: #10172a;
+    background: linear-gradient(145deg, #f8d45d, #e7ad32);
+    font-weight: 850;
+    box-shadow: 0 0 0 2px rgba(52, 91, 173, .62);
+  }
+  .selected-flash-button:hover {
+    color: #081127;
+    border-color: #fff3b7;
+    background: linear-gradient(145deg, #ffe384, #efbb49);
+  }
   .selected-icon-action {
     display: inline-flex;
     width: 38px;
@@ -378,6 +394,16 @@
     white-space: pre-wrap;
   }
   .status.ok { border-color: #285f46; color: #9eeac1; }
+  .status.ok {
+    min-height: 0;
+    margin-top: 7px;
+    padding: 2px 4px;
+    border: 0;
+    color: #82b99f;
+    background: transparent;
+    font-size: 11px;
+    opacity: .78;
+  }
   .status.error { border-color: #713445; color: #ff9cb0; background: #210c12; }
   .example-info {
     margin: 12px 0;
@@ -390,6 +416,22 @@
   }
   .example-info strong { color: var(--text); }
   details { margin-top: 12px; color: var(--muted); }
+  details.developer-details { margin-top: 2px; text-align: right; }
+  details.developer-details summary {
+    display: inline-flex;
+    width: 30px;
+    height: 26px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    color: #7183aa;
+    cursor: pointer;
+    font: 700 11px/1 ui-monospace, monospace;
+    list-style: none;
+  }
+  details.developer-details summary::-webkit-details-marker { display: none; }
+  details.developer-details summary:hover { color: #f3d878; background: rgba(22, 53, 109, .45); }
+  details.developer-details pre { text-align: left; }
   details pre {
     overflow: auto;
     max-height: 280px;
@@ -548,8 +590,8 @@
           </a>
         </div>
         <div id="status" class="status" data-sim-i18n="waiting">กำลังรอเอนจิน…</div>
-        <details>
-          <summary data-sim-i18n="translated">JavaScript ที่แปลงแล้ว</summary>
+        <details class="developer-details">
+          <summary title="JavaScript ที่แปลงแล้ว / Translated JavaScript" aria-label="JavaScript ที่แปลงแล้ว / Translated JavaScript">&lt;/&gt;</summary>
           <pre id="translated"></pre>
         </details>
       </div>
@@ -795,7 +837,7 @@
       compileTime = performance.now();
       lastRuntimeError = "";
       draw(performance.now());
-      setStatus("Compiled " + result.mode + " at source line " + result.sourceLine + ". Logical display is fixed at 128×32.", "ok");
+      setStatus(window.DBK_LANG === "en" ? "128×32 · YAML ready" : "128×32 · YAML พร้อม", "ok");
     } catch (error) {
       compiled = null;
       document.getElementById("translated").textContent = translated || "(translation failed)";
@@ -1009,10 +1051,10 @@
     var button = document.createElement("button");
     button.type = "button";
     button.slot = "activate";
-    button.className = "selected-icon-action";
+    button.className = "selected-flash-button";
     button.title = en ? "Flash " + selected.name : "แฟลช " + selected.name;
     button.setAttribute("aria-label", button.title);
-    button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m13 2-9 12h8l-1 8 9-12h-8z"/></svg>';
+    button.textContent = en ? "⚡ Flash " + selected.name : "⚡ แฟลช " + selected.name;
     installer.appendChild(button);
     document.getElementById("selectedFlashInstall").replaceChildren(installer);
 
