@@ -75,6 +75,10 @@ logger:
   # per-component level more verbose than the global one, so it has to be here.
   level: DEBUG
   baud_rate: 115200
+  logs:
+    # A hosted HTTPS dashboard can lose its HTTP/SSE connection to the board.
+    # Keep useful PMS DEBUG lines without repeating ENOTCONN for the dead socket.
+    web_server_idf: WARN
 
 # Export PM1, PM2.5 and PM10 entities over Wi-Fi to Home Assistant or another
 # ESPHome native-API client. No static credential is baked into public firmware.

@@ -1,6 +1,6 @@
 {
   "name": "DustBoy PM2.5 Monitor",
-  "version": "2026.6.5-c3-wifi-compat",
+  "version": "2026.6.5-web-socket-fix",
   "new_install_prompt_erase": false,
   "builds": [
     {

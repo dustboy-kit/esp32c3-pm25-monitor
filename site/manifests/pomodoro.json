@@ -1,6 +1,6 @@
 {
   "name": "DustBoy Pomodoro Dial",
-  "version": "2026.6.5-local",
+  "version": "2026.6.5-web-socket-fix",
   "new_install_prompt_erase": false,
   "builds": [
     {

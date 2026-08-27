@@ -2,11 +2,14 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const source = await readFile(new URL("../site/tools/dbk-esphome-rpc.js", import.meta.url), "utf8");
+const dashboard = await readFile(new URL("../site/dashboard/index.html", import.meta.url), "utf8");
 const moduleUrl = `data:text/javascript;base64,${Buffer.from(source).toString("base64")}`;
 const { DbkEspHomeRpc, normalizeDeviceUrl } = await import(moduleUrl);
 
 assert.equal(normalizeDeviceUrl("dbk-a1b2c3.local"), "http://dbk-a1b2c3.local");
 assert.equal(normalizeDeviceUrl("http://192.168.1.42/path?q=1"), "http://192.168.1.42");
+assert.doesNotMatch(dashboard, /EventSource|\/events/);
+assert.match(dashboard, /setInterval\(.*5000\)/);
 
 const calls = [];
 const fakeFetch = async (url, init) => {

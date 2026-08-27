@@ -26,3 +26,7 @@ esp32:
 logger:
   hardware_uart: USB_SERIAL_JTAG
   level: DEBUG
+  # Keep PMS frame diagnostics at DEBUG, but do not let a browser that closes
+  # its HTTP/SSE socket flood serial with ESP-IDF ENOTCONN (errno 128).
+  logs:
+    web_server_idf: WARN

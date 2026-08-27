@@ -348,6 +348,7 @@ def verify(examples: list[dict[str, object]]) -> None:
             "\nota:\n",
             "\nimprov_serial:",
             "  output_power: 8.5dBm",
+            "    web_server_idf: WARN",
             "  power_save_mode: none",
             "  fast_connect: true",
             "  min_auth_mode: WPA",
