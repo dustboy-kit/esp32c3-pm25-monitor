@@ -231,3 +231,9 @@ task's stack) and replay it through `COLOR_OFF`, because carving is the only way
 to invert type. Screens 25-29 are dither studies. Everything from 20 up avoids
 the real fonts almost entirely and draws its own 3x5 micro-font, for the same
 reason: `it.print` cannot knock text out of a filled block.
+
+## Captured archive view
+
+The public GitHub Pages copy is a static archive. Its native ESPHome build controls are intentionally disabled because Pages cannot run the localhost build server. Use the release flasher from the main site for USB flashing, or run `tools/esphome-web-server.py` locally when you need compile/flash controls.
+
+![Static archive build panel](assets/static-archive-build-panel.png)
