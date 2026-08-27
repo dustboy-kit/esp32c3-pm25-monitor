@@ -245,3 +245,9 @@ This is the archived simulator view showing all thirty original DBK OLED designs
 https://dustboy-kit.github.io/esp32c3-pm25-monitor/tools/esphome-canvas-simulator.html
 
 ![Captured 30-screen OLED Canvas Simulator gallery](assets/oled-canvas-gallery.png)
+
+## Full-page simulator capture
+
+A full-page capture of the archived simulator, including the 30-screen gallery, editable YAML panel, OLED preview, and archive build/flash notice:
+
+![Full-page ESPHome Canvas Simulator](assets/oled-canvas-simulator-full-page.png)
