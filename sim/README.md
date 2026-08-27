@@ -24,7 +24,7 @@ site/firmware/canvas/<id>.factory.bin
 site/manifests/canvas/<id>.json
 ```
 
-Generate the 33 YAML wrappers, compile all images locally, and verify the
+Generate the 33 standalone YAML files, compile all images locally, and verify the
 published set:
 
 ```bash
@@ -34,10 +34,13 @@ just canvas-verify
 ```
 
 `tools/canvas-firmware.py` extracts the three basic lambdas from the browser
-simulator and indexes the 30 original screens from `oled-gallery-screens.js`, so
-the UI, YAML catalog, and firmware catalog cannot silently drift apart. The
-build is deliberately local; no GitHub Actions firmware workflow is required.
-The checked-in `site/firmware/canvas/catalog.json` records the compiler version,
+simulator and the 30 original C++ lambdas from `gallery.yaml`, so the UI, YAML
+catalog, and firmware catalog cannot silently drift apart. Each generated file
+contains the full ESP32-C3, sensor, font, and display configuration plus one
+direct lambda. It has no `packages`, `!include`, or gallery `switch/case`, and
+can be compiled by itself with `esphome compile sim/canvas/<id>.yaml`. The build
+is deliberately local; no GitHub Actions firmware workflow is required. The
+checked-in `site/firmware/canvas/catalog.json` records the compiler version,
 size, and SHA-256 of every image.
 
 ---
@@ -55,24 +58,21 @@ a missing glyph is a thing you can actually see.
 
 Design decisions worth knowing before you edit it:
 
-- **No credentials, on purpose.** No `wifi` network, no `api`, no `ota`. The file
-  is safe to commit and safe to share. `~/.haos-oracle/lab/dbk.yaml` is a
-  *resolved* config with real secrets inlined — nothing was copied from it except
-  hardware blocks.
-- **`wifi:` is declared but never switched on.** Four screens call
-  `id(wifi_component).is_connected()`, so the component has to exist — and a
-  `wifi:` block will not validate without either a network or an AP. It gets an
-  AP to satisfy the schema plus `enable_on_boot: false`, so no radio comes up and
-  no open access point is broadcast from a board that sits in a classroom.
-  `is_connected()` is therefore always false, which is honest: no uplink.
-  ESPHome warns that the AP is unusable without a captive portal — expected, it
-  is not meant to be used.
+- **No credentials are embedded.** The file is safe to commit and share. Wi-Fi
+  is provisioned after flashing through Improv Serial over USB, ESP32 Improv
+  over BLE, or the fallback captive portal; ESPHome persists the credentials.
+- **Sensor values are network-ready.** `api:` exports PM1, PM2.5 and PM10 to
+  Home Assistant over the native ESPHome API. `ota:` and `dashboard_import:`
+  let an adopted full config be renamed and updated over Wi-Fi.
+- **Every factory image has a unique initial node name.**
+  `name_add_mac_suffix: true` produces `dbk-canvas-aabbcc`-style names. To choose
+  an exact permanent name, import the full YAML into ESPHome Device Builder,
+  then follow ESPHome's two-step `esphome.name` / `wifi.use_address` rename.
 - **No PMS7003 required.** Every lambda was audited for the NaN case, so a bare
   C3 + OLED renders all thirty screens with zeros instead of the hollow boxes
   `"nan"` would produce in `font_value`.
-- **The clock never syncs** without an uplink, so screens 0 and 4 show their
-  designed fallbacks (`09:41`, `WED 26 AUG 2026`). That fallback path is exactly
-  what the gallery should be showing you.
+- **The clock has honest fallbacks.** Before Wi-Fi is provisioned, screens 0 and
+  4 show `09:41` and `WED 26 AUG 2026`; after provisioning they use SNTP time.
 - **Nothing is overlaid on a design.** No screen number is painted on top — each
   renders exactly as drawn. The only screen that shows an index is the `default:`
   case, which is reached only if `screen_idx` goes out of range.
@@ -162,24 +162,19 @@ Set it to `50ms` to watch them run. Every screen still fits the frame budget on 
 C3 except 27, which will begin to stutter. That is a viewing choice, not a design
 change. (The same applies to `dbk-sim.yaml` for the SDL window.)
 
-### If you want it on the network
+### Provision Wi-Fi and choose a name
 
-Drop `enable_on_boot: false` and add a real network **in the lab copy only**,
-using `!secret` references that resolve against `~/.haos-oracle/lab/secrets.yaml`:
+After Web Serial flashing, keep the USB cable connected and let ESP Web Tools
+send the SSID/password through **Improv Serial**. BLE Improv and the
+`DBK-Canvas Setup` captive portal are fallback paths. Home Assistant then
+discovers the unique `dbk-canvas-<mac>` node and receives its PM entities.
 
-```yaml
-wifi:
-  id: wifi_component
-  ssid: !secret wifi_ssid
-  # ...plus the matching !secret reference for the key
-```
-
-With an uplink the clock syncs, so screens 0 and 4 stop showing their fallbacks
-and start showing the real date and time.
-
-Never inline the literal values, and never commit them here. `laris-co/haos-oracle`
-is private, but `hermes-haos-addons` and `watchboy` are public and these files
-travel.
+Improv provisions network credentials; it does not rewrite ESPHome's compiled
+node name. For a custom name, use the YAML icon beside the preview, import that
+complete file into ESPHome Device Builder, change `esphome.name`, and temporarily
+set `wifi.use_address` to the board's current name or IP for the first OTA upload.
+Remove `use_address` and upload again after the new name is live. Never inline
+real Wi-Fi values in the public YAML files.
 
 ---
 

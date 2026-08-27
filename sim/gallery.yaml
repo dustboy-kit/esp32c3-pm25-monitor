@@ -32,10 +32,12 @@ substitutions:
 esphome:
   name: ${device_name}
   friendly_name: ${friendly_name}
+  # One factory image can be flashed to many boards without mDNS/API clashes.
+  name_add_mac_suffix: true
   min_version: 2026.6.5
   project:
     name: dustboy-kit.dbk-gallery
-    version: 0.1.0
+    version: 0.2.0
 
 esp32:
   board: esp32-c3-devkitm-1
@@ -55,20 +57,23 @@ logger:
   level: DEBUG
   baud_rate: 115200
 
-# Declared, but never switched on. Four screens call
-# id(wifi_component).is_connected(), so the component has to EXIST — and a
-# `wifi:` block will not validate without either a network or an AP, while a
-# network would mean credentials in a committed file. So: an AP to satisfy the
-# schema, plus enable_on_boot:false so no radio ever comes up and no open access
-# point is broadcast from a device that sits in a classroom. is_connected() is
-# therefore always false, which is honest — this board has no uplink.
-# ESPHome will warn that the AP is unusable without captive_portal. Expected:
-# it is not meant to be used.
+# Export PM1, PM2.5 and PM10 entities over Wi-Fi to Home Assistant or another
+# ESPHome native-API client. No static credential is baked into public firmware.
+api:
+  reboot_timeout: 0s
+
+# Required for an adopted Device Builder config to rename/update the node over
+# Wi-Fi after its initial USB flash.
+ota:
+- platform: esphome
+
+# No credentials are baked in. Provision Wi-Fi over USB with Improv Serial, over
+# BLE with ESP32 Improv, or through the fallback captive portal. Credentials are
+# persisted by ESPHome and used again after reboot.
 wifi:
   id: wifi_component
-  enable_on_boot: false
   ap:
-    ssid: DBK-GALLERY
+    ssid: DBK-Canvas Setup
   on_connect:
     then:
     - globals.set:
@@ -100,6 +105,9 @@ esp32_improv:
   identify_duration: 10s
   authorized_duration: 1min
   wifi_timeout: 90s
+
+# Fallback provisioning path when BLE or serial Improv is not convenient.
+captive_portal:
 
 # Screens 0 and 4 read the clock. With no uplink it never syncs, and both fall
 # back to their designed constants (09:41 and WED 26 AUG 2026) rather than
