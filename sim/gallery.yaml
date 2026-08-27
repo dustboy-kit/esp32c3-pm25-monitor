@@ -22,9 +22,16 @@
 #   rather than the hollow boxes "nan" would produce in font_value.
 # ─────────────────────────────────────────────────────────────────────────────
 
-esphome:
-  name: dbk-gallery
+substitutions:
+  device_name: dbk-gallery
   friendly_name: DBK Gallery
+  initial_screen: '0'
+  # -1 cycles through all screens; 0..29 pins one Canvas design for flashing.
+  selected_screen: '-1'
+
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
   min_version: 2026.6.5
   project:
     name: dustboy-kit.dbk-gallery
@@ -143,7 +150,7 @@ globals:
 - id: screen_idx
   type: int
   restore_value: false
-  initial_value: '0'
+  initial_value: '${initial_screen}'
 # Screens 12 and 19 read this one.
 - id: mqtt_connected
   type: bool
@@ -194,7 +201,12 @@ interval:
 # The gallery itself: advance one design every 5 seconds, wrap at 30.
 - interval: 5s
   then:
-  - lambda: 'id(screen_idx) = (id(screen_idx) + 1) % 30;'
+  - lambda: |-
+      if (${selected_screen} >= 0) {
+        id(screen_idx) = ${selected_screen};
+      } else {
+        id(screen_idx) = (id(screen_idx) + 1) % 30;
+      }
 
 # GALLERY ONLY — delete this block to make the gallery purely passive.
 # There is no mqtt: client in this firmware, so mqtt_connected would sit false

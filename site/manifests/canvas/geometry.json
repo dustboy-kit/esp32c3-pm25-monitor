@@ -1,0 +1,16 @@
+{
+  "name": "DustBoy Canvas - Geometry Test",
+  "version": "2026.6.5-local-canvas",
+  "new_install_prompt_erase": false,
+  "builds": [
+    {
+      "chipFamily": "ESP32-C3",
+      "parts": [
+        {
+          "path": "../../firmware/canvas/geometry.factory.bin",
+          "offset": 0
+        }
+      ]
+    }
+  ]
+}

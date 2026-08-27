@@ -340,6 +340,36 @@
     image-rendering: crisp-edges;
     box-shadow: 0 0 34px -9px rgba(120, 198, 255, .45);
   }
+  .selected-flash-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 16px;
+    margin-top: 14px;
+    padding: 15px 16px;
+    border: 1px solid rgba(247, 206, 70, .72);
+    border-radius: 11px;
+    background:
+      radial-gradient(360px 110px at 100% 0%, rgba(247, 206, 70, .2), transparent 72%),
+      linear-gradient(120deg, rgba(19, 55, 123, .94), rgba(8, 19, 44, .98));
+    box-shadow: 0 15px 34px -24px rgba(247, 206, 70, .85), inset 0 1px rgba(255,255,255,.06);
+  }
+  .selected-flash-copy strong { display: block; color: #fff1aa; font-size: 15px; }
+  .selected-flash-copy span { display: block; margin-top: 3px; color: var(--muted); font-size: 12px; }
+  .selected-flash-actions { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+  .selected-flash-actions esp-web-install-button { display: inline-flex; }
+  .selected-flash-button {
+    min-width: 220px;
+    padding: 12px 18px;
+    border: 2px solid #fff2a5;
+    color: #11182a;
+    background: linear-gradient(145deg, #ffd95e, #e3a72d);
+    font-weight: 900;
+    letter-spacing: .02em;
+    box-shadow: 0 0 0 3px rgba(43, 91, 185, .8), 0 12px 28px -18px #000;
+  }
+  .selected-flash-button:hover { color: #081127; background: linear-gradient(145deg, #ffeb94, #f0b837); }
+  .selected-yaml-link { color: #ffe47a; font-weight: 700; white-space: nowrap; }
   .status {
     min-height: 42px;
     margin-top: 13px;
@@ -440,6 +470,9 @@
   @media (max-width: 620px) {
     .app { padding: 14px; }
     .gallery-grid { grid-template-columns: repeat(2, minmax(120px, 1fr)); }
+    .selected-flash-card { grid-template-columns: 1fr; }
+    .selected-flash-actions { align-items: stretch; flex-direction: column; }
+    .selected-flash-button { width: 100%; min-width: 0; }
   }
 </style>
   <script type="module" src="https://unpkg.com/esp-web-tools@10.2.1/dist/web/install-button.js?module"></script>
@@ -513,6 +546,16 @@
 
         <div class="stage panel-only" id="previewStage">
           <div class="bezel"><canvas id="oled" role="img" aria-label="128 by 32 monochrome OLED simulation"></canvas></div>
+        </div>
+        <div class="selected-flash-card" aria-live="polite">
+          <div class="selected-flash-copy">
+            <strong id="selectedFlashTitle">เฟิร์มแวร์ของหน้าจอนี้พร้อมแล้ว</strong>
+            <span id="selectedFlashNote">เลือกตัวอย่าง แล้วติดตั้ง factory image ที่คอมไพล์ในเครื่องผ่าน USB</span>
+          </div>
+          <div class="selected-flash-actions">
+            <span id="selectedFlashInstall"></span>
+            <a id="selectedYamlLink" class="selected-yaml-link" target="_blank" rel="noopener">ดู YAML ↗</a>
+          </div>
         </div>
         <div id="status" class="status" data-sim-i18n="waiting">กำลังรอเอนจิน…</div>
         <details>
@@ -955,7 +998,42 @@
       sourceEl.value = EXAMPLES[value];
       info.innerHTML = "<strong>" + document.getElementById("exampleSelect").selectedOptions[0].textContent + "</strong> — " + BASIC_INFO[value];
     }
+    updateSelectedFlash();
     compile();
+  }
+
+  function selectedFirmware() {
+    var select = document.getElementById("exampleSelect");
+    var value = select.value;
+    return {
+      id: value.indexOf("gallery:") === 0 ? value.slice(8) : value,
+      name: select.selectedOptions[0].textContent.replace(/^\d+\.\s*/, "")
+    };
+  }
+
+  function updateSelectedFlash() {
+    var selected = selectedFirmware();
+    var en = window.DBK_LANG === "en";
+    document.getElementById("selectedFlashTitle").textContent = en
+      ? selected.name + " firmware is ready"
+      : "เฟิร์มแวร์ " + selected.name + " พร้อมติดตั้ง";
+    document.getElementById("selectedFlashNote").textContent = en
+      ? "Locally compiled ESPHome factory image for ESP32-C3 + SSD1306 128×32."
+      : "factory image ของ ESPHome ที่คอมไพล์ในเครื่อง สำหรับ ESP32-C3 + SSD1306 128×32";
+
+    var installer = document.createElement("esp-web-install-button");
+    installer.setAttribute("manifest", "../manifests/canvas/" + selected.id + ".json");
+    var button = document.createElement("button");
+    button.type = "button";
+    button.slot = "activate";
+    button.className = "selected-flash-button";
+    button.textContent = en ? "⚡ Flash " + selected.name : "⚡ แฟลช " + selected.name;
+    installer.appendChild(button);
+    document.getElementById("selectedFlashInstall").replaceChildren(installer);
+
+    var yaml = document.getElementById("selectedYamlLink");
+    yaml.href = "https://github.com/dustboy-kit/esp32c3-pm25-monitor/blob/main/sim/canvas/" + selected.id + ".yaml";
+    yaml.textContent = en ? "View YAML ↗" : "ดู YAML ↗";
   }
 
   GALLERY_SCREENS.forEach(function (screen, index) {
@@ -1182,6 +1260,7 @@
 
   sourceEl.value = EXAMPLES.readings;
   document.getElementById("exampleInfo").innerHTML = "<strong>DBK readings</strong> — " + BASIC_INFO.readings;
+  updateSelectedFlash();
   resizeCanvas();
   compile();
   requestAnimationFrame(fitCanvasToStage);
@@ -1236,6 +1315,7 @@
   }
   window.addEventListener("dbk-language-change", function (event) {
     updateEngineBadge(event.detail.lang);
+    updateSelectedFlash();
     if (isStaticArchive) applyStaticArchiveLanguage(event.detail.lang);
   });
   requestAnimationFrame(frame);

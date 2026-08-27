@@ -5,9 +5,40 @@ Two ways to look at a 128x32 OLED design before it reaches a child's desk.
 | File | What it is |
 |---|---|
 | `gallery.yaml` | **Device firmware.** All 30 screen designs in one build, cycling every 5s on a real ESP32-C3 + SSD1306. |
+| `canvas/*.yaml` | **One installable configuration per browser example.** Three simulator basics plus all 30 gallery screens, each pinned to the selected design. |
 | `dbk-sim.yaml` | Host-platform template for `just lab-sim` — renders a device's display lambda to an SDL window, no hardware. |
 | `_active-sim.yaml` | Generated. `tools/lab-sim.py` writes it on every run; do not edit. |
 | `sim_shim.h` | Stands `wifi_component` up as a shim, because the host platform cannot compile the real WiFi component. |
+
+---
+
+## Build every Canvas example for Web Serial
+
+The public simulator does not compile firmware in the browser. Every selectable
+example instead has a checked-in YAML source, a locally compiled ESP32-C3
+factory image, and an ESP Web Tools manifest:
+
+```text
+sim/canvas/<id>.yaml
+site/firmware/canvas/<id>.factory.bin
+site/manifests/canvas/<id>.json
+```
+
+Generate the 33 YAML wrappers, compile all images locally, and verify the
+published set:
+
+```bash
+just canvas-generate
+ESPHOME_CMD=/path/to/esphome just canvas-build
+just canvas-verify
+```
+
+`tools/canvas-firmware.py` extracts the three basic lambdas from the browser
+simulator and indexes the 30 original screens from `oled-gallery-screens.js`, so
+the UI, YAML catalog, and firmware catalog cannot silently drift apart. The
+build is deliberately local; no GitHub Actions firmware workflow is required.
+The checked-in `site/firmware/canvas/catalog.json` records the compiler version,
+size, and SHA-256 of every image.
 
 ---
 

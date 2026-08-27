@@ -1,0 +1,205 @@
+{
+  "schema_version": 1,
+  "device": "ESP32-C3 + SSD1306 128x32",
+  "source": "site/tools/esphome-canvas-simulator.html",
+  "examples": [
+    {
+      "id": "readings",
+      "name": "DBK Readings",
+      "kind": "basic",
+      "screen_index": null
+    },
+    {
+      "id": "animation",
+      "name": "Animated Sweep",
+      "kind": "basic",
+      "screen_index": null
+    },
+    {
+      "id": "geometry",
+      "name": "Geometry Test",
+      "kind": "basic",
+      "screen_index": null
+    },
+    {
+      "id": "seg-clock",
+      "name": "Segment Clock",
+      "kind": "gallery",
+      "screen_index": 0
+    },
+    {
+      "id": "outdoor-countdown",
+      "name": "Outdoor Window",
+      "kind": "gallery",
+      "screen_index": 1
+    },
+    {
+      "id": "pomo-dial",
+      "name": "Pomodoro Dial",
+      "kind": "gallery",
+      "screen_index": 2
+    },
+    {
+      "id": "ota-marching",
+      "name": "Marching Progress",
+      "kind": "gallery",
+      "screen_index": 3
+    },
+    {
+      "id": "week-and-day",
+      "name": "Week and Day",
+      "kind": "gallery",
+      "screen_index": 4
+    },
+    {
+      "id": "mood-face",
+      "name": "Air Face",
+      "kind": "gallery",
+      "screen_index": 5
+    },
+    {
+      "id": "dust-bug",
+      "name": "Dust Bug",
+      "kind": "gallery",
+      "screen_index": 6
+    },
+    {
+      "id": "haze-pong",
+      "name": "Haze Pong",
+      "kind": "gallery",
+      "screen_index": 7
+    },
+    {
+      "id": "air-news-ticker",
+      "name": "Air News",
+      "kind": "gallery",
+      "screen_index": 8
+    },
+    {
+      "id": "dust-cube",
+      "name": "Dust Cube",
+      "kind": "gallery",
+      "screen_index": 9
+    },
+    {
+      "id": "hero-pm25",
+      "name": "Hero Number",
+      "kind": "gallery",
+      "screen_index": 10
+    },
+    {
+      "id": "aqi-band",
+      "name": "Density Scale",
+      "kind": "gallery",
+      "screen_index": 11
+    },
+    {
+      "id": "triple-metric",
+      "name": "Three Columns",
+      "kind": "gallery",
+      "screen_index": 12
+    },
+    {
+      "id": "trend-strip",
+      "name": "Trend Strip",
+      "kind": "gallery",
+      "screen_index": 13
+    },
+    {
+      "id": "sensor-stale",
+      "name": "Stale Reading",
+      "kind": "gallery",
+      "screen_index": 14
+    },
+    {
+      "id": "link-state",
+      "name": "Link State",
+      "kind": "gallery",
+      "screen_index": 15
+    },
+    {
+      "id": "cell-gauge",
+      "name": "Cell Gauge",
+      "kind": "gallery",
+      "screen_index": 16
+    },
+    {
+      "id": "cold-start",
+      "name": "Cold Start",
+      "kind": "gallery",
+      "screen_index": 17
+    },
+    {
+      "id": "hard-alert",
+      "name": "Hard Alert",
+      "kind": "gallery",
+      "screen_index": 18
+    },
+    {
+      "id": "eight-up-board",
+      "name": "Eight Up Board",
+      "kind": "gallery",
+      "screen_index": 19
+    },
+    {
+      "id": "flip-alarm",
+      "name": "Panel Flip Alarm",
+      "kind": "gallery",
+      "screen_index": 20
+    },
+    {
+      "id": "split-polarity",
+      "name": "Split Polarity",
+      "kind": "gallery",
+      "screen_index": 21
+    },
+    {
+      "id": "menu-cursor",
+      "name": "Menu Cursor",
+      "kind": "gallery",
+      "screen_index": 22
+    },
+    {
+      "id": "carve-bar",
+      "name": "Carved Bar",
+      "kind": "gallery",
+      "screen_index": 23
+    },
+    {
+      "id": "wipe-invert",
+      "name": "Polarity Wipe",
+      "kind": "gallery",
+      "screen_index": 24
+    },
+    {
+      "id": "grey-ladder",
+      "name": "Grey Ladder",
+      "kind": "gallery",
+      "screen_index": 25
+    },
+    {
+      "id": "lifted-card",
+      "name": "Lifted Card",
+      "kind": "gallery",
+      "screen_index": 26
+    },
+    {
+      "id": "smoke-plate",
+      "name": "Smoke Plate",
+      "kind": "gallery",
+      "screen_index": 27
+    },
+    {
+      "id": "haze-horizon",
+      "name": "Haze Horizon",
+      "kind": "gallery",
+      "screen_index": 28
+    },
+    {
+      "id": "moving-weave",
+      "name": "Moving Weave",
+      "kind": "gallery",
+      "screen_index": 29
+    }
+  ]
+}
