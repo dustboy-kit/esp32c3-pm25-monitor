@@ -139,11 +139,11 @@ switch:
 
 globals:
 # Which of the 30 designs is on the panel. Not restored: a gallery should always
-# open on screen 0 so a demo is reproducible.
+# open on the Pomodoro Dial (screen 2).
 - id: screen_idx
   type: int
   restore_value: false
-  initial_value: '0'
+  initial_value: '2'
 # Screens 12 and 19 read this one.
 - id: mqtt_connected
   type: bool
