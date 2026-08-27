@@ -87,7 +87,8 @@ Harden `/wifi/` and Improv/AP instructions. Only after C3 is stable, add a separ
 
 ## Current status and blockers
 - Pages scaffold is committed in `3fd07e6` and deployed successfully. Verified HTTP 200 for `/`, `/wifi/`, and `/manifests/dbk.json`.
-- The first firmware validation run is currently compiling `factory.yaml`; release publication remains gated on its result.
+- Tag `v0.1.0` is published with verified `dbk.factory.bin` and `dbk.ota.bin`; the Pages manifest latest-download URL returns HTTP 200.
+- The binary came from successful CI run `29471684427`; newer duplicate validation runs were cancelled. Physical flash validation remains pending.
 - Pages is not enabled yet (API returned 404); enabling/configuring it requires repository admin/write authority.
 - No public source repository for the Cloudflare `dbk-oled-studio` project was confirmed; use it as a canonical reference/link until source is provided.
 - Full flashing validation requires physical hardware and a known-good factory binary.
