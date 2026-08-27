@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>DustBoy Telemetry Dashboard</title>
+  <meta name="description" content="หน้าเว็บอ่าน telemetry และเรียก ESPHome Web API ผ่าน JSON-RPC 2.0 adapter">
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    .dashboard-shell{display:grid;gap:20px}.control-grid{display:grid;grid-template-columns:2fr 1fr auto;gap:12px;align-items:end}.field{display:grid;gap:5px;color:var(--muted);font-size:12px}.field input,.field textarea,.field select{width:100%;border:1px solid rgba(88,137,226,.66);border-radius:8px;padding:11px 12px;background:#050c1c;color:var(--text);font:13px ui-monospace,SFMono-Regular,Menlo,monospace}.field textarea{min-height:150px;resize:vertical}.button-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.telemetry-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px}.metric{min-height:118px;padding:16px;border:1px solid rgba(88,137,226,.48);border-radius:14px;background:linear-gradient(145deg,rgba(11,28,66,.95),rgba(4,13,34,.96))}.metric small{display:block;color:var(--muted);font-size:11px;letter-spacing:.08em;text-transform:uppercase}.metric strong{display:block;margin-top:8px;color:#fff4ba;font:800 clamp(25px,4vw,40px)/1 ui-monospace,SFMono-Regular,Menlo,monospace}.metric span{color:#91a7d3;font-size:12px}.connection-status{margin-top:14px;padding:11px 13px;border:1px solid rgba(88,137,226,.5);border-radius:9px;background:#071126;color:var(--muted)}.connection-status.ok{border-color:#285f46;color:#9eeac1}.connection-status.error{border-color:#713445;color:#ff9cb0}.rpc-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.rpc-output{min-height:210px;max-height:420px;overflow:auto;margin:0;padding:14px;border:1px solid rgba(88,137,226,.55);border-radius:9px;background:#030914;color:#bed2f6;font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap}.explain{padding:13px;border-left:3px solid var(--gold);background:#071126;color:var(--muted);font-size:13px}.link-row{display:flex;gap:16px;flex-wrap:wrap}.danger-button{border-color:#713445;background:linear-gradient(145deg,#6b263a,#351420)}@media(max-width:800px){.control-grid,.rpc-grid{grid-template-columns:1fr}.telemetry-grid{grid-template-columns:1fr 1fr}}@media(max-width:520px){.telemetry-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<main class="app dashboard-shell">
+  <header class="hero">
+    <div>
+      <p class="eyebrow" data-i18n="eyebrow">วงจรแห่งดวงดาว · ESPHOME WEB API</p>
+      <h1>DustBoy <em>Telemetry</em></h1>
+      <p class="lede" data-i18n="lede">อ่าน PM1, PM2.5, PM10 และข้อมูลวินิจฉัยจากบอร์ดโดยตรง พร้อม JSON‑RPC 2.0 adapter ในเบราว์เซอร์</p>
+    </div>
+    <div class="hero-tools"><div class="lang-switch" aria-label="Language"><button type="button" data-lang="th">ไทย</button><button type="button" data-lang="en">EN</button></div><span class="badge">REST JSON · SSE · RPC</span></div>
+  </header>
+
+  <section class="feature">
+    <div class="section-head"><div><span class="kicker" data-i18n="connectKicker">01 · เชื่อมต่อในเครือข่ายเดียวกัน</span><h2 data-i18n="connectTitle">เปิดลิงก์ตรงถึง ESPHome</h2></div><span class="status" id="liveBadge">ยังไม่เชื่อมต่อ</span></div>
+    <p data-i18n="connectBody">ใส่ hostname ที่ Improv แสดงหลังตั้งค่า Wi‑Fi เช่น dbk-a1b2c3.local หรือ IP จากเราเตอร์</p>
+    <div class="control-grid">
+      <label class="field"><span data-i18n="deviceAddress">Hostname หรือ IP ของบอร์ด</span><input id="deviceHost" inputmode="url" autocomplete="url" placeholder="dbk-a1b2c3.local"></label>
+      <label class="field"><span data-i18n="deviceAlias">ชื่อเรียก / alias</span><input id="deviceAlias" maxlength="32" placeholder="ห้องเรียน 2"></label>
+      <div class="button-row"><button id="connectButton" type="button" data-i18n="connect">เชื่อมต่อ</button></div>
+    </div>
+    <div class="button-row" style="margin-top:12px">
+      <button id="saveAlias" type="button" class="action gold" disabled data-i18n="saveAlias">บันทึก alias ลงบอร์ด</button>
+      <a id="deviceUi" class="action secondary" href="#" target="_blank" rel="noopener" data-i18n="openDeviceUi">เปิด ESPHome UI บนบอร์ด ↗</a>
+      <a class="text-link" href="../wifi/" data-i18n="setupWifi">ตั้งค่า Wi‑Fi ก่อน →</a>
+    </div>
+    <div id="connectionStatus" class="connection-status" aria-live="polite">รอ hostname หรือ IP ของอุปกรณ์</div>
+    <div class="explain" style="margin-top:12px" data-i18n="networkNote">หน้า Pages นี้เรียก REST API ที่อยู่ใน LAN โดยตรง เฟิร์มแวร์เปิด CORS/PNA ไว้แล้ว หากเบราว์เซอร์ยังบล็อก HTTPS → HTTP ให้กด “เปิด ESPHome UI บนบอร์ด” ซึ่งทำงานแบบ same-origin เสมอ</div>
+  </section>
+
+  <section class="feature">
+    <div class="section-head"><div><span class="kicker" data-i18n="telemetryKicker">02 · Telemetry สด</span><h2 id="dashboardAlias">DBK</h2></div><span class="status ready" id="sampleTime">—</span></div>
+    <div class="telemetry-grid">
+      <article class="metric"><small>PM1.0</small><strong id="pm1">—</strong><span>µg/m³</span></article>
+      <article class="metric"><small>PM2.5</small><strong id="pm25">—</strong><span>µg/m³</span></article>
+      <article class="metric"><small>PM10</small><strong id="pm10">—</strong><span>µg/m³</span></article>
+      <article class="metric"><small data-i18n="airQuality">คุณภาพอากาศ</small><strong id="airQuality">—</strong><span>state</span></article>
+      <article class="metric"><small>Wi‑Fi RSSI</small><strong id="wifiRssi">—</strong><span>dBm</span></article>
+      <article class="metric"><small data-i18n="uptime">เวลาทำงาน</small><strong id="uptime">—</strong><span id="deviceMeta">ESPHome</span></article>
+    </div>
+  </section>
+
+  <section class="feature">
+    <div class="section-head"><div><span class="kicker" data-i18n="rpcKicker">03 · JSON‑RPC 2.0</span><h2 data-i18n="rpcTitle">คอนโซลอ่านและสั่งงาน</h2></div><span class="status">browser adapter</span></div>
+    <p data-i18n="rpcBody">ESPHome มี REST JSON และ SSE โดยตรง ส่วน adapter นี้รวมหลาย endpoint ให้เรียกด้วยรูปแบบ JSON‑RPC โดยข้อมูลยังวิ่งตรงระหว่างเบราว์เซอร์กับบอร์ด</p>
+    <div class="rpc-grid">
+      <div>
+        <label class="field"><span data-i18n="request">คำขอ</span><textarea id="rpcRequest" spellcheck="false">{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "telemetry.snapshot",
+  "params": {}
+}</textarea></label>
+        <div class="button-row" style="margin-top:10px"><button id="sendRpc" type="button" data-i18n="sendRpc">ส่ง RPC</button><button id="discoverRpc" type="button" class="action secondary" data-i18n="discover">ดู methods</button></div>
+      </div>
+      <div><span class="field" data-i18n="response">ผลลัพธ์</span><pre id="rpcResponse" class="rpc-output">{ "jsonrpc": "2.0", "id": null, "result": "ready" }</pre></div>
+    </div>
+  </section>
+
+  <footer><span data-i18n="footer">DustBoy Kit · telemetry อยู่ในเครือข่ายของคุณ</span><nav><a href="../" data-i18n="home">หน้าติดตั้ง</a><a href="https://github.com/dustboy-kit/esp32c3-pm25-monitor">GitHub</a><a href="https://esphome.io/web-api/index.html" target="_blank" rel="noopener">ESPHome Web API</a></nav></footer>
+</main>
+
+<script type="module">
+import { DbkEspHomeRpc, normalizeDeviceUrl } from "../tools/dbk-esphome-rpc.js?v=1";
+
+const copy = {
+  th:{eyebrow:'วงจรแห่งดวงดาว · ESPHOME WEB API',lede:'อ่าน PM1, PM2.5, PM10 และข้อมูลวินิจฉัยจากบอร์ดโดยตรง พร้อม JSON‑RPC 2.0 adapter ในเบราว์เซอร์',connectKicker:'01 · เชื่อมต่อในเครือข่ายเดียวกัน',connectTitle:'เปิดลิงก์ตรงถึง ESPHome',idle:'ยังไม่เชื่อมต่อ',connectBody:'ใส่ hostname ที่ Improv แสดงหลังตั้งค่า Wi‑Fi เช่น dbk-a1b2c3.local หรือ IP จากเราเตอร์',deviceAddress:'Hostname หรือ IP ของบอร์ด',deviceAlias:'ชื่อเรียก / alias',connect:'เชื่อมต่อ',saveAlias:'บันทึก alias ลงบอร์ด',openDeviceUi:'เปิด ESPHome UI บนบอร์ด ↗',setupWifi:'ตั้งค่า Wi‑Fi ก่อน →',idleHelp:'รอ hostname หรือ IP ของอุปกรณ์',networkNote:'หน้า Pages นี้เรียก REST API ที่อยู่ใน LAN โดยตรง เฟิร์มแวร์เปิด CORS/PNA ไว้แล้ว หากเบราว์เซอร์ยังบล็อก HTTPS → HTTP ให้กด “เปิด ESPHome UI บนบอร์ด” ซึ่งทำงานแบบ same-origin เสมอ',telemetryKicker:'02 · Telemetry สด',airQuality:'คุณภาพอากาศ',uptime:'เวลาทำงาน',rpcKicker:'03 · JSON‑RPC 2.0',rpcTitle:'คอนโซลอ่านและสั่งงาน',rpcBody:'ESPHome มี REST JSON และ SSE โดยตรง ส่วน adapter นี้รวมหลาย endpoint ให้เรียกด้วยรูปแบบ JSON‑RPC โดยข้อมูลยังวิ่งตรงระหว่างเบราว์เซอร์กับบอร์ด',request:'คำขอ',sendRpc:'ส่ง RPC',discover:'ดู methods',response:'ผลลัพธ์',footer:'DustBoy Kit · telemetry อยู่ในเครือข่ายของคุณ',home:'หน้าติดตั้ง',connecting:'กำลังเชื่อมต่อ…',connected:'เชื่อมต่อแล้ว',polling:'เชื่อมต่อแล้ว · polling',live:'เชื่อมต่อแล้ว · SSE สด',connectError:'เชื่อมต่อไม่ได้: '},
+  en:{eyebrow:'THE STARRY CIRCUIT · ESPHOME WEB API',lede:'Read PM1, PM2.5, PM10, and diagnostics directly from the board through a browser JSON-RPC 2.0 adapter.',connectKicker:'01 · Same-network connection',connectTitle:'Open a direct ESPHome link',idle:'not connected',connectBody:'Enter the hostname shown by Improv after Wi-Fi setup, such as dbk-a1b2c3.local, or the IP from your router.',deviceAddress:'Board hostname or IP',deviceAlias:'Friendly alias',connect:'Connect',saveAlias:'Save alias to board',openDeviceUi:'Open on-device ESPHome UI ↗',setupWifi:'Set up Wi-Fi first →',idleHelp:'Waiting for a device hostname or IP address',networkNote:'This Pages app calls the board REST API directly over your LAN. Firmware enables CORS/PNA. If the browser still blocks HTTPS → HTTP, open the on-device ESPHome UI; that route is always same-origin.',telemetryKicker:'02 · Live telemetry',airQuality:'Air quality',uptime:'Uptime',rpcKicker:'03 · JSON-RPC 2.0',rpcTitle:'Read and command console',rpcBody:'ESPHome exposes REST JSON and SSE directly. This adapter combines those endpoints behind JSON-RPC while data still travels directly between browser and board.',request:'Request',sendRpc:'Send RPC',discover:'Discover methods',response:'Response',footer:'DustBoy Kit · telemetry stays on your network',home:'Installer',connecting:'connecting…',connected:'connected',polling:'connected · polling',live:'connected · live SSE',connectError:'Connection failed: '}
+};
+
+let lang='th', rpc=null, pollTimer=0, eventSource=null, eventRefreshTimer=0;
+const $=id=>document.getElementById(id);
+const valueOf=entity=>entity && (entity.value ?? entity.state ?? null);
+function t(key){return (copy[lang]&&copy[lang][key])||copy.th[key]||key}
+function setLang(next){lang=next==='en'?'en':'th';document.documentElement.lang=lang;localStorage.setItem('dbk-lang',lang);document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n));document.querySelectorAll('[data-lang]').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));if(rpc){$('liveBadge').textContent=t(eventSource?'live':'connected');setStatus(t(eventSource?'live':'polling'),'ok')}else{$('liveBadge').textContent=t('idle');setStatus(t('idleHelp'))}}
+function setStatus(message,kind=''){const el=$('connectionStatus');el.textContent=message;el.className='connection-status'+(kind?' '+kind:'')}
+function formatUptime(value){const seconds=Number(value);if(!Number.isFinite(seconds))return '—';const days=Math.floor(seconds/86400),hours=Math.floor(seconds%86400/3600),minutes=Math.floor(seconds%3600/60);return days?`${days}d ${hours}h`:`${hours}h ${minutes}m`}
+function metric(id,entity,formatter=value=>value){const raw=valueOf(entity);$(id).textContent=raw===null||raw===undefined||raw===''?'—':formatter(raw)}
+function render(snapshot){const e=snapshot.entities||{};metric('pm1',e.pm1,v=>Math.round(Number(v)));metric('pm25',e.pm25,v=>Math.round(Number(v)));metric('pm10',e.pm10,v=>Math.round(Number(v)));metric('airQuality',e.airQuality);metric('wifiRssi',e.wifiRssi,v=>Math.round(Number(v)));metric('uptime',e.uptime,formatUptime);const alias=valueOf(e.alias);if(alias){$('dashboardAlias').textContent=alias;$('deviceAlias').value=alias}const ip=valueOf(e.ip),version=valueOf(e.version);$('deviceMeta').textContent=[ip,version].filter(Boolean).join(' · ')||'ESPHome';$('sampleTime').textContent=new Date(snapshot.sampledAt).toLocaleTimeString(lang==='th'?'th-TH':'en-GB')}
+async function snapshot(){if(!rpc)return;const response=await rpc.request({jsonrpc:'2.0',id:Date.now(),method:'telemetry.snapshot',params:{}});if(response.error)throw new Error(response.error.message);if(!Object.keys(response.result.entities||{}).length)throw new Error('No ESPHome telemetry entities answered');render(response.result);setStatus(t(eventSource?'live':'polling'),'ok');$('liveBadge').textContent=t(eventSource?'live':'connected');$('liveBadge').className='status ready'}
+function startPolling(){clearInterval(pollTimer);pollTimer=setInterval(()=>snapshot().catch(error=>setStatus(t('connectError')+error.message,'error')),5000)}
+function startEvents(){if(eventSource)eventSource.close();try{eventSource=new EventSource(rpc.baseUrl+'/events');eventSource.addEventListener('state',()=>{clearTimeout(eventRefreshTimer);eventRefreshTimer=setTimeout(()=>snapshot().catch(()=>{}),250)});eventSource.onopen=()=>{setStatus(t('live'),'ok');$('liveBadge').textContent=t('live')};eventSource.onerror=()=>{if(eventSource){eventSource.close();eventSource=null}setStatus(t('polling'),'ok')}}catch{eventSource=null}}
+async function connect(){try{setStatus(t('connecting'));$('liveBadge').textContent=t('connecting');rpc=new DbkEspHomeRpc($('deviceHost').value,{timeoutMs:6500});localStorage.setItem('dbk-device-host',$('deviceHost').value.trim());$('deviceUi').href=rpc.baseUrl+'/';$('saveAlias').disabled=false;await snapshot();startPolling();startEvents()}catch(error){rpc=null;$('saveAlias').disabled=true;$('liveBadge').textContent=t('idle');$('liveBadge').className='status';setStatus(t('connectError')+error.message,'error')}}
+async function saveAlias(){if(!rpc)return;const response=await rpc.request({jsonrpc:'2.0',id:Date.now(),method:'alias.set',params:{value:$('deviceAlias').value}});$('rpcResponse').textContent=JSON.stringify(response,null,2);if(response.error)setStatus(response.error.message,'error');else{localStorage.setItem('dbk-device-alias',$('deviceAlias').value.trim());await snapshot()}}
+async function sendRpc(request){if(!rpc){await connect();if(!rpc)return}const response=await rpc.request(request);$('rpcResponse').textContent=JSON.stringify(response,null,2)}
+
+const params=new URLSearchParams(location.search);$('deviceHost').value=params.get('host')||localStorage.getItem('dbk-device-host')||'';$('deviceAlias').value=params.get('alias')||localStorage.getItem('dbk-device-alias')||'';
+try{if($('deviceHost').value)$('deviceUi').href=normalizeDeviceUrl($('deviceHost').value)+'/'}catch{}
+setLang(params.get('lang')||localStorage.getItem('dbk-lang')||'th');document.querySelectorAll('[data-lang]').forEach(button=>button.addEventListener('click',()=>setLang(button.dataset.lang)));
+$('connectButton').addEventListener('click',connect);$('saveAlias').addEventListener('click',saveAlias);$('deviceHost').addEventListener('keydown',event=>{if(event.key==='Enter')connect()});
+$('sendRpc').addEventListener('click',()=>{try{sendRpc(JSON.parse($('rpcRequest').value))}catch(error){$('rpcResponse').textContent=JSON.stringify({jsonrpc:'2.0',id:null,error:{code:-32700,message:error.message}},null,2)}});
+$('discoverRpc').addEventListener('click',()=>{const request={jsonrpc:'2.0',id:1,method:'rpc.discover',params:{}};$('rpcRequest').value=JSON.stringify(request,null,2);sendRpc(request)});
+if($('deviceHost').value)connect();
+</script>
+</body>
+</html>

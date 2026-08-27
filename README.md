@@ -97,6 +97,11 @@ wifi_password: new-wifi-password
   - AP remains available for 15 minutes.
 - Enter the new Wi‑Fi details and save.
 
+For a factory image that has no credentials, use the Thai/English
+[USB Wi‑Fi setup page](https://dustboy-kit.github.io/esp32c3-pm25-monitor/wifi/).
+It follows the KRU32 flow: choose the settled Serial port first, then launch
+Improv Serial and send the SSID/password without editing YAML.
+
 ### Force the setup AP
 
 - Turn off the Wi‑Fi hotspot or router the device normally uses.
@@ -112,6 +117,32 @@ wifi_password: new-wifi-password
 - Open `http://dbk-001.local/` in a browser.
 - Replace `dbk-001` with the device `name` if a different ID was configured.
 - The page shows device status and provides basic controls.
+- Factory and Canvas images embed ESPHome Web Server v3, so this UI, its REST
+  JSON endpoints, and `/events` SSE stream work without an internet connection.
+- A factory node gets a unique MAC-suffixed hostname such as
+  `dbk-a1b2c3.local`. Its persistent friendly alias starts as `DBK A1B2C3` and
+  can be changed from the device page, Home Assistant, or the
+  [DustBoy Telemetry Dashboard](https://dustboy-kit.github.io/esp32c3-pm25-monitor/dashboard/).
+- The alias is intentionally separate from the hostname: changing it never
+  breaks mDNS, OTA, or the native ESPHome API address.
+
+### REST JSON and browser JSON-RPC
+
+ESPHome serves entity JSON directly on the local network:
+
+```text
+GET  http://dbk-a1b2c3.local/sensor/PM2.5
+GET  http://dbk-a1b2c3.local/text/Device%20Alias
+POST http://dbk-a1b2c3.local/text/Device%20Alias/set?value=DBK%20LAB%202
+GET  http://dbk-a1b2c3.local/events
+```
+
+`site/tools/dbk-esphome-rpc.js` is a zero-server JSON-RPC 2.0 adapter over that
+official Web API. The hosted dashboard uses it for `telemetry.snapshot`,
+`device.info`, `entity.get`, `alias.set`, `button.press`, and `device.restart`.
+The browser still talks directly to the ESP32; no telemetry proxy or cloud is
+introduced. If a browser blocks an HTTPS Pages app from reaching an HTTP LAN
+address, open the embedded on-device UI instead.
 
 ## Optional MQTT
 
@@ -145,8 +176,13 @@ mqtt_password: your-mqtt-password
 - If Wi‑Fi cannot be joined, the temporary setup AP is named `DBK-xxx` and uses password `12345678`. It appears after 90 seconds and remains available for 15 minutes.
 
 - Topic prefix: `DUSTBOY/DBK/<device-id>/`
-- MQTT discovery: disabled
-- Use the topics directly if MQTT is enabled.
+- MQTT discovery: enabled for Home Assistant
+- ESPHome publishes its normal per-entity topics plus one aggregate JSON
+  snapshot every ten seconds at
+  `DUSTBOY/DBK/<device-id>/telemetry` with `device_id`, `alias`, `pm1`, `pm25`,
+  `pm10`, `wifi_rssi`, `uptime_ms`, and `connected`.
+- MQTT remains opt-in because broker credentials must never be embedded in a
+  public factory image.
 
 ### OLED layout
 

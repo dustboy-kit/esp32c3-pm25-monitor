@@ -5,7 +5,9 @@ mqtt:
   port: !secret mqtt_port
   username: !secret mqtt_username
   password: !secret mqtt_password
-  discovery: false
+  # Home Assistant can discover the native ESPHome entities when this optional
+  # fleet profile is compiled with private broker credentials.
+  discovery: true
   on_connect:
     - globals.set:
         id: mqtt_connected
@@ -23,3 +25,21 @@ mqtt:
     topic: DUSTBOY/DBK/${device_id}/status
     payload: offline
     retain: true
+
+# In addition to ESPHome's normal per-entity MQTT topics, publish one compact
+# JSON snapshot for classrooms, fleet collectors, and non-HA consumers.
+interval:
+  - interval: 10s
+    then:
+      - mqtt.publish_json:
+          topic: DUSTBOY/DBK/${device_id}/telemetry
+          retain: false
+          payload: |-
+            root["device_id"] = "${device_id}";
+            root["alias"] = id(device_alias).state;
+            root["pm1"] = id(pms_pm1).state;
+            root["pm25"] = id(pms_pm25).state;
+            root["pm10"] = id(pms_pm10).state;
+            root["wifi_rssi"] = id(wifi_rssi).state;
+            root["uptime_ms"] = millis();
+            root["connected"] = id(mqtt_connected);

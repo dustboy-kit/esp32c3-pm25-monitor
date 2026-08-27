@@ -62,12 +62,16 @@ Design decisions worth knowing before you edit it:
   is provisioned after flashing through Improv Serial over USB, ESP32 Improv
   over BLE, or the fallback captive portal; ESPHome persists the credentials.
 - **Sensor values are network-ready.** `api:` exports PM1, PM2.5 and PM10 to
-  Home Assistant over the native ESPHome API. `ota:` and `dashboard_import:`
-  let an adopted full config be renamed and updated over Wi-Fi.
+  Home Assistant over the native ESPHome API. The embedded Web Server v3 also
+  exposes a local dashboard, REST JSON, and `/events` SSE; `ota:` and
+  `dashboard_import:` let an adopted full config be updated over Wi-Fi.
 - **Every factory image has a unique initial node name.**
   `name_add_mac_suffix: true` produces `dbk-canvas-aabbcc`-style names. To choose
   an exact permanent name, import the full YAML into ESPHome Device Builder,
   then follow ESPHome's two-step `esphome.name` / `wifi.use_address` rename.
+- **The friendly alias is safe to rename.** It starts as `DBK AABBCC`, is stored
+  in flash, and can be changed through the on-device UI or DustBoy telemetry
+  dashboard without changing the unique hostname.
 - **No PMS7003 required.** Every lambda was audited for the NaN case, so a bare
   C3 + OLED renders all thirty screens with zeros instead of the hollow boxes
   `"nan"` would produce in `font_value`.
@@ -168,6 +172,10 @@ After Web Serial flashing, keep the USB cable connected and let ESP Web Tools
 send the SSID/password through **Improv Serial**. BLE Improv and the
 `DBK-Canvas Setup` captive portal are fallback paths. Home Assistant then
 discovers the unique `dbk-canvas-<mac>` node and receives its PM entities.
+
+The public [Wi-Fi setup page](../site/wifi/index.html) performs this as a
+separate, stable-port step. After provisioning, the [telemetry dashboard](../site/dashboard/index.html)
+reads the on-device Web API directly and can persist the `DBK <suffix>` alias.
 
 Improv provisions network credentials; it does not rewrite ESPHome's compiled
 node name. For a custom name, use the YAML icon beside the preview, import that

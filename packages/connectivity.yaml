@@ -1,4 +1,7 @@
 api:
+  # A browser uses the Web API below; Home Assistant and ESPHome tooling use
+  # this native protobuf API. Keep the monitor running if neither is present.
+  reboot_timeout: 0s
 
 ota:
   - platform: esphome
@@ -36,6 +39,12 @@ esp32_improv:
 web_server:
   version: 3
   include_internal: false
+  # Keep the complete dashboard on the board so http://<node>.local/ works
+  # without an internet connection. REST JSON and /events are served here too.
+  local: true
+  enable_private_network_access: true
+  ota: false
+  log: false
 
 dashboard_import:
   package_import_url: github://dustboy-kit/esp32c3-pm25-monitor/dbk.yaml@main

@@ -34,3 +34,42 @@ button:
   - platform: safe_mode
     name: Restart in Safe Mode
     entity_category: diagnostic
+
+# This is a mutable human label, not the ESPHome node hostname. The hostname
+# stays unique through name_add_mac_suffix, while this value can be changed from
+# the on-device web UI, Home Assistant, or POST /text/Device%20Alias/set.
+text:
+  - platform: template
+    id: device_alias
+    name: Device Alias
+    icon: mdi:rename-box
+    mode: text
+    optimistic: true
+    restore_value: true
+    min_length: 1
+    max_length: 32
+    entity_category: config
+
+# On first boot only, seed the alias from the final ESPHome node ID. Because
+# name_add_mac_suffix is enabled this becomes "DBK A1B2C3". Restored user
+# aliases are non-empty and are therefore never overwritten on later boots.
+esphome:
+  on_boot:
+    - priority: -100
+      then:
+        - if:
+            condition:
+              lambda: return id(device_alias).state.empty();
+            then:
+              - text.set:
+                  id: device_alias
+                  value: !lambda |-
+                    std::string node = App.get_name();
+                    const size_t separator = node.rfind('-');
+                    std::string suffix = separator == std::string::npos
+                                           ? node
+                                           : node.substr(separator + 1);
+                    for (auto &character : suffix) {
+                      character = static_cast<char>(toupper(character));
+                    }
+                    return "DBK " + suffix;

@@ -349,11 +349,18 @@ def verify(examples: list[dict[str, object]]) -> None:
             "\nimprov_serial:",
             "\nesp32_improv:\n",
             "\ncaptive_portal:\n",
+            "\nweb_server:\n",
+            "  local: true",
+            "  enable_private_network_access: true",
+            "  name: Device Alias",
+            'return "DBK " + suffix;',
+            "- platform: wifi_signal",
+            "- platform: uptime",
             "\ndashboard_import:\n",
             f"sim/canvas/{record['id']}.yaml@main",
         )
         if any(marker not in yaml_source for marker in required):
-            raise SystemExit(f"Wi-Fi/provisioning config mismatch for {record['id']}")
+            raise SystemExit(f"provisioning/telemetry config mismatch for {record['id']}")
         if "packages:" in yaml_source or "!include" in yaml_source or "screen_idx" in yaml_source:
             raise SystemExit(f"non-standalone YAML for {record['id']}")
         part = json.loads(manifest_path.read_text())["builds"][0]["parts"][0]

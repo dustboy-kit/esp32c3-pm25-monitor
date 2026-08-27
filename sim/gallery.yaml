@@ -38,6 +38,25 @@ esphome:
   project:
     name: dustboy-kit.dbk-gallery
     version: 0.2.0
+  on_boot:
+  - priority: -100
+    then:
+    - if:
+        condition:
+          lambda: return id(device_alias).state.empty();
+        then:
+        - text.set:
+            id: device_alias
+            value: !lambda |-
+              std::string node = App.get_name();
+              const size_t separator = node.rfind('-');
+              std::string suffix = separator == std::string::npos
+                                     ? node
+                                     : node.substr(separator + 1);
+              for (auto &character : suffix) {
+                character = static_cast<char>(toupper(character));
+              }
+              return "DBK " + suffix;
 
 esp32:
   board: esp32-c3-devkitm-1
@@ -108,6 +127,17 @@ esp32_improv:
 
 # Fallback provisioning path when BLE or serial Improv is not convenient.
 captive_portal:
+
+# A complete ESPHome dashboard is embedded in every standalone Canvas image.
+# It exposes the same entities as JSON REST endpoints and live /events SSE.
+# The public Pages dashboard talks to this API directly on the local network.
+web_server:
+  version: 3
+  include_internal: false
+  local: true
+  enable_private_network_access: true
+  ota: false
+  log: false
 
 # Screens 0 and 4 read the clock. With no uplink it never syncs, and both fall
 # back to their designed constants (09:41 and WED 26 AUG 2026) rather than
@@ -204,6 +234,57 @@ sensor:
     unit_of_measurement: "µg/m³"
     device_class: pm10
     state_class: measurement
+
+- platform: wifi_signal
+  id: wifi_rssi
+  name: Wi-Fi RSSI
+  update_interval: 30s
+  entity_category: diagnostic
+
+- platform: uptime
+  id: device_uptime
+  name: Uptime
+  update_interval: 60s
+  entity_category: diagnostic
+
+text_sensor:
+- platform: version
+  id: esphome_version
+  name: ESPHome Version
+  entity_category: diagnostic
+
+- platform: wifi_info
+  ip_address:
+    id: device_ip
+    name: IP Address
+    entity_category: diagnostic
+  mac_address:
+    id: device_mac
+    name: MAC Address
+    entity_category: diagnostic
+
+# Mutable label for classrooms and fleets. This does not change the unique
+# dbk-canvas-xxxxxx hostname and therefore cannot create an mDNS/API collision.
+text:
+- platform: template
+  id: device_alias
+  name: Device Alias
+  icon: mdi:rename-box
+  mode: text
+  optimistic: true
+  restore_value: true
+  min_length: 1
+  max_length: 32
+  entity_category: config
+
+button:
+- platform: restart
+  name: Restart
+  entity_category: diagnostic
+
+- platform: safe_mode
+  name: Restart in Safe Mode
+  entity_category: diagnostic
 
 interval:
 # The gallery itself: advance one design every 5 seconds, wrap at 30.
