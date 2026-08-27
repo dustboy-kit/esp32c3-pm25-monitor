@@ -8,6 +8,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: firmware-validation
+  cancel-in-progress: true
+
 jobs:
   esphome:
     runs-on: ubuntu-latest
