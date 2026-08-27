@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="th">
+<html lang="th" data-theme="minimal">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -9,12 +9,14 @@
   <style>
     .recovery-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.route{padding:18px;border:1px solid rgba(88,137,226,.55);border-radius:14px;background:#071126}.route h3{margin:0 0 8px;color:#fff0a6}.route p,.route li{color:var(--muted)}.route ol{padding-left:20px}.route code{white-space:nowrap}.button-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.diagnosis{margin:16px 0;padding:14px;border-left:3px solid var(--gold);background:#071126;color:#c2d2ef}@media(max-width:720px){.recovery-grid{grid-template-columns:1fr}}
   </style>
+  <link rel="stylesheet" href="../../theme.css">
+  <script src="../../ui-preferences.js"></script>
 </head>
 <body>
 <main class="app">
   <header class="hero">
     <div><p class="eyebrow" data-i18n="eyebrow">วงจรแห่งดวงดาว · กู้คืนการเชื่อมต่อ</p><h1>DustBoy <em>Wi‑Fi Recovery</em></h1><p class="lede" data-i18n="lede">ถ้า Improv มองเห็นบอร์ดและรายชื่อเครือข่าย แต่ขึ้น Unable to connect แปลว่า USB ใช้งานได้แล้ว ปัญหาอยู่ในช่วงเชื่อมต่อเราเตอร์</p></div>
-    <div class="hero-tools"><div class="lang-switch" aria-label="Language"><button type="button" data-lang="th">ไทย</button><button type="button" data-lang="en">EN</button></div><span class="badge">ESP32‑C3 · 2.4 GHz</span></div>
+    <div class="hero-tools"><div class="preference-bar"><button class="theme-toggle" type="button" data-theme-toggle><span aria-hidden="true" data-theme-icon>◐</span></button><div class="lang-switch" aria-label="Language"><button type="button" data-lang="th">ไทย</button><button type="button" data-lang="en">EN</button></div></div><span class="badge">ESP32‑C3 · 2.4 GHz</span></div>
   </header>
 
   <section class="feature">

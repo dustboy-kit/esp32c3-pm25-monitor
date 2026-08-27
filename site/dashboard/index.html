@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="th">
+<html lang="th" data-theme="minimal">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -9,6 +9,8 @@
   <style>
     .dashboard-shell{display:grid;gap:20px}.control-grid{display:grid;grid-template-columns:2fr 1fr auto;gap:12px;align-items:end}.field{display:grid;gap:5px;color:var(--muted);font-size:12px}.field input,.field textarea,.field select{width:100%;border:1px solid rgba(88,137,226,.66);border-radius:8px;padding:11px 12px;background:#050c1c;color:var(--text);font:13px ui-monospace,SFMono-Regular,Menlo,monospace}.field textarea{min-height:150px;resize:vertical}.button-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.telemetry-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px}.metric{min-height:118px;padding:16px;border:1px solid rgba(88,137,226,.48);border-radius:14px;background:linear-gradient(145deg,rgba(11,28,66,.95),rgba(4,13,34,.96))}.metric small{display:block;color:var(--muted);font-size:11px;letter-spacing:.08em;text-transform:uppercase}.metric strong{display:block;margin-top:8px;color:#fff4ba;font:800 clamp(25px,4vw,40px)/1 ui-monospace,SFMono-Regular,Menlo,monospace}.metric span{color:#91a7d3;font-size:12px}.connection-status{margin-top:14px;padding:11px 13px;border:1px solid rgba(88,137,226,.5);border-radius:9px;background:#071126;color:var(--muted)}.connection-status.ok{border-color:#285f46;color:#9eeac1}.connection-status.error{border-color:#713445;color:#ff9cb0}.rpc-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.rpc-output{min-height:210px;max-height:420px;overflow:auto;margin:0;padding:14px;border:1px solid rgba(88,137,226,.55);border-radius:9px;background:#030914;color:#bed2f6;font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap}.explain{padding:13px;border-left:3px solid var(--gold);background:#071126;color:var(--muted);font-size:13px}.link-row{display:flex;gap:16px;flex-wrap:wrap}.danger-button{border-color:#713445;background:linear-gradient(145deg,#6b263a,#351420)}@media(max-width:800px){.control-grid,.rpc-grid{grid-template-columns:1fr}.telemetry-grid{grid-template-columns:1fr 1fr}}@media(max-width:520px){.telemetry-grid{grid-template-columns:1fr}}
   </style>
+  <link rel="stylesheet" href="../theme.css">
+  <script src="../ui-preferences.js"></script>
 </head>
 <body>
 <main class="app dashboard-shell">
@@ -18,7 +20,7 @@
       <h1>DustBoy <em>Telemetry</em></h1>
       <p class="lede" data-i18n="lede">อ่าน PM1, PM2.5, PM10 และข้อมูลวินิจฉัยจากบอร์ดโดยตรง พร้อม JSON‑RPC 2.0 adapter ในเบราว์เซอร์</p>
     </div>
-    <div class="hero-tools"><div class="lang-switch" aria-label="Language"><button type="button" data-lang="th">ไทย</button><button type="button" data-lang="en">EN</button></div><span class="badge">REST JSON · SSE · RPC</span></div>
+    <div class="hero-tools"><div class="preference-bar"><button class="theme-toggle" type="button" data-theme-toggle><span aria-hidden="true" data-theme-icon>◐</span></button><div class="lang-switch" aria-label="Language"><button type="button" data-lang="th">ไทย</button><button type="button" data-lang="en">EN</button></div></div><span class="badge">REST JSON · RPC</span></div>
   </header>
 
   <section class="feature">

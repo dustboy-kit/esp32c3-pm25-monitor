@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="th">
+<html lang="th" data-theme="minimal">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -10,12 +10,14 @@
   <style>
     .setup-shell{display:grid;gap:20px}.step{display:grid;grid-template-columns:44px 1fr;gap:14px;padding:18px 0;border-top:1px solid rgba(88,137,226,.28)}.step:first-of-type{border-top:0}.step-number{display:grid;place-items:center;width:38px;height:38px;border:1px solid rgba(247,206,70,.72);border-radius:50%;color:var(--gold);background:#071126;font:800 17px ui-monospace,monospace}.step h3{margin:0 0 5px;color:#fff4ba}.step p{margin:0 0 12px}.wide-action{width:min(380px,100%);min-height:49px}.disabled-step{opacity:.42;pointer-events:none}.setup-status{min-height:24px;color:var(--muted);font-size:12px}.setup-status.ok{color:#9eeac1}.setup-status.error{color:#ff9cb0}.alias-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:10px;max-width:760px}.alias-grid label{display:grid;gap:5px;color:var(--muted);font-size:12px}.alias-grid input{width:100%;padding:11px 12px;border:1px solid rgba(88,137,226,.66);border-radius:8px;background:#050c1c;color:var(--text);font:13px ui-monospace,monospace}.setup-actions{display:flex;gap:10px;flex-wrap:wrap}.facts{display:grid;grid-template-columns:1fr 1fr;gap:12px}.fact{padding:14px;border:1px solid rgba(88,137,226,.42);border-radius:10px;background:#071126;color:var(--muted);font-size:13px}.fact strong{display:block;margin-bottom:4px;color:#fff0a6}.why{padding:14px;border-left:3px solid var(--gold);background:#071126;color:var(--muted);font-size:13px}@media(max-width:650px){.step{grid-template-columns:34px 1fr}.step-number{width:30px;height:30px}.alias-grid,.facts{grid-template-columns:1fr}}
   </style>
+  <link rel="stylesheet" href="../theme.css">
+  <script src="../ui-preferences.js"></script>
 </head>
 <body>
 <main class="app setup-shell">
   <header class="hero">
     <div><p class="eyebrow" data-i18n="eyebrow">วงจรแห่งดวงดาว · หลังแฟลช</p><h1>DustBoy <em>Wi‑Fi</em></h1><p class="lede" data-i18n="lede">ต่อบอร์ดที่แฟลชแล้วเข้ากับ Wi‑Fi ผ่าน USB โดยไม่ต้องแก้ YAML จากนั้นตั้งชื่อเรียกและเปิด telemetry ได้ทันที</p></div>
-    <div class="hero-tools"><div class="lang-switch" aria-label="Language"><button type="button" data-lang="th">ไทย</button><button type="button" data-lang="en">EN</button></div><span class="badge">Improv Serial · ESP32‑C3</span></div>
+    <div class="hero-tools"><div class="preference-bar"><button class="theme-toggle" type="button" data-theme-toggle><span aria-hidden="true" data-theme-icon>◐</span></button><div class="lang-switch" aria-label="Language"><button type="button" data-lang="th">ไทย</button><button type="button" data-lang="en">EN</button></div></div><span class="badge">Improv Serial · ESP32‑C3</span></div>
   </header>
 
   <section class="feature">
