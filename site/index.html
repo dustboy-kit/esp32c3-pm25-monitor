@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DustBoy OLED Studio</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="https://unpkg.com/esp-web-tools@10.2.1/dist/web/install-button.js?module"></script>
+</head>
+<body>
+  <main>
+    <header><p class="eyebrow">DUSTBOY KIT · ESP32-C3</p><h1>PM2.5 monitor <span>OLED studio</span></h1><p>Preview the 128×32 display, then flash a released ESPHome image directly over USB.</p></header>
+    <section class="card"><h2>Canvas simulator</h2><p>The canonical editor translates ESPHome display lambdas in your browser. It is a preview tool; native ESPHome validation remains the release gate.</p><a class="button" href="https://dbk-oled-studio.pages.dev/tools/esphome-canvas-simulator" target="_blank" rel="noreferrer">Open OLED canvas simulator ↗</a></section>
+    <section class="card"><h2>Flash ESP32-C3 firmware</h2><p class="warning">Use Chrome or Edge on a computer, HTTPS, and a data-capable USB cable. Flashing erases/replaces device firmware; connect only a supported ESP32-C3 board.</p><esp-web-install-button manifest="./manifests/dbk.json"><button slot="activate">Connect and flash DBK</button></esp-web-install-button><p class="small">The button becomes usable after a tagged GitHub release publishes <code>dbk.factory.bin</code>.</p></section>
+    <section class="card"><h2>After flashing</h2><p>Unplug/replug the board, then follow the separate Wi-Fi setup guide. The device exposes an AP fallback after boot if it cannot join Wi-Fi.</p><a href="./wifi/">Open Wi-Fi setup →</a></section>
+    <footer><a href="https://github.com/dustboy-kit/esp32c3-pm25-monitor">Source on GitHub</a><span>·</span><a href="https://the-oracle-keeps-the-human-human.github.io/kru32-oracle/">KRU32 reference</a></footer>
+  </main>
+</body>
+</html>

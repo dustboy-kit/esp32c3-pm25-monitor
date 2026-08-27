@@ -1,0 +1,12 @@
+{
+  "name": "DustBoy PM2.5 Monitor",
+  "version": "latest",
+  "new_install_prompt_erase": false,
+  "builds": [{
+    "chipFamily": "ESP32-C3",
+    "parts": [{
+      "path": "https://github.com/dustboy-kit/esp32c3-pm25-monitor/releases/latest/download/dbk.factory.bin",
+      "offset": 0
+    }]
+  }]
+}
