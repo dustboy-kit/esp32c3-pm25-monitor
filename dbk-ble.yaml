@@ -14,7 +14,7 @@ substitutions:
   friendly_name: DBK BLE
   device_id: DBK
   name_add_mac_suffix: "true"
-  project_version: "0.1.0-ble"
+  project_version: "0.2.0-ble"
   good_limit: "25"
   fair_limit: "50"
   splash_seconds: "3"
@@ -29,6 +29,12 @@ substitutions:
   ble_pm10_uuid: "d8b70004-5b1e-4c3a-9f2e-00d0b0000001"
   ble_status_uuid: "d8b70005-5b1e-4c3a-9f2e-00d0b0000001"
   ble_alias_uuid: "d8b70006-5b1e-4c3a-9f2e-00d0b0000001"
+  ble_ota_ctrl_uuid: "d8b70010-5b1e-4c3a-9f2e-00d0b0000001"
+  ble_ota_data_uuid: "d8b70011-5b1e-4c3a-9f2e-00d0b0000001"
+  ble_ota_status_uuid: "d8b70012-5b1e-4c3a-9f2e-00d0b0000001"
+  # Shared passcode the OTA page sends with BEGIN. Guards against mistakes,
+  # not against attackers: anyone in BLE range who knows it can flash.
+  ble_ota_passcode: "dbk"
 
 packages:
   board: !include packages/board.yaml

@@ -72,9 +72,64 @@ esp32_ble_server:
               std::string s = id(device_alias).state;
               return std::vector<uint8_t>(s.begin(), s.end());
 
+        # ---- firmware update over BLE (see packages/ble_ota.h) ----
+        # ota_ctrl: "BEGIN <size> <sha256hex> <passcode>" | "END" | "ABORT"
+        - id: ble_ota_ctrl
+          uuid: ${ble_ota_ctrl_uuid}
+          description: "OTA control"
+          write: true
+          on_write:
+            then:
+              - lambda: |-
+                  std::string cmd(x.begin(), x.end());
+                  if (cmd.rfind("BEGIN ", 0) == 0) {
+                    char sha[65] = {0}; char pass[32] = {0}; unsigned long size = 0;
+                    if (sscanf(cmd.c_str(), "BEGIN %lu %64s %31s", &size, sha, pass) != 3 ||
+                        std::string(pass) != std::string("${ble_ota_passcode}")) {
+                      dbk_ble_ota::fail("bad begin");
+                    } else {
+                      dbk_ble_ota::begin((size_t) size, std::string(sha));
+                    }
+                  } else if (cmd == "END") {
+                    if (dbk_ble_ota::end()) {
+                      id(ota_reboot_at_ms) = millis() + 1500;
+                    }
+                  } else if (cmd == "ABORT") {
+                    dbk_ble_ota::abort_session();
+                  }
+              # progress/result is pushed by the 1 s interval below
+        # ota_data: raw image bytes, any chunk size up to the MTU
+        - id: ble_ota_data
+          uuid: ${ble_ota_data_uuid}
+          description: "OTA data"
+          write: true
+          write_no_response: true
+          on_write:
+            then:
+              - lambda: |-
+                  dbk_ble_ota::write(x);
+        # ota_status: "IDLE" | "RX n/total" | "VERIFY" | "OK" | "ERR <reason>"
+        - id: ble_ota_status
+          uuid: ${ble_ota_status_uuid}
+          description: "OTA status"
+          read: true
+          notify: true
+          value:
+            data: !lambda |-
+              std::string s = dbk_ble_ota::status() + " slot=" + dbk_ble_ota::running_slot() + " v=${project_version}";
+              return std::vector<uint8_t>(s.begin(), s.end());
+
+esphome:
+  includes:
+    - packages/ble_ota.h
+
 globals:
   - id: ble_client_count
     type: int
+    restore_value: false
+    initial_value: "0"
+  - id: ota_reboot_at_ms
+    type: uint32_t
     restore_value: false
     initial_value: "0"
 
@@ -95,3 +150,12 @@ interval:
                 id: ble_pm10
             - ble_server.characteristic.notify:
                 id: ble_status
+            - ble_server.characteristic.notify:
+                id: ble_ota_status
+      - if:
+          condition:
+            lambda: return id(ota_reboot_at_ms) != 0 && millis() >= id(ota_reboot_at_ms);
+          then:
+            - lambda: |-
+                ESP_LOGI("ble_ota", "rebooting into the new image");
+                App.safe_reboot();

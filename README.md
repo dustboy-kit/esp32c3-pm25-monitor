@@ -278,6 +278,12 @@ without a network, an access point, or any Wi-Fi TX power workaround.
 - GATT service `d8b70001-5b1e-4c3a-9f2e-00d0b0000001`: PM1 `…0002`, PM2.5 `…0003`,
   PM10 `…0004` (float32 little-endian, read + notify every second), status `…0005`
   (UTF-8 `GOOD` / `FAIR` / `BAD` / `SENSOR ERROR`), alias `…0006`.
+- Wireless update: `site/ble/ota.html` streams an ESPHome `.ota.bin` into the idle app slot
+  over BLE (`ota_ctrl` `…0010`, `ota_data` `…0011`, `ota_status` `…0012`; see
+  `packages/ble_ota.h`). The board checks size and SHA-256 before switching slots, so a lost
+  link or a wrong file leaves it on the current firmware. There is no bootloader rollback:
+  an image that verifies but crashes at boot needs a USB flash. Boards must take one USB
+  flash of 0.2.0-ble or newer first. `site/firmware/dbk-ble.ota.bin` is the latest image.
 - The Wi-Fi firmware (`dbk.yaml`) is unchanged. Wi-Fi and BLE are not combined on purpose:
   the single-core ESP32-C3 SuperMini clones in the kit are short on RAM and on Wi-Fi margin.
 

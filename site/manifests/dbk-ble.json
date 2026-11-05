@@ -1,6 +1,6 @@
 {
   "name": "DustBoy PM2.5 Monitor (Bluetooth)",
-  "version": "0.1.0-ble",
+  "version": "0.2.0-ble",
   "new_install_prompt_erase": false,
   "builds": [
     {
