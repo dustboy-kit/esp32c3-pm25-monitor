@@ -1,0 +1,16 @@
+{
+  "name": "DustBoy PM2.5 Monitor (Wi-Fi 11 dBm test)",
+  "version": "0.1.0-tx11",
+  "new_install_prompt_erase": false,
+  "builds": [
+    {
+      "chipFamily": "ESP32-C3",
+      "parts": [
+        {
+          "path": "../firmware/dbk-tx11.factory.bin",
+          "offset": 0
+        }
+      ]
+    }
+  ]
+}

@@ -10,6 +10,7 @@ substitutions:
   wifi_ap_timeout_seconds: "90"
   wifi_ap_active_timeout_minutes: "15"
   wifi_reboot_timeout: "990s"
+  wifi_output_power: "8.5dBm"
   timezone: "Asia/Bangkok"
   warmup_seconds: "30"
   stale_seconds: "10"

@@ -62,6 +62,14 @@ wifi_password: your-wifi-password
 
 - Do not commit or share `secrets.yaml`.
 
+### Wi-Fi transmit power
+
+`dbk.yaml` sets `wifi_output_power: "8.5dBm"` (ESPHome's default of 20 dBm makes the
+ESP32-C3 SuperMini clones fail with `Auth Expired`). `dbk-tx11.yaml` is the same firmware
+at 11 dBm for range tests; override per device with `wifi_output_power` under
+`substitutions:` in `workshop.yaml`. ESPHome accepts 8.5dB to 20.5dB in 0.25 dB steps
+(the chip rounds down to 8.5, 11, 13, 14, 15, 16.5, 18, 19.5, 20).
+
 ### 5. Connect and flash
 
 - Connect the ESP32-C3 by USB.
