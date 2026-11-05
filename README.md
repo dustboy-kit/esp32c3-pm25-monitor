@@ -256,6 +256,23 @@ After 90 seconds, the setup access point is active for 15 minutes:
 - Filled Wi‑Fi symbol: Wi‑Fi connected
 - Crossed Wi‑Fi symbol: Wi‑Fi disconnected
 
+## Bluetooth variant (no Wi-Fi)
+
+`dbk-ble.yaml` is the same monitor without Wi-Fi. The board advertises as `DBK-xxxxxx`
+and serves PM1.0 / PM2.5 / PM10 over a BLE GATT service, so a phone or laptop reads it
+without a network, an access point, or any Wi-Fi TX power workaround.
+
+- Flash: open the site and press **Flash DBK Bluetooth**, or run `esphome run dbk-ble.yaml`.
+- Read: open `site/ble/` (`https://dustboy-kit.github.io/esp32c3-pm25-monitor/ble/`) in
+  Chrome or Edge on Android, macOS, Windows or Linux and press **Connect**. iOS Safari has no
+  Web Bluetooth; use the Bluefy app.
+- OLED top row shows uptime, a Bluetooth icon with the connected-client count, and the device ID.
+- GATT service `d8b70001-5b1e-4c3a-9f2e-00d0b0000001`: PM1 `…0002`, PM2.5 `…0003`,
+  PM10 `…0004` (float32 little-endian, read + notify every second), status `…0005`
+  (UTF-8 `GOOD` / `FAIR` / `BAD` / `SENSOR ERROR`), alias `…0006`.
+- The Wi-Fi firmware (`dbk.yaml`) is unchanged. Wi-Fi and BLE are not combined on purpose:
+  the single-core ESP32-C3 SuperMini clones in the kit are short on RAM and on Wi-Fi margin.
+
 ## Hardware wiring
 
 | Device               | Pin    | ESP32-C3 |

@@ -4,3 +4,4 @@ secrets.yaml
 workshop.yaml
 mqtt-workshop.md
 *.bin
+!site/firmware/*.bin

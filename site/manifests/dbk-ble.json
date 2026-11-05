@@ -1,0 +1,16 @@
+{
+  "name": "DustBoy PM2.5 Monitor (Bluetooth)",
+  "version": "0.1.0-ble",
+  "new_install_prompt_erase": false,
+  "builds": [
+    {
+      "chipFamily": "ESP32-C3",
+      "parts": [
+        {
+          "path": "../firmware/dbk-ble.factory.bin",
+          "offset": 0
+        }
+      ]
+    }
+  ]
+}

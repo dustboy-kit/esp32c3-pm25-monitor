@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="th" data-theme="plain">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#040818">
+  <title>DBK Bluetooth</title>
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../theme.css">
+  <script src="../ui-preferences.js"></script>
+  <style>
+    main { max-width: 560px; margin: 0 auto; padding: 1.5rem 1rem; font-family: system-ui, sans-serif; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .75rem; margin: 1rem 0; }
+    .tile { border: 1px solid currentColor; border-radius: .75rem; padding: .75rem; text-align: center; }
+    .tile .v { font-size: 2.2rem; font-weight: 700; line-height: 1.1; }
+    .tile .l { font-size: .8rem; opacity: .7; }
+    .status { font-size: 1.1rem; margin: .5rem 0; }
+    .status[data-level="GOOD"] { color: #2e9e3d; }
+    .status[data-level="FAIR"] { color: #c9a200; }
+    .status[data-level="BAD"] { color: #d33; }
+    button.action { font-size: 1rem; padding: .7rem 1.2rem; border-radius: .6rem; cursor: pointer; }
+    .note { font-size: .85rem; opacity: .75; }
+    .unsupported { color: #d33; }
+  </style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">DUSTBOY KIT · ESP32-C3 · BLUETOOTH</p>
+  <h1>DBK Bluetooth</h1>
+  <p id="lede">อ่านค่าฝุ่นจากบอร์ด DBK ผ่าน Bluetooth โดยไม่ต้องมี Wi-Fi ใช้ Chrome บน Android, macOS, Windows หรือ Linux (iPhone ต้องใช้แอป Bluefy)</p>
+
+  <p>
+    <button class="action" id="connect" type="button">🔵 เชื่อมต่อ DBK</button>
+    <button class="action" id="disconnect" type="button" hidden>ตัดการเชื่อมต่อ</button>
+  </p>
+  <p id="unsupported" class="unsupported" hidden>เบราว์เซอร์นี้ไม่มี Web Bluetooth ใช้ Chrome หรือ Edge บนคอม/Android หรือ Bluefy บน iPhone</p>
+
+  <p class="status" id="device">ยังไม่ได้เชื่อมต่อ</p>
+  <div class="grid">
+    <div class="tile"><div class="v" id="pm1">–</div><div class="l">PM1.0 µg/m³</div></div>
+    <div class="tile"><div class="v" id="pm25">–</div><div class="l">PM2.5 µg/m³</div></div>
+    <div class="tile"><div class="v" id="pm10">–</div><div class="l">PM10 µg/m³</div></div>
+  </div>
+  <p class="status" id="level" data-level="">–</p>
+  <p class="note" id="updated"></p>
+
+  <h2>ติดตั้งเฟิร์มแวร์ Bluetooth</h2>
+  <p class="note">แฟลชจากหน้าแรก: <a href="../">ปุ่ม "แฟลช DBK Bluetooth"</a> ผ่านสาย USB (Chrome/Edge บนคอม) เวอร์ชันนี้ปิด Wi-Fi ทั้งหมด</p>
+
+  <h2>สำหรับคนเขียนแอป</h2>
+  <p class="note">Service <code>d8b70001-5b1e-4c3a-9f2e-00d0b0000001</code> · PM1 <code>…0002</code> · PM2.5 <code>…0003</code> · PM10 <code>…0004</code> (float32 little-endian, read + notify ทุก 1 s) · status <code>…0005</code> (UTF-8: GOOD / FAIR / BAD / SENSOR ERROR) · alias <code>…0006</code></p>
+</main>
+
+<script>
+(() => {
+  const SERVICE = 'd8b70001-5b1e-4c3a-9f2e-00d0b0000001';
+  const CH = {
+    pm1:    'd8b70002-5b1e-4c3a-9f2e-00d0b0000001',
+    pm25:   'd8b70003-5b1e-4c3a-9f2e-00d0b0000001',
+    pm10:   'd8b70004-5b1e-4c3a-9f2e-00d0b0000001',
+    status: 'd8b70005-5b1e-4c3a-9f2e-00d0b0000001',
+    alias:  'd8b70006-5b1e-4c3a-9f2e-00d0b0000001',
+  };
+  const $ = (id) => document.getElementById(id);
+  let device = null;
+
+  if (!navigator.bluetooth) {
+    $('unsupported').hidden = false;
+    $('connect').disabled = true;
+  }
+
+  const f32 = (dv) => (dv.byteLength >= 4 ? dv.getFloat32(0, true) : NaN);
+  const txt = (dv) => new TextDecoder().decode(dv.buffer);
+  const show = (id, v) => { $(id).textContent = Number.isFinite(v) ? Math.round(v) : '–'; };
+  const stamp = () => { $('updated').textContent = 'อัปเดต ' + new Date().toLocaleTimeString('th-TH'); };
+
+  async function subscribe(service, uuid, onValue) {
+    const ch = await service.getCharacteristic(uuid);
+    onValue(await ch.readValue());
+    await ch.startNotifications();
+    ch.addEventListener('characteristicvaluechanged', (e) => onValue(e.target.value));
+  }
+
+  async function connect() {
+    try {
+      device = await navigator.bluetooth.requestDevice({
+        filters: [{ services: [SERVICE] }, { namePrefix: 'DBK' }],
+        optionalServices: [SERVICE],
+      });
+      device.addEventListener('gattserverdisconnected', onDisconnected);
+      const server = await device.gatt.connect();
+      const service = await server.getPrimaryService(SERVICE);
+
+      try {
+        const alias = await service.getCharacteristic(CH.alias);
+        $('device').textContent = 'เชื่อมต่อแล้ว: ' + txt(await alias.readValue());
+      } catch (_) {
+        $('device').textContent = 'เชื่อมต่อแล้ว: ' + (device.name || 'DBK');
+      }
+
+      await subscribe(service, CH.pm1,  (dv) => { show('pm1',  f32(dv)); stamp(); });
+      await subscribe(service, CH.pm25, (dv) => { show('pm25', f32(dv)); stamp(); });
+      await subscribe(service, CH.pm10, (dv) => { show('pm10', f32(dv)); stamp(); });
+      await subscribe(service, CH.status, (dv) => {
+        const s = txt(dv);
+        $('level').textContent = s;
+        $('level').dataset.level = s;
+      });
+
+      $('connect').hidden = true;
+      $('disconnect').hidden = false;
+    } catch (err) {
+      $('device').textContent = 'เชื่อมต่อไม่สำเร็จ: ' + (err && err.message ? err.message : err);
+    }
+  }
+
+  function onDisconnected() {
+    $('device').textContent = 'หลุดการเชื่อมต่อ';
+    $('connect').hidden = false;
+    $('disconnect').hidden = true;
+  }
+
+  $('connect').addEventListener('click', connect);
+  $('disconnect').addEventListener('click', () => { if (device && device.gatt.connected) device.gatt.disconnect(); });
+})();
+</script>
+</body>
+</html>

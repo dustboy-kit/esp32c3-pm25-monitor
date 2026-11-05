@@ -1,0 +1,82 @@
+# OLED layout for the BLE variant. Same three-column PM screen as oled.yaml;
+# the top row shows a Bluetooth marker and the connected-client count instead
+# of clock / Wi-Fi / MQTT (there is no network time without Wi-Fi).
+
+i2c:
+  id: oled_bus
+  sda:
+    number: GPIO9
+    ignore_strapping_warning: true
+  scl: GPIO10
+  scan: true
+  frequency: 400kHz
+
+font:
+  - file: "https://raw.githubusercontent.com/Templarian/MaterialDesign-Webfont/v7.4.47/fonts/materialdesignicons-webfont.ttf"
+    id: font_icons
+    size: 10
+    glyphs:
+      - "\U000F00AF" # mdi-bluetooth
+      - "\U000F00B1" # mdi-bluetooth-connect
+  - file: "gfonts://Roboto Mono"
+    id: font_header
+    size: 10
+  - file: "gfonts://Roboto Mono"
+    id: font_label
+    size: 7
+  - file: "gfonts://Open Sans"
+    id: font_value
+    size: 10
+    glyphs: " 0123456789"
+
+display:
+  - platform: ssd1306_i2c
+    id: oled
+    i2c_id: oled_bus
+    model: SSD1306 128x32
+    address: 0x3C
+    update_interval: 1s
+    lambda: |-
+      const uint32_t splash_duration_ms = ${splash_seconds} * 1000UL;
+      if (millis() < splash_duration_ms) {
+        it.print(64, 5, id(font_header), TextAlign::TOP_CENTER, "Dustboy Kit For Kids");
+        it.rectangle(14, 24, 100, 6);
+        const int progress_width = (millis() * 96UL) / splash_duration_ms;
+        it.filled_rectangle(16, 26, progress_width, 2);
+        return;
+      }
+
+      const uint32_t up = millis() / 1000UL;
+      it.printf(0, -1, id(font_header), TextAlign::TOP_LEFT, "%02lu:%02lu", (up / 3600UL) % 100UL, (up / 60UL) % 60UL);
+
+      if (id(ble_client_count) > 0) {
+        it.print(68, 0, id(font_icons), "\U000F00B1");
+        it.printf(80, -1, id(font_header), TextAlign::TOP_LEFT, "%d", id(ble_client_count));
+      } else {
+        it.print(68, 0, id(font_icons), "\U000F00AF");
+      }
+      it.print(124, -1, id(font_header), TextAlign::TOP_RIGHT, "${device_id}");
+      it.horizontal_line(0, 11, 128);
+
+      if (millis() < (${warmup_seconds} * 1000UL)) {
+        it.print(64, 18, id(font_header), TextAlign::CENTER, "CHECKING SENSOR...");
+        return;
+      }
+
+      const bool stale = id(last_pms_update_ms) == 0 ||
+                         (uint32_t) (millis() - id(last_pms_update_ms)) > (${stale_seconds} * 1000UL);
+      if (!id(pms_pm25).has_state() || stale) {
+        it.print(64, 18, id(font_header), TextAlign::CENTER, "SENSOR ERROR");
+        return;
+      }
+
+      it.vertical_line(42, 11, 21);
+      it.vertical_line(85, 11, 21);
+
+      it.print(21, 11, id(font_label), TextAlign::TOP_CENTER, "PM1");
+      it.print(64, 11, id(font_label), TextAlign::TOP_CENTER, "PM2.5");
+      it.print(106, 11, id(font_label), TextAlign::TOP_CENTER, "PM10");
+
+      it.printf(21, 19, id(font_value), TextAlign::TOP_CENTER, "%.0f", id(pms_pm1).state);
+      it.printf(64, 19, id(font_value), TextAlign::TOP_CENTER, "%.0f", id(pms_pm25).state);
+      it.printf(106, 19, id(font_value), TextAlign::TOP_CENTER, "%.0f", id(pms_pm10).state);

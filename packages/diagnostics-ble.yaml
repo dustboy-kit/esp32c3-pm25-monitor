@@ -1,0 +1,47 @@
+# Diagnostics for the BLE variant: no Wi-Fi entities, no web server.
+# Keeps the mutable alias so the BLE client can show "DBK A1B2C3".
+
+sensor:
+  - platform: uptime
+    id: uptime_seconds
+    name: Uptime
+    update_interval: 60s
+    entity_category: diagnostic
+
+button:
+  - platform: restart
+    name: Restart
+    entity_category: diagnostic
+
+text:
+  - platform: template
+    id: device_alias
+    name: Device Alias
+    icon: mdi:rename-box
+    mode: text
+    optimistic: true
+    restore_value: true
+    min_length: 1
+    max_length: 32
+    entity_category: config
+
+esphome:
+  on_boot:
+    - priority: -100
+      then:
+        - if:
+            condition:
+              lambda: return id(device_alias).state.empty();
+            then:
+              - text.set:
+                  id: device_alias
+                  value: !lambda |-
+                    std::string node = App.get_name();
+                    const size_t separator = node.rfind('-');
+                    std::string suffix = separator == std::string::npos
+                                           ? node
+                                           : node.substr(separator + 1);
+                    for (auto &character : suffix) {
+                      character = static_cast<char>(toupper(character));
+                    }
+                    return "DBK " + suffix;

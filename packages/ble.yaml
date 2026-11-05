@@ -1,0 +1,97 @@
+# Bluetooth Low Energy profile for the DBK monitor.
+#
+# This package replaces Wi-Fi entirely. The board advertises as "DBK <mac>"
+# and exposes one GATT service with PM1.0 / PM2.5 / PM10 as little-endian
+# float32 characteristics (read + notify) plus one UTF-8 status string.
+# A phone or laptop reads it from site/ble/ over Web Bluetooth; no network,
+# no access point, no WPA authentication, no Wi-Fi TX power problem.
+
+esp32_ble:
+  # 13 characters max because name_add_mac_suffix is enabled in board.yaml.
+  name: ${ble_name}
+
+esp32_ble_server:
+  manufacturer: "DustBoy Kit"
+  model: "DBK BLE"
+  firmware_version: ${project_version}
+  max_clients: 2
+  on_connect:
+    - globals.set:
+        id: ble_client_count
+        value: !lambda "return id(ble_client_count) + 1;"
+  on_disconnect:
+    - globals.set:
+        id: ble_client_count
+        value: !lambda "return id(ble_client_count) > 0 ? id(ble_client_count) - 1 : 0;"
+  services:
+    - uuid: ${ble_service_uuid}
+      advertise: true
+      characteristics:
+        - id: ble_pm1
+          uuid: ${ble_pm1_uuid}
+          description: "PM1.0 ug/m3 float32 LE"
+          read: true
+          notify: true
+          value:
+            data: !lambda |-
+              float v = id(pms_pm1).has_state() ? id(pms_pm1).state : NAN;
+              return bytebuffer::ByteBuffer::wrap(v, bytebuffer::LITTLE).get_data();
+        - id: ble_pm25
+          uuid: ${ble_pm25_uuid}
+          description: "PM2.5 ug/m3 float32 LE"
+          read: true
+          notify: true
+          value:
+            data: !lambda |-
+              float v = id(pms_pm25).has_state() ? id(pms_pm25).state : NAN;
+              return bytebuffer::ByteBuffer::wrap(v, bytebuffer::LITTLE).get_data();
+        - id: ble_pm10
+          uuid: ${ble_pm10_uuid}
+          description: "PM10 ug/m3 float32 LE"
+          read: true
+          notify: true
+          value:
+            data: !lambda |-
+              float v = id(pms_pm10).has_state() ? id(pms_pm10).state : NAN;
+              return bytebuffer::ByteBuffer::wrap(v, bytebuffer::LITTLE).get_data();
+        - id: ble_status
+          uuid: ${ble_status_uuid}
+          description: "Air quality level text"
+          read: true
+          notify: true
+          value:
+            data: !lambda |-
+              std::string s = id(air_quality_level).has_state() ? id(air_quality_level).state : std::string("WARMUP");
+              return std::vector<uint8_t>(s.begin(), s.end());
+        - id: ble_alias
+          uuid: ${ble_alias_uuid}
+          description: "Device alias"
+          read: true
+          value:
+            data: !lambda |-
+              std::string s = id(device_alias).state;
+              return std::vector<uint8_t>(s.begin(), s.end());
+
+globals:
+  - id: ble_client_count
+    type: int
+    restore_value: false
+    initial_value: "0"
+
+# Push a fresh reading to every subscribed client once per second. The
+# characteristic values are templated, so each notify re-reads the sensors.
+interval:
+  - interval: 1s
+    then:
+      - if:
+          condition:
+            lambda: return id(ble_client_count) > 0;
+          then:
+            - ble_server.characteristic.notify:
+                id: ble_pm1
+            - ble_server.characteristic.notify:
+                id: ble_pm25
+            - ble_server.characteristic.notify:
+                id: ble_pm10
+            - ble_server.characteristic.notify:
+                id: ble_status
