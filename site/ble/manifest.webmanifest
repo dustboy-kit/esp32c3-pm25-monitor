@@ -1,0 +1,14 @@
+{
+  "name": "DBK Bluetooth",
+  "short_name": "DBK BLE",
+  "description": "Read DustBoy Kit PM2.5 over Bluetooth LE",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#040818",
+  "theme_color": "#040818",
+  "lang": "th",
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

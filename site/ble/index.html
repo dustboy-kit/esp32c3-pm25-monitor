@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#040818">
   <title>DBK Bluetooth</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icon.svg">
   <link rel="stylesheet" href="../styles.css">
   <link rel="stylesheet" href="../theme.css">
   <script src="../ui-preferences.js"></script>
@@ -32,6 +35,7 @@
   <p>
     <button class="action" id="connect" type="button">🔵 เชื่อมต่อ DBK</button>
     <button class="action" id="disconnect" type="button" hidden>ตัดการเชื่อมต่อ</button>
+    <button class="action" id="install" type="button" hidden>📱 ติดตั้งเป็นแอป</button>
   </p>
   <p id="unsupported" class="unsupported" hidden>เบราว์เซอร์นี้ไม่มี Web Bluetooth ใช้ Chrome หรือ Edge บนคอม/Android หรือ Bluefy บน iPhone</p>
 
@@ -121,6 +125,12 @@
   }
 
   $('connect').addEventListener('click', connect);
+
+  // Installable app (PWA): Chrome on Android / desktop shows the install button.
+  let installPrompt = null;
+  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installPrompt = e; $('install').hidden = false; });
+  $('install').addEventListener('click', async () => { if (!installPrompt) return; installPrompt.prompt(); await installPrompt.userChoice; installPrompt = null; $('install').hidden = true; });
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
   $('disconnect').addEventListener('click', () => { if (device && device.gatt.connected) device.gatt.disconnect(); });
 })();
 </script>
