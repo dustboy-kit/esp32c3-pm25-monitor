@@ -4,137 +4,414 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#040818">
-  <title>DBK Bluetooth</title>
+  <meta name="description" content="DBK Bluetooth: เครื่องวัด PM2.5 DustBoy Kit รุ่นไม่ใช้ Wi-Fi แฟลช อ่านค่า และอัปเดตเฟิร์มแวร์จากเบราว์เซอร์ผ่าน Bluetooth">
+  <title>DBK Bluetooth · DustBoy Kit</title>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="./icon.svg">
   <link rel="stylesheet" href="../styles.css">
   <link rel="stylesheet" href="../theme.css">
   <script src="../ui-preferences.js"></script>
+  <script type="module" src="https://unpkg.com/esp-web-tools@10.2.1/dist/web/install-button.js?module"></script>
   <style>
-    main { max-width: 560px; margin: 0 auto; padding: 1.5rem 1rem; font-family: system-ui, sans-serif; }
-    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .75rem; margin: 1rem 0; }
-    .tile { border: 1px solid currentColor; border-radius: .75rem; padding: .75rem; text-align: center; }
-    .tile .v { font-size: 2.2rem; font-weight: 700; line-height: 1.1; }
-    .tile .l { font-size: .8rem; opacity: .7; }
-    .status { font-size: 1.1rem; margin: .5rem 0; }
-    .status[data-level="GOOD"] { color: #2e9e3d; }
-    .status[data-level="FAIR"] { color: #c9a200; }
-    .status[data-level="BAD"] { color: #d33; }
-    button.action { font-size: 1rem; padding: .7rem 1.2rem; border-radius: .6rem; cursor: pointer; }
-    .note { font-size: .85rem; opacity: .75; }
-    .unsupported { color: #d33; }
+    .hub { position: relative; z-index: 1; width: min(880px, 100%); margin: auto; padding: clamp(22px, 5vw, 56px) 18px 48px; }
+    .hub ::selection { background: var(--gold); color: #1a1200; }
+    .hub :focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; border-radius: 6px; }
+    .hub h1 { margin: 10px 0 0; font: italic 800 clamp(40px, 9vw, 72px)/.95 Georgia, "Times New Roman", serif; letter-spacing: -.03em; text-wrap: balance; }
+    .hub h1 em { color: var(--gold); font-style: inherit; }
+    .hub h2 { margin: 0 0 6px; color: #fff4ba; font: italic 750 clamp(24px, 4.5vw, 32px)/1.1 Georgia, serif; letter-spacing: -.02em; text-wrap: balance; }
+    .hub p { margin: 8px 0; color: #b8c8e9; max-width: 68ch; }
+    .hub section { margin-top: clamp(34px, 7vw, 56px); scroll-margin-top: 16px; }
+    .hub .lede { font-size: clamp(16px, 2.4vw, 19px); margin-top: 14px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .topbar a.home { color: var(--muted); text-decoration: none; font-size: 13px; }
+    .topbar a.home:hover { color: var(--text); }
+    .pref { display: inline-flex; align-items: center; gap: 8px; }
+    .pref .theme-toggle { width: 36px; height: 36px; padding: 0; border-radius: 999px; }
+
+    .hero-ble { display: grid; gap: 18px; }
+    .jump { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+    .jump a { border: 1px solid var(--line); border-radius: 999px; padding: 7px 13px; color: var(--text); text-decoration: none; font-size: 13px; background: rgba(4, 12, 31, .55); }
+    .jump a:hover { border-color: var(--gold); color: #fff0a6; }
+    .state { border: 1px solid rgba(247, 206, 70, .55); border-radius: 14px; padding: 14px 16px; background: linear-gradient(145deg, rgba(60, 44, 6, .55), rgba(9, 24, 57, .7)); box-shadow: 0 18px 40px -30px #000; }
+    .state strong { color: #ffe387; }
+    .state p { margin: 4px 0 0; font-size: 14px; }
+
+    .cmp { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 10px; font-variant-numeric: tabular-nums; }
+    .cmp th, .cmp td { text-align: left; padding: 10px 10px; border-bottom: 1px solid rgba(88, 137, 226, .35); vertical-align: top; }
+    .cmp th { color: #ffe387; font-weight: 700; }
+    .cmp th:first-child, .cmp td:first-child { color: var(--muted); width: 32%; }
+    .cmp tr:last-child td { border-bottom: 0; }
+    @media (max-width: 520px) { .cmp { font-size: 13px; } .cmp th, .cmp td { padding: 8px 6px; } }
+
+    .tool { border: 1px solid rgba(88, 137, 226, .55); border-radius: 18px; padding: 20px; background: linear-gradient(145deg, rgba(9, 24, 57, .9), rgba(4, 12, 31, .92)); box-shadow: 0 24px 60px -40px #000; }
+    .tool ol { margin: 10px 0 0; padding-left: 22px; color: #b8c8e9; }
+    .tool ol li { margin: 6px 0; }
+    .tool ol li::marker { color: var(--gold); font-weight: 700; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 14px; }
+    .meta { display: inline-block; margin-top: 8px; color: var(--muted); font-size: 13px; }
+
+    .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
+    .tile { border: 1px solid rgba(88, 137, 226, .45); border-radius: 12px; padding: 12px 8px; text-align: center; background: #071126; }
+    .tile .v { font: 700 clamp(28px, 7vw, 40px)/1.05 ui-sans-serif, system-ui, sans-serif; font-variant-numeric: tabular-nums; color: var(--text); }
+    .tile .l { margin-top: 4px; font-size: 12px; color: var(--muted); }
+    .level { margin-top: 12px; font-size: 18px; font-weight: 700; }
+    .level[data-level="GOOD"] { color: var(--green); }
+    .level[data-level="FAIR"] { color: var(--gold); }
+    .level[data-level="BAD"] { color: var(--danger); }
+    .live { font-size: 13px; color: var(--muted); }
+
+    .file { display: grid; gap: 10px; margin-top: 12px; }
+    input[type="file"] { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+    .file .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 8px; }
+    .level:empty, .otastat:empty { display: none; }
+    .uuids { white-space: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    progress { width: 100%; height: 14px; border: 0; border-radius: 999px; overflow: hidden; background: #071126; accent-color: var(--gold); margin-top: 12px; }
+    progress::-webkit-progress-bar { background: #071126; border-radius: 999px; }
+    progress::-webkit-progress-value { background: linear-gradient(90deg, #d9a920, var(--gold)); border-radius: 999px; transition: width .25s ease-out; }
+    .otastat { margin-top: 8px; font-size: 15px; color: var(--text); white-space: pre-wrap; }
+    .passcode { margin-top: 14px; padding: 12px 14px; border: 1px solid rgba(255, 123, 118, .6); border-radius: 12px; background: rgba(78, 20, 18, .35); color: #ffd9d7; font-size: 14px; }
+    .passcode strong { color: #ffb5b1; }
+
+    .facts { display: grid; gap: 10px; margin-top: 12px; }
+    .fact { display: grid; grid-template-columns: 22px 1fr; gap: 10px; align-items: start; color: #b8c8e9; font-size: 14.5px; }
+    .fact svg { width: 20px; height: 20px; margin-top: 2px; }
+    .fact b { color: var(--text); }
+    details { border: 1px solid rgba(88, 137, 226, .45); border-radius: 12px; padding: 10px 14px; background: rgba(7, 17, 38, .7); margin-top: 10px; }
+    details summary { cursor: pointer; color: #fff0a6; font-weight: 700; }
+    details p { font-size: 14px; }
+    .uuids { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; color: #d9e8ff; line-height: 1.7; }
+    .uuids b { color: #ffe387; font-weight: 600; }
+    .unsupported { border: 1px solid rgba(255, 123, 118, .6); border-radius: 12px; padding: 10px 14px; color: #ffb5b1; background: rgba(78, 20, 18, .35); font-size: 14px; margin-top: 12px; }
+    footer.hubfoot { margin-top: 48px; padding-top: 18px; border-top: 1px solid rgba(88, 137, 226, .3); color: #8295bd; font-size: 12px; display: flex; flex-wrap: wrap; gap: 14px; justify-content: space-between; }
+    @media (prefers-reduced-motion: reduce) { progress::-webkit-progress-value { transition: none; } }
+    [hidden] { display: none !important; }
   </style>
 </head>
 <body>
-<main>
-  <p class="eyebrow">DUSTBOY KIT · ESP32-C3 · BLUETOOTH</p>
-  <h1>DBK Bluetooth</h1>
-  <p id="lede">อ่านค่าฝุ่นจากบอร์ด DBK ผ่าน Bluetooth โดยไม่ต้องมี Wi-Fi ใช้ Chrome บน Android, macOS, Windows หรือ Linux (iPhone ต้องใช้แอป Bluefy)</p>
-
-  <p>
-    <button class="action" id="connect" type="button">🔵 เชื่อมต่อ DBK</button>
-    <button class="action" id="disconnect" type="button" hidden>ตัดการเชื่อมต่อ</button>
-    <button class="action" id="install" type="button" hidden>📱 ติดตั้งเป็นแอป</button>
-  </p>
-  <p id="unsupported" class="unsupported" hidden>เบราว์เซอร์นี้ไม่มี Web Bluetooth ใช้ Chrome หรือ Edge บนคอม/Android หรือ Bluefy บน iPhone</p>
-
-  <p class="status" id="device">ยังไม่ได้เชื่อมต่อ</p>
-  <div class="grid">
-    <div class="tile"><div class="v" id="pm1">–</div><div class="l">PM1.0 µg/m³</div></div>
-    <div class="tile"><div class="v" id="pm25">–</div><div class="l">PM2.5 µg/m³</div></div>
-    <div class="tile"><div class="v" id="pm10">–</div><div class="l">PM10 µg/m³</div></div>
+<main class="hub">
+  <div class="topbar">
+    <a class="home" href="../" data-i18n="home">← DustBoy Kit</a>
+    <div class="pref">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Theme"><span aria-hidden="true" data-theme-icon>◐</span></button>
+      <div class="lang-switch" aria-label="Language">
+        <button type="button" data-lang="th">ไทย</button>
+        <button type="button" data-lang="en">EN</button>
+      </div>
+    </div>
   </div>
-  <p class="status" id="level" data-level="">–</p>
-  <p class="note" id="updated"></p>
 
-  <h2>ติดตั้งเฟิร์มแวร์ Bluetooth</h2>
-  <p class="note">แฟลชจากหน้าแรก: <a href="../">ปุ่ม "แฟลช DBK Bluetooth"</a> ผ่านสาย USB (Chrome/Edge บนคอม) เวอร์ชันนี้ปิด Wi-Fi ทั้งหมด</p>
+  <header class="hero-ble">
+    <div>
+      <h1 data-i18n="h1">DBK <em>Bluetooth</em></h1>
+      <p class="lede" data-i18n="lede">เครื่องวัด PM2.5 DustBoy Kit รุ่นที่ไม่ต้องมี Wi-Fi: แฟลช อ่านค่า และอัปเดตเฟิร์มแวร์ ทั้งหมดจากเบราว์เซอร์ผ่าน Bluetooth</p>
+      <nav class="jump" aria-label="sections">
+        <a href="#flash" data-i18n="jFlash">1 · แฟลชผ่าน USB</a>
+        <a href="#read" data-i18n="jRead">2 · อ่านค่าสด</a>
+        <a href="#ota" data-i18n="jOta">3 · อัปเดตไร้สาย</a>
+        <a href="#req" data-i18n="jReq">ข้อกำหนด</a>
+        <a href="#safety" data-i18n="jSafety">ความปลอดภัย</a>
+        <a href="#help" data-i18n="jHelp">แก้ปัญหา</a>
+      </nav>
+    </div>
+    <div class="state" role="status">
+      <strong data-i18n="stateHead">สถานะ: ยังไม่ได้ทดสอบบนบอร์ดจริง</strong>
+      <p data-i18n="stateBody">เฟิร์มแวร์ 0.2.0-ble คอมไพล์ผ่านและขึ้นเว็บแล้ว (5 พ.ย. 2026) แต่ยังไม่มีใครแฟลชลงบอร์ด DBK แล้วลองอ่านค่าหรือ OTA จริง ใครทดสอบแล้วบอกผลในห้อง dustboy-kit จะอัปเดตกล่องนี้</p>
+    </div>
+  </header>
 
-  <h2>อัปเดตเฟิร์มแวร์แบบไร้สาย</h2>
-  <p class="note"><a class="action secondary" href="./ota.html">⬆️ OTA ผ่าน Bluetooth</a> ส่งเฟิร์มแวร์ใหม่เข้าบอร์ดจากหน้าเว็บ ไม่ต้องเสียบสาย (เฟิร์มแวร์ 0.2.0-ble ขึ้นไป)</p>
+  <section id="compare">
+    <h2 data-i18n="cmpHead">ต่างจาก DBK Wi-Fi ตรงไหน</h2>
+    <p data-i18n="cmpBody">บอร์ด เซ็นเซอร์ จอ และไฟสถานะเหมือนกันทุกอย่าง ต่างกันแค่ทางที่ข้อมูลออกจากบอร์ด</p>
+    <table class="cmp">
+      <thead><tr><th></th><th>DBK Wi-Fi</th><th>DBK Bluetooth</th></tr></thead>
+      <tbody>
+        <tr><td data-i18n="r1">เชื่อมต่อ</td><td>Wi-Fi 2.4 GHz + MQTT</td><td>Bluetooth LE (GATT)</td></tr>
+        <tr><td data-i18n="r2">ดูค่าจาก</td><td data-i18n="r2a">เว็บบนบอร์ด, Home Assistant, Dashboard</td><td data-i18n="r2b">หน้านี้ (Web Bluetooth) หรือแอปที่ติดตั้งจากหน้านี้</td></tr>
+        <tr><td data-i18n="r3">ต้องตั้งค่า</td><td data-i18n="r3a">ชื่อ Wi-Fi + รหัสผ่าน ผ่าน Improv</td><td data-i18n="r3b">ไม่ต้องตั้งอะไร เปิดแล้วกดเชื่อมต่อ</td></tr>
+        <tr><td data-i18n="r4">อัปเดตเฟิร์มแวร์</td><td data-i18n="r4a">USB หรือ OTA ผ่าน Wi-Fi (ESPHome)</td><td data-i18n="r4b">USB หรือ OTA ผ่าน Bluetooth (หน้านี้)</td></tr>
+        <tr><td data-i18n="r5">ปัญหา Auth Expired</td><td data-i18n="r5a">ต้องลด TX เป็น 8.5 dBm</td><td data-i18n="r5b">ไม่มี เพราะไม่มี Wi-Fi</td></tr>
+        <tr><td data-i18n="r6">ส่งข้อมูลขึ้นเน็ต</td><td data-i18n="r6a">ได้ (MQTT)</td><td data-i18n="r6b">ไม่ได้ อ่านได้เฉพาะในระยะ ~10 ม.</td></tr>
+        <tr><td data-i18n="r7">ไฟล์เฟิร์มแวร์</td><td><code>dbk.factory.bin</code></td><td><code>dbk-ble.factory.bin</code> · <code>dbk-ble.ota.bin</code></td></tr>
+      </tbody>
+    </table>
+  </section>
 
-  <h2>สำหรับคนเขียนแอป</h2>
-  <p class="note">Service <code>d8b70001-5b1e-4c3a-9f2e-00d0b0000001</code> · PM1 <code>…0002</code> · PM2.5 <code>…0003</code> · PM10 <code>…0004</code> (float32 little-endian, read + notify ทุก 1 s) · status <code>…0005</code> (UTF-8: GOOD / FAIR / BAD / SENSOR ERROR) · alias <code>…0006</code></p>
+  <section id="req">
+    <h2 data-i18n="reqHead">ใช้ได้กับอะไร</h2>
+    <div class="facts">
+      <div class="fact"><svg viewBox="0 0 24 24" fill="none" stroke="#68d7a2" stroke-width="2" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span data-i18n="req1"><b>Chrome หรือ Edge</b> บน Android, Windows, macOS, Linux (ต้อง HTTPS: หน้านี้เป็น HTTPS อยู่แล้ว)</span></div>
+      <div class="fact"><svg viewBox="0 0 24 24" fill="none" stroke="#ff7b76" stroke-width="2" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg><span data-i18n="req2"><b>iPhone / iPad / Safari ใช้ไม่ได้</b> เพราะไม่มี Web Bluetooth ทางเลือกคือแอป Bluefy บน iOS</span></div>
+      <div class="fact"><svg viewBox="0 0 24 24" fill="none" stroke="#62c8df" stroke-width="2" aria-hidden="true"><path d="M12 2v20M7 7l10 10M17 7 7 17"/></svg><span data-i18n="req3"><b>ไม่ต้องจับคู่ (pair) ในตั้งค่าเครื่อง</b> กดปุ่มเชื่อมต่อในหน้านี้ เลือก <code>DBK-xxxxxx</code> จากรายการ เท่านั้น</span></div>
+      <div class="fact"><svg viewBox="0 0 24 24" fill="none" stroke="#f7ce46" stroke-width="2" aria-hidden="true"><path d="M12 3 2 21h20L12 3z"/><path d="M12 10v5M12 18h.01"/></svg><span data-i18n="req4"><b>แฟลชครั้งแรกต้องใช้สาย USB</b> (ข้อ 1) บอร์ดที่ยังเป็นเฟิร์มแวร์ Wi-Fi หรือรุ่นก่อน 0.2.0-ble ไม่มี Bluetooth OTA ให้ใช้</span></div>
+    </div>
+    <p id="unsupported" class="unsupported" hidden data-i18n="unsupported">เบราว์เซอร์นี้ไม่มี Web Bluetooth: ข้อ 2 และ 3 ใช้ไม่ได้ที่นี่ เปิดหน้านี้ใน Chrome หรือ Edge บนคอม/Android</p>
+  </section>
+
+  <section id="flash">
+    <div class="tool">
+      <h2 data-i18n="t1Head">1 · แฟลชเฟิร์มแวร์ผ่าน USB</h2>
+      <p data-i18n="t1Body">ครั้งแรก และทุกครั้งที่บอร์ดบูตไม่ขึ้น ใช้ทางนี้ Chrome/Edge บนคอมเท่านั้น (Web Serial)</p>
+      <ol>
+        <li data-i18n="t1s1">เสียบบอร์ด DBK เข้าคอมด้วยสาย USB ที่ส่งข้อมูลได้</li>
+        <li data-i18n="t1s2">กด "แฟลช DBK Bluetooth" เลือกพอร์ตของบอร์ด แล้วรอจนเสร็จ</li>
+        <li data-i18n="t1s3">ถอดแล้วเสียบใหม่ จอจะโชว์ "Dustboy Kit For Kids" แล้วแถวบนมีไอคอน Bluetooth</li>
+      </ol>
+      <div class="actions">
+        <esp-web-install-button manifest="../manifests/dbk-ble.json"><button class="action" slot="activate" data-i18n="t1Btn">⚡ แฟลช DBK Bluetooth</button></esp-web-install-button>
+        <span class="meta">dbk-ble.factory.bin · 0.2.0-ble · ESP32-C3</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="read">
+    <div class="tool">
+      <h2 data-i18n="t2Head">2 · อ่านค่าสดผ่าน Bluetooth</h2>
+      <p data-i18n="t2Body">ค่า PM1 / PM2.5 / PM10 มาทุก 1 วินาที จากบอร์ดในระยะประมาณ 10 เมตร</p>
+      <ol>
+        <li data-i18n="t2s1">เปิด Bluetooth ของเครื่อง แล้วกด "เชื่อมต่อ DBK"</li>
+        <li data-i18n="t2s2">เลือก <code>DBK-xxxxxx</code> (เลขท้ายตรงกับที่จอบอร์ด) แล้วกด Pair/เชื่อมต่อในหน้าต่างของ Chrome</li>
+        <li data-i18n="t2s3">ค่าจะขึ้นด้านล่าง กด "ติดตั้งเป็นแอป" ถ้าอยากเปิดจากหน้าจอโฮม</li>
+      </ol>
+      <div class="actions">
+        <button class="action" id="connect" type="button" data-i18n="btnConnect">🔵 เชื่อมต่อ DBK</button>
+        <button class="action secondary" id="disconnect" type="button" hidden data-i18n="btnDisconnect">ตัดการเชื่อมต่อ</button>
+        <button class="action secondary" id="install" type="button" hidden data-i18n="btnInstall">📱 ติดตั้งเป็นแอป</button>
+        <span class="live" id="device" data-i18n="notConnected">ยังไม่ได้เชื่อมต่อ</span>
+      </div>
+      <div class="tiles" aria-live="polite">
+        <div class="tile"><div class="v" id="pm1">–</div><div class="l">PM1.0 µg/m³</div></div>
+        <div class="tile"><div class="v" id="pm25">–</div><div class="l">PM2.5 µg/m³</div></div>
+        <div class="tile"><div class="v" id="pm10">–</div><div class="l">PM10 µg/m³</div></div>
+      </div>
+      <div class="level" id="level" data-level=""></div>
+      <div class="live" id="updated"></div>
+    </div>
+  </section>
+
+  <section id="ota">
+    <div class="tool">
+      <h2 data-i18n="t3Head">3 · อัปเดตเฟิร์มแวร์ไร้สาย (OTA ผ่าน Bluetooth)</h2>
+      <p data-i18n="t3Body">ส่งเฟิร์มแวร์ใหม่เข้าบอร์ดโดยไม่ต้องเสียบสาย ใช้ได้กับบอร์ดที่เป็น 0.2.0-ble ขึ้นไป ใช้เวลาราว 1–2 นาที</p>
+      <ol>
+        <li data-i18n="t3s1">เชื่อมต่อบอร์ดด้วยข้อ 2 ก่อน (ปุ่มเดียวกัน)</li>
+        <li data-i18n="t3s2">เลือกไฟล์ <code>.ota.bin</code> หรือกด "ใช้ตัวล่าสุดจากเว็บ"</li>
+        <li data-i18n="t3s3">กด "เริ่มอัปเดต" รอแถบเต็มและขึ้น OK บอร์ดจะรีบูตเองแล้วกลับมาโฆษณาชื่อเดิม</li>
+      </ol>
+      <div class="file">
+        <span data-i18n="fileLabel">ไฟล์เฟิร์มแวร์ (<code>.ota.bin</code>)</span>
+        <input type="file" id="file" accept=".bin" aria-label="firmware .ota.bin">
+        <div class="row"><button class="action secondary" id="pick" type="button" data-i18n="btnPick">📂 เลือกไฟล์จากเครื่อง</button><button class="action secondary" id="latest" type="button" data-i18n="btnLatest">⬇️ ใช้ตัวล่าสุดจากเว็บ (dbk-ble.ota.bin)</button></div>
+        <div class="meta" id="fileinfo"></div>
+      </div>
+      <div class="actions">
+        <button class="action" id="start" type="button" disabled data-i18n="btnStart">⬆️ เริ่มอัปเดต</button>
+        <button class="action secondary" id="abort" type="button" disabled data-i18n="btnAbort">ยกเลิก</button>
+        <span class="live" id="speed"></span>
+      </div>
+      <progress id="bar" value="0" max="100" aria-label="OTA progress"></progress>
+      <div class="otastat" id="otastat" role="status"></div>
+      <div class="passcode" data-i18n="passcode"><strong>รหัส OTA เป็นค่าคงที่ "dbk" และเปิดเผยใน repo สาธารณะ</strong> มันกันการส่งผิดบอร์ดเท่านั้น ไม่ได้กันคนที่อยู่ในระยะ Bluetooth ตั้งใจส่งเฟิร์มแวร์ของตัวเอง ถ้าจะใช้นอกห้องเรียน ให้รอเวอร์ชันรหัสต่อเครื่อง</div>
+    </div>
+  </section>
+
+  <section id="safety">
+    <h2 data-i18n="safeHead">OTA ปลอดภัยแค่ไหน</h2>
+    <div class="facts">
+      <div class="fact"><svg viewBox="0 0 24 24" fill="none" stroke="#68d7a2" stroke-width="2" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.5 9.5 8 11 4.5-1.5 8-6 8-11V5l-8-3z"/><path d="m9 12 2 2 4-4"/></svg><span data-i18n="safe1"><b>เขียนลง slot ว่าง</b> บอร์ดมี 2 ช่องเฟิร์มแวร์ (app0/app1 ช่องละ 1.75 MB) ตัวที่กำลังรันไม่ถูกแตะระหว่างส่ง</span></div>
+      <div class="fact"><svg viewBox="0 0 24 24" fill="none" stroke="#68d7a2" stroke-width="2" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.5 9.5 8 11 4.5-1.5 8-6 8-11V5l-8-3z"/><path d="m9 12 2 2 4-4"/></svg><span data-i18n="safe2"><b>ตรวจ SHA-256 และขนาดก่อนสลับ</b> ครบและตรงจึงสลับช่องบูต ไฟล์ผิด หลุดกลางทาง หรือกดยกเลิก = บอร์ดยังเป็นเฟิร์มแวร์เดิม</span></div>
+      <div class="fact"><svg viewBox="0 0 24 24" fill="none" stroke="#68d7a2" stroke-width="2" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.5 9.5 8 11 4.5-1.5 8-6 8-11V5l-8-3z"/><path d="m9 12 2 2 4-4"/></svg><span data-i18n="safe3"><b>ไฟล์ผิดชิปถูกปฏิเสธ</b> image ของ ESPHome มี magic + chip id ตัวที่ไม่ใช่ ESP32-C3 จะถูก esp_ota_end ตีกลับ</span></div>
+      <div class="fact"><svg viewBox="0 0 24 24" fill="none" stroke="#f7ce46" stroke-width="2" aria-hidden="true"><path d="M12 3 2 21h20L12 3z"/><path d="M12 10v5M12 18h.01"/></svg><span data-i18n="safe4"><b>ไม่มี auto-rollback</b> ถ้าเฟิร์มแวร์ใหม่แฮชถูกแต่บูตแล้วค้าง บอร์ดไม่ย้อนกลับเอง ทางกู้คือแฟลช USB ข้อ 1 (ข้อมูลไม่หาย เพราะ DBK ไม่เก็บอะไรบนบอร์ด)</span></div>
+      <div class="fact"><svg viewBox="0 0 24 24" fill="none" stroke="#f7ce46" stroke-width="2" aria-hidden="true"><path d="M12 3 2 21h20L12 3z"/><path d="M12 10v5M12 18h.01"/></svg><span data-i18n="safe5"><b>ครั้งแรกต้อง USB</b> OTA ใช้ได้กับบอร์ดที่เป็น 0.2.0-ble ขึ้นไปเท่านั้น</span></div>
+    </div>
+  </section>
+
+  <section id="help">
+    <h2 data-i18n="helpHead">แก้ปัญหา</h2>
+    <details><summary data-i18n="h1q">ไม่เห็น DBK ในรายการอุปกรณ์</summary><p data-i18n="h1a">เช็คว่าจอบอร์ดมีไอคอน Bluetooth (ถ้าไม่มี = ยังเป็นเฟิร์มแวร์ Wi-Fi ให้ทำข้อ 1) · ปิดแอปอื่นที่ค้างเชื่อมต่อกับบอร์ดอยู่ (บอร์ดรับได้ 2 คนพร้อมกัน) · เข้าใกล้กว่า 5 เมตร · Android ต้องให้สิทธิ์ Location/Nearby devices กับ Chrome</p></details>
+    <details><summary data-i18n="h2q">กดเชื่อมต่อแล้วล้มเหลว หรือหลุดทันที</summary><p data-i18n="h2a">ปิด-เปิด Bluetooth ของเครื่อง แล้วลองใหม่ · ถ้าเคยจับคู่ไว้ในตั้งค่าเครื่อง ให้ลบ (forget) ก่อน · บนคอม Windows ต้องเป็น Windows 10 ขึ้นไปและมี Bluetooth 4.0+</p></details>
+    <details><summary data-i18n="h3q">OTA ค้างกลางทาง หรือขึ้น ERR</summary><p data-i18n="h3a">ERR sha mismatch = ไฟล์ไม่ตรง โหลดใหม่จาก "ใช้ตัวล่าสุดจากเว็บ" · ERR bad begin = รหัสผิดหรือรูปแบบไฟล์ผิด ใช้ .ota.bin ไม่ใช่ .factory.bin · ค้างที่ RX = ลิงก์หลุด กดยกเลิก เชื่อมต่อใหม่ เริ่มใหม่ (บอร์ดยังเป็นเฟิร์มแวร์เดิม) · ขึ้น OK แล้วบอร์ดไม่กลับมา = แฟลช USB ข้อ 1</p></details>
+    <details><summary data-i18n="h4q">iPhone / iPad</summary><p data-i18n="h4a">Safari และ Chrome บน iOS ไม่มี Web Bluetooth ใช้แอป Bluefy (App Store) เปิด URL หน้านี้ข้างในแอป ข้อ 2 ใช้ได้ ข้อ 3 ใช้ได้แต่ช้ากว่า</p></details>
+  </section>
+
+  <section id="dev">
+    <h2 data-i18n="devHead">สำหรับคนเขียนแอป</h2>
+    <p data-i18n="devBody">หนึ่ง GATT service, ค่าเป็น float32 little-endian, สถานะเป็น UTF-8 ซอร์สทั้งหมดอยู่ใน <a href="https://github.com/dustboy-kit/esp32c3-pm25-monitor">dustboy-kit/esp32c3-pm25-monitor</a> (<code>packages/ble.yaml</code>, <code>packages/ble_ota.h</code>)</p>
+    <div class="uuids">
+      <b>service</b> d8b70001-5b1e-4c3a-9f2e-00d0b0000001<br>
+      <b>pm1</b> …0002 · <b>pm2.5</b> …0003 · <b>pm10</b> …0004 (read, notify 1 s)<br>
+      <b>status</b> …0005 GOOD | FAIR | BAD | SENSOR ERROR · <b>alias</b> …0006<br>
+      <b>ota_ctrl</b> …0010 "BEGIN &lt;size&gt; &lt;sha256&gt; &lt;passcode&gt;" | END | ABORT<br>
+      <b>ota_data</b> …0011 write-no-response ≤ 244 B · <b>ota_status</b> …0012 "RX n/total | VERIFY | OK | ERR …"
+    </div>
+    <p data-i18n="related"><b>งานที่เกี่ยวข้อง</b> FireMan (ESP32-S3, MeshCore/Meshtastic) ทำ OTA ผ่าน Bluetooth ไว้ก่อนเมื่อ 21 ต.ค. 2026 ด้วย loader แยก (<a href="https://github.com/laris-co/laris-meshtastic">laris-co/laris-meshtastic</a>, repo ส่วนตัว) DBK ใช้คนละวิธี คือเขียนลง slot ว่างของ ESPHome โดยตรง ไม่มี loader</p>
+  </section>
+
+  <footer class="hubfoot">
+    <span>DustBoy Kit · CCDC</span>
+    <span><a href="../">DustBoy Kit</a> · <a href="../dashboard/" data-i18n="fWifi">Dashboard (Wi-Fi)</a> · <a href="https://github.com/dustboy-kit/esp32c3-pm25-monitor" data-i18n="fSrc">ซอร์ส</a></span>
+  </footer>
 </main>
 
 <script>
 (() => {
-  const SERVICE = 'd8b70001-5b1e-4c3a-9f2e-00d0b0000001';
-  const CH = {
-    pm1:    'd8b70002-5b1e-4c3a-9f2e-00d0b0000001',
-    pm25:   'd8b70003-5b1e-4c3a-9f2e-00d0b0000001',
-    pm10:   'd8b70004-5b1e-4c3a-9f2e-00d0b0000001',
-    status: 'd8b70005-5b1e-4c3a-9f2e-00d0b0000001',
-    alias:  'd8b70006-5b1e-4c3a-9f2e-00d0b0000001',
+  const T = {
+    th: {},
+    en: {
+      home: '← DustBoy Kit', h1: 'DBK <em>Bluetooth</em>',
+      lede: 'The DustBoy Kit PM2.5 monitor that needs no Wi-Fi: flash it, read it and update it, all from a browser over Bluetooth.',
+      jFlash: '1 · Flash by USB', jRead: '2 · Live reading', jOta: '3 · Wireless update', jReq: 'Requirements', jSafety: 'Safety', jHelp: 'Troubleshooting',
+      stateHead: 'Status: not yet run on a real board',
+      stateBody: 'Firmware 0.2.0-ble compiles and is published (5 Nov 2026), but nobody has flashed a DBK board and tried the reader or OTA yet. Report results in the dustboy-kit thread and this box gets updated.',
+      cmpHead: 'How it differs from DBK Wi-Fi', cmpBody: 'Same board, sensor, display and LED. Only the way data leaves the board differs.',
+      r1: 'Link', r2: 'Read values from', r2a: 'On-board web page, Home Assistant, Dashboard', r2b: 'This page (Web Bluetooth) or the app installed from it',
+      r3: 'Setup needed', r3a: 'Wi-Fi name + password via Improv', r3b: 'None: power on, press Connect',
+      r4: 'Firmware update', r4a: 'USB or OTA over Wi-Fi (ESPHome)', r4b: 'USB or OTA over Bluetooth (this page)',
+      r5: 'Auth Expired issue', r5a: 'Needs TX lowered to 8.5 dBm', r5b: 'None, there is no Wi-Fi',
+      r6: 'Uploads to the internet', r6a: 'Yes (MQTT)', r6b: 'No, readable within ~10 m only', r7: 'Firmware files',
+      reqHead: 'What it works with',
+      req1: '<b>Chrome or Edge</b> on Android, Windows, macOS, Linux (HTTPS required: this page already is)',
+      req2: '<b>iPhone / iPad / Safari do not work</b>: no Web Bluetooth. Alternative on iOS: the Bluefy app',
+      req3: '<b>No pairing in system settings</b>: press Connect here and pick <code>DBK-xxxxxx</code> from the list, that is all',
+      req4: '<b>The first flash needs a USB cable</b> (step 1). Boards still on Wi-Fi firmware or older than 0.2.0-ble have no Bluetooth OTA',
+      unsupported: 'This browser has no Web Bluetooth: steps 2 and 3 will not work here. Open this page in Chrome or Edge on a computer or Android.',
+      t1Head: '1 · Flash firmware by USB', t1Body: 'The first time, and whenever the board will not boot, use this. Chrome/Edge on a computer only (Web Serial).',
+      t1s1: 'Plug the DBK board into the computer with a data-capable USB cable', t1s2: 'Press "Flash DBK Bluetooth", pick the board\'s port and wait', t1s3: 'Unplug and replug: the display shows "Dustboy Kit For Kids", then a Bluetooth icon on the top row',
+      t1Btn: '⚡ Flash DBK Bluetooth',
+      t2Head: '2 · Live reading over Bluetooth', t2Body: 'PM1 / PM2.5 / PM10 arrive every second from a board within about 10 m.',
+      t2s1: 'Turn on Bluetooth, then press "Connect DBK"', t2s2: 'Pick <code>DBK-xxxxxx</code> (the suffix matches the board display) and confirm in Chrome\'s dialog', t2s3: 'Values appear below. Press "Install as app" to open it from the home screen',
+      btnConnect: '🔵 Connect DBK', btnDisconnect: 'Disconnect', btnInstall: '📱 Install as app', notConnected: 'Not connected',
+      t3Head: '3 · Wireless firmware update (OTA over Bluetooth)', t3Body: 'Send new firmware to the board without a cable. Works on boards running 0.2.0-ble or newer. About 1–2 minutes.',
+      t3s1: 'Connect the board with step 2 first (same button)', t3s2: 'Choose a <code>.ota.bin</code> file or press "Use latest from the site"', t3s3: 'Press "Start update", wait for the bar to fill and OK; the board reboots and advertises again under the same name',
+      fileLabel: 'Firmware file (<code>.ota.bin</code>)', btnPick: '📂 Choose a file', btnLatest: '⬇️ Use latest from the site (dbk-ble.ota.bin)', btnStart: '⬆️ Start update', btnAbort: 'Cancel',
+      passcode: '<strong>The OTA passcode is fixed ("dbk") and public in the repository.</strong> It only guards against sending to the wrong board. It does not stop someone in Bluetooth range from sending their own firmware on purpose. For use outside the classroom, wait for the per-device passcode version.',
+      safeHead: 'How safe is OTA',
+      safe1: '<b>Written to the idle slot.</b> The board has two firmware slots (app0/app1, 1.75 MB each); the running one is untouched during transfer',
+      safe2: '<b>SHA-256 and size are checked before switching.</b> Only a complete, matching image flips the boot slot. Wrong file, dropped link or Cancel = the board stays on its current firmware',
+      safe3: '<b>Wrong-chip files are rejected.</b> ESPHome images carry a magic and chip id; a non-ESP32-C3 image is refused by esp_ota_end',
+      safe4: '<b>No auto-rollback.</b> If a new image hashes correctly but hangs at boot, the board does not revert by itself. Recovery is a USB flash (step 1); nothing is lost, DBK stores no data on the board',
+      safe5: '<b>First install by USB.</b> OTA only works on boards already running 0.2.0-ble or newer',
+      helpHead: 'Troubleshooting',
+      h1q: 'DBK is not in the device list', h1a: 'Check the board display shows a Bluetooth icon (if not, it is still Wi-Fi firmware: do step 1) · close other apps still connected to the board (it accepts 2 clients) · get within 5 m · on Android, Chrome needs the Location / Nearby devices permission',
+      h2q: 'Connect fails or drops at once', h2a: 'Toggle the device\'s Bluetooth off and on, retry · if it was ever paired in system settings, forget it first · on Windows you need Windows 10+ and Bluetooth 4.0+',
+      h3q: 'OTA stalls or shows ERR', h3a: 'ERR sha mismatch = file does not match, reload with "Use latest from the site" · ERR bad begin = wrong passcode or wrong file type, use .ota.bin not .factory.bin · stuck at RX = link dropped: Cancel, reconnect, start again (the board is still on the old firmware) · OK but the board never comes back = USB flash, step 1',
+      h4q: 'iPhone / iPad', h4a: 'Safari and Chrome on iOS have no Web Bluetooth. Use the Bluefy app (App Store) and open this URL inside it. Step 2 works; step 3 works but is slower',
+      devHead: 'For app developers', devBody: 'One GATT service, values as float32 little-endian, status as UTF-8. All source is in <a href="https://github.com/dustboy-kit/esp32c3-pm25-monitor">dustboy-kit/esp32c3-pm25-monitor</a> (<code>packages/ble.yaml</code>, <code>packages/ble_ota.h</code>)',
+      related: '<b>Related work</b> FireMan (ESP32-S3, MeshCore/Meshtastic) shipped OTA over Bluetooth on 21 Oct 2026 using a separate loader (<a href="https://github.com/laris-co/laris-meshtastic">laris-co/laris-meshtastic</a>, private repo). DBK takes a different route: it writes straight into ESPHome\'s idle slot, no loader',
+      fWifi: 'Dashboard (Wi-Fi)', fSrc: 'Source',
+    },
   };
-  const $ = (id) => document.getElementById(id);
-  let device = null;
-
-  if (!navigator.bluetooth) {
-    $('unsupported').hidden = false;
-    $('connect').disabled = true;
+  document.querySelectorAll('[data-i18n]').forEach((el) => { T.th[el.dataset.i18n] = el.innerHTML; });
+  const root = document.documentElement;
+  function setLang(lang) {
+    const dict = T[lang] || T.th;
+    document.querySelectorAll('[data-i18n]').forEach((el) => { const k = el.dataset.i18n; if (dict[k] != null) el.innerHTML = dict[k]; });
+    root.lang = lang;
+    document.querySelectorAll('[data-lang]').forEach((b) => b.classList.toggle('active', b.dataset.lang === lang));
+    try { localStorage.setItem('dbk-lang', lang); } catch (_) {}
   }
+  document.querySelectorAll('[data-lang]').forEach((b) => b.addEventListener('click', () => setLang(b.dataset.lang)));
+  let stored = null; try { stored = localStorage.getItem('dbk-lang'); } catch (_) {}
+  setLang(stored === 'en' ? 'en' : 'th');
+
+  const SERVICE = 'd8b70001-5b1e-4c3a-9f2e-00d0b0000001';
+  const CH = { pm1: 'd8b70002-5b1e-4c3a-9f2e-00d0b0000001', pm25: 'd8b70003-5b1e-4c3a-9f2e-00d0b0000001', pm10: 'd8b70004-5b1e-4c3a-9f2e-00d0b0000001', status: 'd8b70005-5b1e-4c3a-9f2e-00d0b0000001', alias: 'd8b70006-5b1e-4c3a-9f2e-00d0b0000001', ctrl: 'd8b70010-5b1e-4c3a-9f2e-00d0b0000001', data: 'd8b70011-5b1e-4c3a-9f2e-00d0b0000001', ota: 'd8b70012-5b1e-4c3a-9f2e-00d0b0000001' };
+  const PASS = 'dbk', CHUNK = 244, LATEST = '../firmware/dbk-ble.ota.bin';
+  const $ = (id) => document.getElementById(id);
+  const enc = new TextEncoder(), dec = new TextDecoder();
+  let device = null, ctrl = null, data = null, image = null, aborted = false;
+  const th = () => root.lang !== 'en';
+  const t = (thText, enText) => (th() ? thText : enText);
+
+  if (!navigator.bluetooth) { $('unsupported').hidden = false; $('connect').disabled = true; }
 
   const f32 = (dv) => (dv.byteLength >= 4 ? dv.getFloat32(0, true) : NaN);
-  const txt = (dv) => new TextDecoder().decode(dv.buffer);
+  const txt = (dv) => dec.decode(dv.buffer);
   const show = (id, v) => { $(id).textContent = Number.isFinite(v) ? Math.round(v) : '–'; };
-  const stamp = () => { $('updated').textContent = 'อัปเดต ' + new Date().toLocaleTimeString('th-TH'); };
+  const stamp = () => { $('updated').textContent = t('อัปเดต ', 'Updated ') + new Date().toLocaleTimeString(th() ? 'th-TH' : 'en-GB'); };
+  const otaReady = () => { $('start').disabled = !(image && ctrl && device && device.gatt.connected); };
 
-  async function subscribe(service, uuid, onValue) {
-    const ch = await service.getCharacteristic(uuid);
+  async function subscribe(svc, uuid, onValue) {
+    const ch = await svc.getCharacteristic(uuid);
     onValue(await ch.readValue());
     await ch.startNotifications();
     ch.addEventListener('characteristicvaluechanged', (e) => onValue(e.target.value));
+    return ch;
   }
-
+  function onOtaStatus(dv) {
+    const s = txt(dv);
+    $('otastat').textContent = s;
+    const m = /^RX (\d+)\/(\d+)/.exec(s);
+    if (m) $('bar').value = Math.floor((+m[1] / +m[2]) * 100);
+    if (s.startsWith('OK')) { $('bar').value = 100; $('otastat').textContent = t('OK: บอร์ดกำลังรีบูตเข้าเฟิร์มแวร์ใหม่', 'OK: the board is rebooting into the new firmware'); }
+  }
   async function connect() {
     try {
-      device = await navigator.bluetooth.requestDevice({
-        filters: [{ services: [SERVICE] }, { namePrefix: 'DBK' }],
-        optionalServices: [SERVICE],
-      });
+      device = await navigator.bluetooth.requestDevice({ filters: [{ services: [SERVICE] }, { namePrefix: 'DBK' }], optionalServices: [SERVICE] });
       device.addEventListener('gattserverdisconnected', onDisconnected);
       const server = await device.gatt.connect();
-      const service = await server.getPrimaryService(SERVICE);
-
+      const svc = await server.getPrimaryService(SERVICE);
+      let name = device.name || 'DBK';
+      try { name = txt(await (await svc.getCharacteristic(CH.alias)).readValue()); } catch (_) {}
+      $('device').textContent = t('เชื่อมต่อแล้ว: ', 'Connected: ') + name;
+      await subscribe(svc, CH.pm1, (dv) => { show('pm1', f32(dv)); stamp(); });
+      await subscribe(svc, CH.pm25, (dv) => { show('pm25', f32(dv)); stamp(); });
+      await subscribe(svc, CH.pm10, (dv) => { show('pm10', f32(dv)); stamp(); });
+      await subscribe(svc, CH.status, (dv) => { const s = txt(dv); $('level').textContent = s; $('level').dataset.level = s; });
       try {
-        const alias = await service.getCharacteristic(CH.alias);
-        $('device').textContent = 'เชื่อมต่อแล้ว: ' + txt(await alias.readValue());
+        ctrl = await svc.getCharacteristic(CH.ctrl);
+        data = await svc.getCharacteristic(CH.data);
+        await subscribe(svc, CH.ota, onOtaStatus);
       } catch (_) {
-        $('device').textContent = 'เชื่อมต่อแล้ว: ' + (device.name || 'DBK');
+        ctrl = data = null;
+        $('otastat').textContent = t('บอร์ดนี้ไม่มี OTA ผ่าน Bluetooth (เฟิร์มแวร์เก่ากว่า 0.2.0-ble) อัปเดตผ่าน USB ข้อ 1', 'This board has no Bluetooth OTA (firmware older than 0.2.0-ble). Update by USB, step 1');
       }
-
-      await subscribe(service, CH.pm1,  (dv) => { show('pm1',  f32(dv)); stamp(); });
-      await subscribe(service, CH.pm25, (dv) => { show('pm25', f32(dv)); stamp(); });
-      await subscribe(service, CH.pm10, (dv) => { show('pm10', f32(dv)); stamp(); });
-      await subscribe(service, CH.status, (dv) => {
-        const s = txt(dv);
-        $('level').textContent = s;
-        $('level').dataset.level = s;
-      });
-
-      $('connect').hidden = true;
-      $('disconnect').hidden = false;
+      $('connect').hidden = true; $('disconnect').hidden = false;
+      otaReady();
     } catch (err) {
-      $('device').textContent = 'เชื่อมต่อไม่สำเร็จ: ' + (err && err.message ? err.message : err);
+      $('device').textContent = t('เชื่อมต่อไม่สำเร็จ: ', 'Connect failed: ') + (err && err.message ? err.message : err);
     }
   }
-
   function onDisconnected() {
-    $('device').textContent = 'หลุดการเชื่อมต่อ';
-    $('connect').hidden = false;
-    $('disconnect').hidden = true;
+    $('device').textContent = t('หลุดการเชื่อมต่อ', 'Disconnected');
+    $('connect').hidden = false; $('disconnect').hidden = true;
+    ctrl = data = null; otaReady();
   }
-
   $('connect').addEventListener('click', connect);
+  $('disconnect').addEventListener('click', () => { if (device && device.gatt.connected) device.gatt.disconnect(); });
 
-  // Installable app (PWA): Chrome on Android / desktop shows the install button.
+  async function sha256hex(buf) { const h = await crypto.subtle.digest('SHA-256', buf); return [...new Uint8Array(h)].map((b) => b.toString(16).padStart(2, '0')).join(''); }
+  $('pick').addEventListener('click', () => $('file').click());
+  async function loadFile(buf, name) { image = buf; $('fileinfo').textContent = name + ' · ' + buf.byteLength.toLocaleString() + ' B · sha256 ' + (await sha256hex(buf)).slice(0, 12) + '…'; otaReady(); }
+  $('file').addEventListener('change', async (e) => { const f = e.target.files[0]; if (f) await loadFile(await f.arrayBuffer(), f.name); });
+  $('latest').addEventListener('click', async () => {
+    try { const r = await fetch(LATEST, { cache: 'no-store' }); if (!r.ok) throw new Error('HTTP ' + r.status); await loadFile(await r.arrayBuffer(), 'dbk-ble.ota.bin'); }
+    catch (err) { $('fileinfo').textContent = t('โหลดไม่ได้: ', 'Could not load: ') + (err.message || err); }
+  });
+  $('abort').addEventListener('click', () => { aborted = true; });
+  $('start').addEventListener('click', async () => {
+    if (!image || !ctrl || !data) return;
+    aborted = false; $('start').disabled = true; $('abort').disabled = false; $('bar').value = 0;
+    const total = image.byteLength, sha = await sha256hex(image), t0 = performance.now();
+    try {
+      await ctrl.writeValueWithResponse(enc.encode(`BEGIN ${total} ${sha} ${PASS}`));
+      const bytes = new Uint8Array(image);
+      for (let off = 0, i = 0; off < total; off += CHUNK, i++) {
+        if (aborted) { await ctrl.writeValueWithResponse(enc.encode('ABORT')); $('otastat').textContent = t('ยกเลิกแล้ว บอร์ดยังใช้เฟิร์มแวร์เดิม', 'Cancelled, the board keeps its current firmware'); break; }
+        const part = bytes.subarray(off, Math.min(off + CHUNK, total));
+        if (i % 32 === 31) await data.writeValueWithResponse(part); else await data.writeValueWithoutResponse(part);
+        if (i % 64 === 0) { const s = (performance.now() - t0) / 1000, kbps = (off + part.length) / 1024 / (s || 1); $('speed').textContent = Math.round(kbps) + ' KB/s · ~' + Math.round((total - off) / 1024 / (kbps || 1)) + ' s'; }
+      }
+      if (!aborted) { $('otastat').textContent = t('ส่งครบ กำลังตรวจสอบ…', 'Sent, verifying…'); await ctrl.writeValueWithResponse(enc.encode('END')); }
+    } catch (err) {
+      $('otastat').textContent = t('ล้มเหลว: ', 'Failed: ') + (err.message || err) + t(' (บอร์ดยังใช้เฟิร์มแวร์เดิม)', ' (the board keeps its current firmware)');
+    } finally { $('abort').disabled = true; $('speed').textContent = ''; otaReady(); }
+  });
+
   let installPrompt = null;
   window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installPrompt = e; $('install').hidden = false; });
   $('install').addEventListener('click', async () => { if (!installPrompt) return; installPrompt.prompt(); await installPrompt.userChoice; installPrompt = null; $('install').hidden = true; });
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
-  $('disconnect').addEventListener('click', () => { if (device && device.gatt.connected) device.gatt.disconnect(); });
 })();
 </script>
 </body>
