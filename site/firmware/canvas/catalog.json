@@ -11,8 +11,8 @@
       "yaml": "sim/canvas/readings.yaml",
       "manifest": "site/manifests/canvas/readings.json",
       "firmware": "site/firmware/canvas/readings.factory.bin",
-      "bytes": 1706000,
-      "sha256": "5c36f5e41cdd6ac8c5d78e9ae81e1921ef5d10233e0c7289060b5ceafcc22521"
+      "bytes": 1706208,
+      "sha256": "bf2f53fe65920d39eaa41fcf32a8ada716c82f1b3bbb9d8155edbbc3b6799b3f"
     },
     {
       "id": "animation",
@@ -22,8 +22,8 @@
       "yaml": "sim/canvas/animation.yaml",
       "manifest": "site/manifests/canvas/animation.json",
       "firmware": "site/firmware/canvas/animation.factory.bin",
-      "bytes": 1706048,
-      "sha256": "a75d234a23d5838ba563eda473729b85813589490d5599f8db66fe6c1e4be846"
+      "bytes": 1706240,
+      "sha256": "e3464fa009f33e42e63a6498dd19eab17c750086f3ff171a5bb9a289500adf4d"
     },
     {
       "id": "geometry",
@@ -33,8 +33,8 @@
       "yaml": "sim/canvas/geometry.yaml",
       "manifest": "site/manifests/canvas/geometry.json",
       "firmware": "site/firmware/canvas/geometry.factory.bin",
-      "bytes": 1706320,
-      "sha256": "e63defe61f9e0cc99087561a814d81848f27aa8228b4ace412fe36455c4a44a7"
+      "bytes": 1706528,
+      "sha256": "1984df4b457bd8cee2fec59abb5a1f9f46272c80d031f5deacc99e9f6baa54fb"
     },
     {
       "id": "seg-clock",
@@ -44,8 +44,8 @@
       "yaml": "sim/canvas/seg-clock.yaml",
       "manifest": "site/manifests/canvas/seg-clock.json",
       "firmware": "site/firmware/canvas/seg-clock.factory.bin",
-      "bytes": 1706800,
-      "sha256": "b4a3c540d0dc930f5d35ef0a7698eeba1f60cb374d666eee67ab92262e7b66bc"
+      "bytes": 1706992,
+      "sha256": "38367efd8b09bd52e367e92bd29bd219b57d4d89bfa778bf0e0ae2e579eb8890"
     },
     {
       "id": "outdoor-countdown",
@@ -55,8 +55,8 @@
       "yaml": "sim/canvas/outdoor-countdown.yaml",
       "manifest": "site/manifests/canvas/outdoor-countdown.json",
       "firmware": "site/firmware/canvas/outdoor-countdown.factory.bin",
-      "bytes": 1706480,
-      "sha256": "edc55555319f31468e3d6da5b2371568d6de41524a92c223481ed5f298b10bd7"
+      "bytes": 1706672,
+      "sha256": "76ea4a332cd29bfaa32d136bb493fabaf4ef4cf4b0642bb7d05672c9de139518"
     },
     {
       "id": "pomo-dial",
@@ -66,8 +66,8 @@
       "yaml": "sim/canvas/pomo-dial.yaml",
       "manifest": "site/manifests/canvas/pomo-dial.json",
       "firmware": "site/firmware/canvas/pomo-dial.factory.bin",
-      "bytes": 1714544,
-      "sha256": "556026c80ad1cdc30d4fa2e9dcc95a88534509be481c7ecadc16bde8f1b76b6d"
+      "bytes": 1714768,
+      "sha256": "398d62f83bd16b19ddc0057ea9535d9c7cb6365ff20d9f8bc6bd392b7a7310d4"
     },
     {
       "id": "ota-marching",
@@ -77,8 +77,8 @@
       "yaml": "sim/canvas/ota-marching.yaml",
       "manifest": "site/manifests/canvas/ota-marching.json",
       "firmware": "site/firmware/canvas/ota-marching.factory.bin",
-      "bytes": 1706608,
-      "sha256": "56e3109d5eeea7355ae42768363948ec80c407957f702527dabb859f20adab76"
+      "bytes": 1706816,
+      "sha256": "ec3b8fc9b044577e1288045254e215598a4a23d842a77f459449043cbdd9f73a"
     },
     {
       "id": "week-and-day",
@@ -88,8 +88,8 @@
       "yaml": "sim/canvas/week-and-day.yaml",
       "manifest": "site/manifests/canvas/week-and-day.json",
       "firmware": "site/firmware/canvas/week-and-day.factory.bin",
-      "bytes": 1706864,
-      "sha256": "83c843c190541071aa1bd8aabc7e21613524b9cb3436f6137e49919ca98f8047"
+      "bytes": 1707072,
+      "sha256": "b4868537c71b4a0dc16e215f5d6e84e5c0ef0c065fea2180516fd8063add23c2"
     },
     {
       "id": "mood-face",
@@ -99,8 +99,8 @@
       "yaml": "sim/canvas/mood-face.yaml",
       "manifest": "site/manifests/canvas/mood-face.json",
       "firmware": "site/firmware/canvas/mood-face.factory.bin",
-      "bytes": 1712304,
-      "sha256": "0819bbaaf6486302f4f25645e5be380d2c605c7467fce3c21ccdb2d66752648f"
+      "bytes": 1712512,
+      "sha256": "271b3b951e53106e99315056e95f40c01000ed36db655decf90808a9ff24ef75"
     },
     {
       "id": "dust-bug",
@@ -110,8 +110,8 @@
       "yaml": "sim/canvas/dust-bug.yaml",
       "manifest": "site/manifests/canvas/dust-bug.json",
       "firmware": "site/firmware/canvas/dust-bug.factory.bin",
-      "bytes": 1712400,
-      "sha256": "2dcd766fff9b7b3ac8f9c4116ead72e7ba455029da33629eeae3f5132ef6691f"
+      "bytes": 1712592,
+      "sha256": "e84d96115e0b3701ea3cf2bb7e9025777fa6e6b1393e532f4c650161afdd78dd"
     },
     {
       "id": "haze-pong",
@@ -121,8 +121,8 @@
       "yaml": "sim/canvas/haze-pong.yaml",
       "manifest": "site/manifests/canvas/haze-pong.json",
       "firmware": "site/firmware/canvas/haze-pong.factory.bin",
-      "bytes": 1706944,
-      "sha256": "f9740ec68b8c8cf456990f8c4efae9309fdde3e410878fbe625a9c59efc3c360"
+      "bytes": 1707152,
+      "sha256": "3c4f3494acc53503813cd7595c886d81f016c42aae6aa0f1b2b1e2f76e7428c3"
     },
     {
       "id": "air-news-ticker",
@@ -132,8 +132,8 @@
       "yaml": "sim/canvas/air-news-ticker.yaml",
       "manifest": "site/manifests/canvas/air-news-ticker.json",
       "firmware": "site/firmware/canvas/air-news-ticker.factory.bin",
-      "bytes": 1706064,
-      "sha256": "e811a5fd2b44e2ed08911008feb3baef25f42a42acde6735a3553cf120583002"
+      "bytes": 1706272,
+      "sha256": "45b0dafec5f4cce218e4d3e46bdf08777a7b5c3397b00beeadad2333d513a478"
     },
     {
       "id": "dust-cube",
@@ -143,8 +143,8 @@
       "yaml": "sim/canvas/dust-cube.yaml",
       "manifest": "site/manifests/canvas/dust-cube.json",
       "firmware": "site/firmware/canvas/dust-cube.factory.bin",
-      "bytes": 1712176,
-      "sha256": "a0849b2de6ab9a8f1de31ae1621d93faaced61d7da180999b33d0f88068d85fb"
+      "bytes": 1712368,
+      "sha256": "1c3d020e9929bde99b0cab8387c69d8fb5b80d894a9fdcb090c0dfeec9a2a039"
     },
     {
       "id": "hero-pm25",
@@ -154,8 +154,8 @@
       "yaml": "sim/canvas/hero-pm25.yaml",
       "manifest": "site/manifests/canvas/hero-pm25.json",
       "firmware": "site/firmware/canvas/hero-pm25.factory.bin",
-      "bytes": 1706240,
-      "sha256": "034ca149c69702013aaf5a13fdde034aa06c8f5555e4e2eaecf2a5e64a62cf11"
+      "bytes": 1706448,
+      "sha256": "c03fc9283c9dca211a5cccf93453a2a9e6be1817df7251a3c78cbaf6f757153a"
     },
     {
       "id": "aqi-band",
@@ -165,8 +165,8 @@
       "yaml": "sim/canvas/aqi-band.yaml",
       "manifest": "site/manifests/canvas/aqi-band.json",
       "firmware": "site/firmware/canvas/aqi-band.factory.bin",
-      "bytes": 1706736,
-      "sha256": "58b751ab7e2471a127a3e795217cbd1482c454baec59c152c9077b0ddb3f1f98"
+      "bytes": 1706928,
+      "sha256": "780dc89b90fa0c0dbe627578f567da5bdb9ee1e65b200e0c194263a34d0f1c69"
     },
     {
       "id": "triple-metric",
@@ -176,8 +176,8 @@
       "yaml": "sim/canvas/triple-metric.yaml",
       "manifest": "site/manifests/canvas/triple-metric.json",
       "firmware": "site/firmware/canvas/triple-metric.factory.bin",
-      "bytes": 1706896,
-      "sha256": "75289f121e0cd49e2b973267e2e443e52d7b97739efac062ca4c528b69066a01"
+      "bytes": 1707104,
+      "sha256": "621e91a629c2a1835b7a25c6bfa25aed8eeffe20f513bda8727571be195e4081"
     },
     {
       "id": "trend-strip",
@@ -187,8 +187,8 @@
       "yaml": "sim/canvas/trend-strip.yaml",
       "manifest": "site/manifests/canvas/trend-strip.json",
       "firmware": "site/firmware/canvas/trend-strip.factory.bin",
-      "bytes": 1711664,
-      "sha256": "32268e8c858825d694fa037c21755ada25784f11b4bff0bccb1218c22e970f2f"
+      "bytes": 1711872,
+      "sha256": "4378255031593c081909f0f8c18be382b45ddfaf268a19586f16b8aafa748073"
     },
     {
       "id": "sensor-stale",
@@ -198,8 +198,8 @@
       "yaml": "sim/canvas/sensor-stale.yaml",
       "manifest": "site/manifests/canvas/sensor-stale.json",
       "firmware": "site/firmware/canvas/sensor-stale.factory.bin",
-      "bytes": 1706336,
-      "sha256": "c12ade3212b6b3f5ed20b914426b8c52872f0e2f2f2079f3450938747c8f2676"
+      "bytes": 1706528,
+      "sha256": "6d0dba1a88a0742345cd20d37004b0fd16b63eb87a79d82b8f10e505d766246e"
     },
     {
       "id": "link-state",
@@ -209,8 +209,8 @@
       "yaml": "sim/canvas/link-state.yaml",
       "manifest": "site/manifests/canvas/link-state.json",
       "firmware": "site/firmware/canvas/link-state.factory.bin",
-      "bytes": 1706032,
-      "sha256": "cd65cf4c2ea9b24773f6561258d36f8666bb9a15c332f40e96fb249db60d5854"
+      "bytes": 1706240,
+      "sha256": "4eafb6baf736fdfcb5dd9f29906c1233ba3dd86008bf40389058b76590008591"
     },
     {
       "id": "cell-gauge",
@@ -220,8 +220,8 @@
       "yaml": "sim/canvas/cell-gauge.yaml",
       "manifest": "site/manifests/canvas/cell-gauge.json",
       "firmware": "site/firmware/canvas/cell-gauge.factory.bin",
-      "bytes": 1706272,
-      "sha256": "e4f8502e6617d168cc12e4b08c7b31a2205df00050238b0ae2b2d6410d72989f"
+      "bytes": 1706480,
+      "sha256": "5e1fe65faf7d312954fe093c8534a6cd85f00a14e448d23e109885213f31896d"
     },
     {
       "id": "cold-start",
@@ -231,8 +231,8 @@
       "yaml": "sim/canvas/cold-start.yaml",
       "manifest": "site/manifests/canvas/cold-start.json",
       "firmware": "site/firmware/canvas/cold-start.factory.bin",
-      "bytes": 1706384,
-      "sha256": "97301701789755890d26c13057f56ea01273fccc4c59b9d8d71e0829f5ad38c2"
+      "bytes": 1706592,
+      "sha256": "947e55ccaf0fdfd0c384bbc5379e1abff32ddddc09014c968171dad2c5073a2b"
     },
     {
       "id": "hard-alert",
@@ -242,8 +242,8 @@
       "yaml": "sim/canvas/hard-alert.yaml",
       "manifest": "site/manifests/canvas/hard-alert.json",
       "firmware": "site/firmware/canvas/hard-alert.factory.bin",
-      "bytes": 1706384,
-      "sha256": "66176b10478ab002db3d534e4559c9b0cd2c0b71816bf11132a6e9d24d648346"
+      "bytes": 1706592,
+      "sha256": "4281e6ee8b6804cab1beb0915953d549c1b0171de16d9a8c2ab7d9a6aeeb4ef5"
     },
     {
       "id": "eight-up-board",
@@ -253,8 +253,8 @@
       "yaml": "sim/canvas/eight-up-board.yaml",
       "manifest": "site/manifests/canvas/eight-up-board.json",
       "firmware": "site/firmware/canvas/eight-up-board.factory.bin",
-      "bytes": 1706096,
-      "sha256": "a1a5b36b56393c09947e480fb5304d3d35c919a855a68e335738e02273e91b92"
+      "bytes": 1706304,
+      "sha256": "ebddb2a90f0f314c4d1df935c0476060a8a216a4391c4aa4fb5a212f33111cbf"
     },
     {
       "id": "flip-alarm",
@@ -264,8 +264,8 @@
       "yaml": "sim/canvas/flip-alarm.yaml",
       "manifest": "site/manifests/canvas/flip-alarm.json",
       "firmware": "site/firmware/canvas/flip-alarm.factory.bin",
-      "bytes": 1706288,
-      "sha256": "6f207ee790697979501f4aef121a4e567c9836cf32edb4dbad02fad1033196a5"
+      "bytes": 1706496,
+      "sha256": "099311143ae33b59bc0c9aaf31481e5a934ac91283c75980f5e89fcbeb7eb73f"
     },
     {
       "id": "split-polarity",
@@ -275,8 +275,8 @@
       "yaml": "sim/canvas/split-polarity.yaml",
       "manifest": "site/manifests/canvas/split-polarity.json",
       "firmware": "site/firmware/canvas/split-polarity.factory.bin",
-      "bytes": 1706416,
-      "sha256": "f6169c702aaf11690d8a576668e9b0db7a8ab607ba13cd233ec77e27ee70d194"
+      "bytes": 1706624,
+      "sha256": "efd5d4df4ae181f4eac5f19701faf13a4942ca2365a27781e60cd21c8ad04f23"
     },
     {
       "id": "menu-cursor",
@@ -286,8 +286,8 @@
       "yaml": "sim/canvas/menu-cursor.yaml",
       "manifest": "site/manifests/canvas/menu-cursor.json",
       "firmware": "site/firmware/canvas/menu-cursor.factory.bin",
-      "bytes": 1706432,
-      "sha256": "0363b1e9c89662327ff6b6d1e3eaf68007685041135a767428f52f48dc47df3a"
+      "bytes": 1706624,
+      "sha256": "80ddc4af52fec32d0b34a00582072ff768ebf45074f1a16b3799864e52e02e72"
     },
     {
       "id": "carve-bar",
@@ -297,8 +297,8 @@
       "yaml": "sim/canvas/carve-bar.yaml",
       "manifest": "site/manifests/canvas/carve-bar.json",
       "firmware": "site/firmware/canvas/carve-bar.factory.bin",
-      "bytes": 1706496,
-      "sha256": "373d6fc04de0cb9bc9e6518cfee2eb0adbf24e249b11465c7519f31023accc96"
+      "bytes": 1706688,
+      "sha256": "a533350c0bbb55ce805f1bb56af11eecc191d4f9c698de3250e2dcde9c03ba8b"
     },
     {
       "id": "wipe-invert",
@@ -308,8 +308,8 @@
       "yaml": "sim/canvas/wipe-invert.yaml",
       "manifest": "site/manifests/canvas/wipe-invert.json",
       "firmware": "site/firmware/canvas/wipe-invert.factory.bin",
-      "bytes": 1706560,
-      "sha256": "d83e83cf55c97e46b12f075cf671dfe57c987527c6a7d9456e5fde25f645f67a"
+      "bytes": 1706768,
+      "sha256": "f48b9b13fa88bd2e98e8a65cfc7ecc3538f4d61d5020994b4597f0910b78bb58"
     },
     {
       "id": "grey-ladder",
@@ -319,8 +319,8 @@
       "yaml": "sim/canvas/grey-ladder.yaml",
       "manifest": "site/manifests/canvas/grey-ladder.json",
       "firmware": "site/firmware/canvas/grey-ladder.factory.bin",
-      "bytes": 1706176,
-      "sha256": "2132838e393c596bca8210d3bf008a580469327e10756a44cb6c9bcaca16ece7"
+      "bytes": 1706384,
+      "sha256": "5a7da5c5df0b09e799bf5d5cd7359c97eddfcf0dd052ae429fad779998a40e5b"
     },
     {
       "id": "lifted-card",
@@ -330,8 +330,8 @@
       "yaml": "sim/canvas/lifted-card.yaml",
       "manifest": "site/manifests/canvas/lifted-card.json",
       "firmware": "site/firmware/canvas/lifted-card.factory.bin",
-      "bytes": 1711744,
-      "sha256": "7c2058489b1d90a7deb0fb7bea9cc1aaf151da0448b6551235e0421e6699abb4"
+      "bytes": 1711936,
+      "sha256": "c75b732e50a0e1764dd183b69845901de99875747bda1e2f39f41662fa7b3320"
     },
     {
       "id": "smoke-plate",
@@ -341,8 +341,8 @@
       "yaml": "sim/canvas/smoke-plate.yaml",
       "manifest": "site/manifests/canvas/smoke-plate.json",
       "firmware": "site/firmware/canvas/smoke-plate.factory.bin",
-      "bytes": 1706256,
-      "sha256": "02f488d52729373c1f8756aa90ae381e1d1671fe2f4d85fd70544c511debaea6"
+      "bytes": 1706464,
+      "sha256": "26f87d0c5cc8a489f96f6cd245fe8e7f170038472fa2b7a986072b33b331a161"
     },
     {
       "id": "haze-horizon",
@@ -352,8 +352,8 @@
       "yaml": "sim/canvas/haze-horizon.yaml",
       "manifest": "site/manifests/canvas/haze-horizon.json",
       "firmware": "site/firmware/canvas/haze-horizon.factory.bin",
-      "bytes": 1711936,
-      "sha256": "971acaf42dd088ff76b485d75994e0a18ad85ebfae3012a08b2da4c221477fe7"
+      "bytes": 1712144,
+      "sha256": "955cbc6b904ab51a9cb22e4078df1f6d371d0c3bec43c4b29d294dd002226056"
     },
     {
       "id": "moving-weave",
@@ -363,8 +363,8 @@
       "yaml": "sim/canvas/moving-weave.yaml",
       "manifest": "site/manifests/canvas/moving-weave.json",
       "firmware": "site/firmware/canvas/moving-weave.factory.bin",
-      "bytes": 1706064,
-      "sha256": "b2bacceb407f0ec9f6e4e51555499eca478651c3fb8fe747531c233a97274623"
+      "bytes": 1706256,
+      "sha256": "7297c224ae5437099f14251d542cab7a3e428b4003c534df7a35913e445d927b"
     }
   ]
 }
