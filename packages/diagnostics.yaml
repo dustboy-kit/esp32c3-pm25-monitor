@@ -17,9 +17,11 @@ text_sensor:
 
   - platform: wifi_info
     ip_address:
+      id: wifi_ip
       name: IP Address
       entity_category: diagnostic
     mac_address:
+      id: wifi_mac
       name: MAC Address
       entity_category: diagnostic
     scan_results:

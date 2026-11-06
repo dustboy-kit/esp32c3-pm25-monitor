@@ -1,13 +1,22 @@
-# Optional DustBoy fleet profile. Copy secrets.yaml.example to secrets.yaml first.
+# Optional DustBoy fleet profile (workshop.yaml). Copy secrets.yaml.example to secrets.yaml,
+# then build workshop.yaml with a per-kit device_id (DBK-001, DBK-002, ...).
+#
+# Topics (same layout as the Model-N WiFi fleet, so 00_mz_forwarder can collect it
+# with 02-config/params/030_model_dbk.yml):
+#   DUSTBOY/DBK/<device_id>/status   JSON every 30 s: {"info": {...}, "d": {...}}
+#   DUSTBOY/DBK/<device_id>/lwt      online / offline (birth + will, retained)
+# ESPHome's per-entity topics (DUSTBOY/DBK/<device_id>/sensor/pm2_5/state, ...) are
+# still published for anyone who wants single values.
 mqtt:
   id: mqtt_client
   broker: !secret mqtt_broker
   port: !secret mqtt_port
   username: !secret mqtt_username
   password: !secret mqtt_password
-  # Home Assistant can discover the native ESPHome entities when this optional
-  # fleet profile is compiled with private broker credentials.
-  discovery: true
+  # The classroom broker account is write-only inside DUSTBOY/DBK/+/#; it cannot
+  # publish Home Assistant discovery and must not stream the log to the broker.
+  discovery: false
+  log_topic:
   on_connect:
     - globals.set:
         id: mqtt_connected
@@ -18,28 +27,37 @@ mqtt:
         value: "false"
   topic_prefix: DUSTBOY/DBK/${device_id}
   birth_message:
-    topic: DUSTBOY/DBK/${device_id}/status
+    topic: DUSTBOY/DBK/${device_id}/lwt
     payload: online
     retain: true
   will_message:
-    topic: DUSTBOY/DBK/${device_id}/status
+    topic: DUSTBOY/DBK/${device_id}/lwt
     payload: offline
     retain: true
 
-# In addition to ESPHome's normal per-entity MQTT topics, publish one compact
-# JSON snapshot for classrooms, fleet collectors, and non-HA consumers.
+# One JSON snapshot per 30 s on .../status. The collector reads d.pm1, d.pm2_5 and
+# d.pm10 and takes the kit name (DBK-001) from the topic.
 interval:
-  - interval: 10s
+  - interval: 30s
     then:
-      - mqtt.publish_json:
-          topic: DUSTBOY/DBK/${device_id}/telemetry
-          retain: false
-          payload: |-
-            root["device_id"] = "${device_id}";
-            root["alias"] = id(device_alias).state;
-            root["pm1"] = id(pms_pm1).state;
-            root["pm25"] = id(pms_pm25).state;
-            root["pm10"] = id(pms_pm10).state;
-            root["wifi_rssi"] = id(wifi_rssi).state;
-            root["uptime_ms"] = millis();
-            root["connected"] = id(mqtt_connected);
+      - if:
+          condition:
+            mqtt.connected:
+          then:
+            - mqtt.publish_json:
+                topic: DUSTBOY/DBK/${device_id}/status
+                retain: false
+                payload: |-
+                  JsonObject info = root["info"].to<JsonObject>();
+                  info["mac"] = id(wifi_mac).state;
+                  info["ip"] = id(wifi_ip).state;
+                  info["version"] = "${project_version}";
+                  info["device_id"] = "${device_id}";
+                  JsonObject d = root["d"].to<JsonObject>();
+                  d["myName"] = "${device_id}";
+                  d["alias"] = id(device_alias).state;
+                  d["pm1"] = id(pms_pm1).state;
+                  d["pm2_5"] = id(pms_pm25).state;
+                  d["pm10"] = id(pms_pm10).state;
+                  d["rssi"] = id(wifi_rssi).state;
+                  d["uptime_s"] = millis() / 1000UL;
