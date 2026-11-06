@@ -155,8 +155,8 @@ export class DbkEspHomeRpc {
       }
       case "kit.set": {
         const value = String(params.value || "").trim().toUpperCase();
-        if (!/^[A-Z0-9][A-Z0-9-]{0,23}$/.test(value)) {
-          throw new RpcFault(-32602, "Kit ID must be 1 to 24 letters, digits or dashes (e.g. DBK-001)");
+        if (!/^DBK-[0-9]{3}$/.test(value)) {
+          throw new RpcFault(-32602, "Kit ID must be DBK- followed by three digits (e.g. DBK-001)");
         }
         const query = new URLSearchParams({ value });
         await this.fetchJson(`${entityPath("text", "Kit ID", "set")}?${query}`, { method: "POST" });
