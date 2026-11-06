@@ -330,6 +330,11 @@ text:
       if (id(mqtt_client).is_connected()) {
         id(mqtt_client).publish(lwt, "online", 0, true);
       }
+      // The alias defaults to the kit id until someone types their own.
+      const std::string &alias = id(device_alias).state;
+      if (alias.empty() || alias.rfind("DBK-", 0) == 0 || alias.rfind("DBK ", 0) == 0) {
+        id(device_alias).make_call().set_value(x).perform();
+      }
 
 - platform: template
   id: mqtt_password
