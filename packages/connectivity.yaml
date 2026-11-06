@@ -17,7 +17,10 @@ wifi:
   output_power: ${wifi_output_power}
   power_save_mode: none
   passive_scan: false
-  fast_connect: true
+  # fast_connect skips the scan, so a kit that already holds credentials answers
+  # Improv's network list with nothing (the web page then shows only "Join other").
+  # Scan-based connect also picks the strongest BSSID. Verified on 2026-11-06.
+  fast_connect: false
   min_auth_mode: WPA
   reboot_timeout: ${wifi_reboot_timeout}
   ap:
