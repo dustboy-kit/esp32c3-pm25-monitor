@@ -161,26 +161,25 @@ address, open the embedded on-device UI instead.
 
 ## Optional MQTT
 
-- The base `dbk.yaml` does not include MQTT.
-- To use MQTT, open `workshop.yaml`.
-- Under `packages:`, add:
+- The base `dbk.yaml` does not include MQTT, and the prebuilt images on the site
+  carry no broker credentials.
+- `workshop.yaml` (copy of `workshop.yaml.example`) is the per-kit build: it includes
+  `dbk.yaml` plus `packages/mqtt.yaml` and sets the kit's `device_id`.
+  1. Set `name`, `friendly_name` and `device_id` to the kit's id (`DBK-001`, `DBK-002`, ...).
+     Keep the `DBK-` prefix: it is the MQTT topic segment and the name the CCDC
+     collector looks up.
+  2. Ask the instructor for the broker, port, username, and password and put them in
+     `secrets.yaml` (copy `secrets.yaml.example`):
 
-```yaml
-  mqtt: !include packages/mqtt.yaml
-```
+     ```yaml
+     mqtt_broker: mqtt.example.com
+     mqtt_port: "1883"
+     mqtt_username: your-mqtt-username
+     mqtt_password: your-mqtt-password
+     ```
 
-- Ask the instructor for the current broker, port, username, and password.
-- Enter those values in `secrets.yaml`:
-
-```yaml
-mqtt_broker: mqtt.example.com
-mqtt_port: "1883"
-mqtt_username: your-mqtt-username
-mqtt_password: your-mqtt-password
-```
-
-- Flash the device by USB with `esphome run workshop.yaml`.
-- If MQTT is not needed, remove the `mqtt` package line from `workshop.yaml`.
+  3. Flash by USB: `esphome run workshop.yaml`.
+  4. If MQTT is not needed, remove the `mqtt` package line from `workshop.yaml`.
 
 ### Wi‑Fi and MQTT status on the display
 
@@ -190,12 +189,15 @@ mqtt_password: your-mqtt-password
 - Wi‑Fi and MQTT are separate: the device can have Wi‑Fi while MQTT is still unavailable because the broker or credentials are incorrect.
 - If Wi‑Fi cannot be joined, the temporary setup AP is named `DBK-xxx` and uses password `12345678`. It appears after 90 seconds and remains available for 15 minutes.
 
-- Topic prefix: `DUSTBOY/DBK/<device-id>/`
-- MQTT discovery: enabled for Home Assistant
-- ESPHome publishes its normal per-entity topics plus one aggregate JSON
-  snapshot every ten seconds at
-  `DUSTBOY/DBK/<device-id>/telemetry` with `device_id`, `alias`, `pm1`, `pm25`,
-  `pm10`, `wifi_rssi`, `uptime_ms`, and `connected`.
+- Topics, same layout as the Model-N Wi-Fi fleet:
+  - `DUSTBOY/DBK/<device-id>/status`: one JSON snapshot every 30 seconds,
+    `{"info": {"mac", "ip", "version", "device_id"}, "d": {"myName", "alias", "pm1", "pm2_5", "pm10", "rssi", "uptime_s"}}`.
+    The fleet collector (`00_mz_forwarder`, params `030_model_dbk.yml`) reads `d.pm1`,
+    `d.pm2_5`, `d.pm10` and takes the kit name from the topic.
+  - `DUSTBOY/DBK/<device-id>/lwt`: `online` / `offline` (birth and will, retained).
+  - ESPHome's per-entity topics (`DUSTBOY/DBK/<device-id>/sensor/pm2_5/state`, ...).
+- Home Assistant discovery and the MQTT log topic are off: the classroom broker
+  account is write-only inside `DUSTBOY/DBK/+/#`.
 - MQTT remains opt-in because broker credentials must never be embedded in a
   public factory image.
 
