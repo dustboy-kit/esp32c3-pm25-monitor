@@ -31,6 +31,33 @@ esphome:
                 character = static_cast<char>(toupper(character));
               }
               return "DBK " + suffix;
+  # Priority 600: text values are restored (800) but Wi-Fi/MQTT not set up
+  # yet (250), so the seeded kit id reaches the first MQTT connect.
+  - priority: 600
+    then:
+    - if:
+        condition:
+          lambda: return id(kit_id).state.empty();
+        then:
+        - text.set:
+            id: kit_id
+            value: !lambda |-
+              std::string mac = get_mac_address();  // aabbccddeeff
+              std::string tail = mac.size() >= 4 ? mac.substr(mac.size() - 4) : mac;
+              for (auto &c : tail) {
+                c = static_cast<char>(toupper(c));
+              }
+              return "DBK-" + tail;
+  # After all components are set up (MQTT starts disabled: enable_on_boot
+  # false). The restored password's on_value ran before MQTT existed, so the
+  # client is switched on here when a password is stored.
+  - priority: -100
+    then:
+    - if:
+        condition:
+          lambda: return !id(mqtt_password).state.empty();
+        then:
+        - mqtt.enable:
 
 esp32:
   board: esp32-c3-devkitm-1
@@ -74,7 +101,9 @@ wifi:
   output_power: 8.5dBm
   power_save_mode: none
   passive_scan: false
-  fast_connect: true
+  # Off: with fast_connect a provisioned kit never scans, so Improv's network
+  # list is empty (verified 2026-11-06). Scan-based connect picks the best AP.
+  fast_connect: false
   # Accept WPA/WPA2/WPA3 so field devices can join older 2.4 GHz routers.
   min_auth_mode: WPA
   ap:
@@ -244,6 +273,31 @@ text_sensor:
     name: MAC Address
     entity_category: diagnostic
 
+# Fleet MQTT, configured at runtime so one image serves every kit (same block as
+# packages/mqtt.yaml; kept inline because tools/canvas-firmware.py forbids
+# includes). Kit ID and MQTT Password are text entities stored on the board and
+# set from the Wi-Fi setup page. The client stays disabled until a password is
+# stored. Topics: DUSTBOY/DBK/<Kit ID>/status (JSON, 30 s) and .../lwt.
+mqtt:
+  id: mqtt_client
+  broker: mqtt.laris.co
+  port: 1883
+  username: dbk
+  password: ""
+  enable_on_boot: false
+  discovery: false
+  log_topic:
+  topic_prefix: null
+  reboot_timeout: 0s
+  on_connect:
+  - globals.set:
+      id: mqtt_connected
+      value: 'true'
+  on_disconnect:
+  - globals.set:
+      id: mqtt_connected
+      value: 'false'
+
 # Mutable label for classrooms and fleets. This does not change the unique
 # dbk-canvas-xxxxxx hostname and therefore cannot create an mDNS/API collision.
 text:
@@ -258,6 +312,51 @@ text:
   max_length: 32
   entity_category: config
 
+- platform: template
+  id: kit_id
+  name: Kit ID
+  icon: mdi:identifier
+  mode: text
+  optimistic: true
+  restore_value: true
+  min_length: 1
+  max_length: 24
+  entity_category: config
+  on_value:
+  - lambda: |-
+      const std::string lwt = "DUSTBOY/DBK/" + x + "/lwt";
+      id(mqtt_client).set_birth_message({lwt, "online", 0, true});
+      id(mqtt_client).set_last_will({lwt, "offline", 0, true});
+      if (id(mqtt_client).is_connected()) {
+        id(mqtt_client).publish(lwt, "online", 0, true);
+      }
+
+- platform: template
+  id: mqtt_password
+  name: MQTT Password
+  icon: mdi:key-variant
+  mode: password
+  optimistic: true
+  restore_value: true
+  min_length: 0
+  max_length: 64
+  entity_category: config
+  on_value:
+  - lambda: |-
+      id(mqtt_client).set_password(x);
+      // Restored during boot before MQTT is set up: leave it to on_boot -100.
+      if (!id(mqtt_client).is_ready()) {
+        return;
+      }
+      if (x.empty() && id(mqtt_client).is_connected()) {
+        // Leave a clean retained state behind before switching off.
+        id(mqtt_client).publish("DUSTBOY/DBK/" + id(kit_id).state + "/lwt", "offline", 0, true);
+      }
+      id(mqtt_client).disable();
+      if (!x.empty()) {
+        id(mqtt_client).enable();
+      }
+
 button:
 - platform: restart
   name: Restart
@@ -268,14 +367,33 @@ button:
   entity_category: diagnostic
 
 interval:
-# GALLERY ONLY — delete this block to make the gallery purely passive.
-# There is no mqtt: client in this firmware, so mqtt_connected would sit false
-# forever and the connected branches of screens 12 (Three Columns) and 19 (Eight
-# Up Board) would never appear on real glass. Toggling it every ~17s makes both
-# branches observable. The shipped DBK firmware does nothing like this.
-- interval: 1s
+# GALLERY ONLY marker: tools/canvas-firmware.py cuts the rotation above this
+# line and keeps everything below it in every standalone Canvas image.
+# One JSON snapshot per 30 s on DUSTBOY/DBK/<Kit ID>/status for the CCDC
+# collector (00_mz_forwarder 030_model_dbk.yml). Only while MQTT is connected.
+- interval: 30s
   then:
-  - lambda: 'id(mqtt_connected) = ((millis() / 17000UL) % 2) == 0;'
+  - if:
+      condition:
+        mqtt.connected:
+      then:
+      - mqtt.publish_json:
+          topic: !lambda return "DUSTBOY/DBK/" + id(kit_id).state + "/status";
+          retain: false
+          payload: |-
+            JsonObject info = root["info"].to<JsonObject>();
+            info["mac"] = id(device_mac).state;
+            info["ip"] = id(device_ip).state;
+            info["version"] = "0.2.0";
+            info["device_id"] = id(kit_id).state;
+            JsonObject d = root["d"].to<JsonObject>();
+            d["myName"] = id(kit_id).state;
+            d["alias"] = id(device_alias).state;
+            d["pm1"] = id(pms_pm1).state;
+            d["pm2_5"] = id(pms_pm25).state;
+            d["pm10"] = id(pms_pm10).state;
+            d["rssi"] = id(wifi_rssi).state;
+            d["uptime_s"] = millis() / 1000UL;
 
 # ─────────────────────────────────────────────────────────────────────────────
 # THE FOUR FONTS — glyph coverage is a hard limit, not a suggestion.

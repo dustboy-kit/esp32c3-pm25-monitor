@@ -11,6 +11,14 @@ substitutions:
   wifi_ap_active_timeout_minutes: "15"
   wifi_reboot_timeout: "990s"
   wifi_output_power: "8.5dBm"
+  # Fleet MQTT (packages/mqtt.yaml). Host and user are public; the password and
+  # the kit id are stored on the board from the web page. A workshop.yaml may
+  # pre-seed both at compile time (kit_id: DBK-001, mqtt_password: !secret ...).
+  mqtt_broker: mqtt.laris.co
+  mqtt_port: "1883"
+  mqtt_username: dbk
+  mqtt_password: ""
+  kit_id: ""
   timezone: "Asia/Bangkok"
   warmup_seconds: "30"
   stale_seconds: "10"
@@ -22,3 +30,4 @@ packages:
   status_led: !include packages/status-led.yaml
   oled: !include packages/oled.yaml
   diagnostics: !include packages/diagnostics.yaml
+  mqtt: !include packages/mqtt.yaml
