@@ -4,6 +4,8 @@ const METHODS = Object.freeze({
   "telemetry.snapshot": "Read PM values and device diagnostics in one result.",
   "entity.get": "Read one ESPHome Web API entity.",
   "alias.set": "Persist the mutable Device Alias text entity.",
+  "kit.set": "Persist the Kit ID text entity (MQTT topic DUSTBOY/DBK/<Kit ID>/...).",
+  "mqtt.password.set": "Store the broker password on the board; empty disables MQTT.",
   "button.press": "Press a named ESPHome button entity.",
   "device.restart": "Press the Restart button entity.",
 });
@@ -16,6 +18,7 @@ const SNAPSHOT_ENTITIES = Object.freeze({
   wifiRssi: ["sensor", "Wi-Fi RSSI"],
   uptime: ["sensor", "Uptime"],
   alias: ["text", "Device Alias"],
+  kitId: ["text", "Kit ID"],
   ip: ["text_sensor", "IP Address"],
   mac: ["text_sensor", "MAC Address"],
   version: ["text_sensor", "ESPHome Version"],
@@ -149,6 +152,22 @@ export class DbkEspHomeRpc {
         const query = new URLSearchParams({ value });
         await this.fetchJson(`${entityPath("text", "Device Alias", "set")}?${query}`, { method: "POST" });
         return { alias: value, persisted: true };
+      }
+      case "kit.set": {
+        const value = String(params.value || "").trim().toUpperCase();
+        if (!/^[A-Z0-9][A-Z0-9-]{0,23}$/.test(value)) {
+          throw new RpcFault(-32602, "Kit ID must be 1 to 24 letters, digits or dashes (e.g. DBK-001)");
+        }
+        const query = new URLSearchParams({ value });
+        await this.fetchJson(`${entityPath("text", "Kit ID", "set")}?${query}`, { method: "POST" });
+        return { kitId: value, persisted: true };
+      }
+      case "mqtt.password.set": {
+        const value = String(params.value || "");
+        if (value.length > 64) throw new RpcFault(-32602, "Password must be at most 64 characters");
+        const query = new URLSearchParams({ value });
+        await this.fetchJson(`${entityPath("text", "MQTT Password", "set")}?${query}`, { method: "POST" });
+        return { stored: value.length > 0, persisted: true };
       }
       case "button.press": {
         const name = String(params.name || "").trim();

@@ -1,12 +1,17 @@
+# Per-kit build with everything pre-seeded, for kits flashed over USB in the lab.
+# Copy to workshop.yaml (gitignored), set the kit id, put the broker password and
+# Wi-Fi in secrets.yaml. The public web image needs none of this: kit id and
+# MQTT password are entered on the Wi-Fi setup page and stored on the board.
 substitutions:
   name: dbk-001
   friendly_name: DBK-001
   device_id: DBK-001
+  kit_id: DBK-001
+  mqtt_password: !secret mqtt_password
   name_add_mac_suffix: "false"
 
 packages:
   device: !include dbk.yaml
-  mqtt: !include packages/mqtt.yaml
 
 wifi:
   networks:
