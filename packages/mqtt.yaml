@@ -1,22 +1,33 @@
-# Optional DustBoy fleet profile (workshop.yaml). Copy secrets.yaml.example to secrets.yaml,
-# then build workshop.yaml with a per-kit device_id (DBK-001, DBK-002, ...).
+# DustBoy fleet MQTT, configured at runtime so one public image serves every kit.
 #
-# Topics (same layout as the Model-N WiFi fleet, so 00_mz_forwarder can collect it
-# with 02-config/params/030_model_dbk.yml):
-#   DUSTBOY/DBK/<device_id>/status   JSON every 30 s: {"info": {...}, "d": {...}}
-#   DUSTBOY/DBK/<device_id>/lwt      online / offline (birth + will, retained)
-# ESPHome's per-entity topics (DUSTBOY/DBK/<device_id>/sensor/pm2_5/state, ...) are
-# still published for anyone who wants single values.
+# Two values live in the board's flash and are set from the web page
+# (https://dustboy-kit.github.io/esp32c3-pm25-monitor/wifi/) or the on-board
+# web UI, never baked into the image:
+#   Kit ID         DBK-001, DBK-002, ...   (defaults to DBK-<last 4 MAC hex digits>)
+#   MQTT Password  the classroom password of the broker user ${mqtt_username}
+# Broker host and user name are not secrets; they are substitutions in dbk.yaml.
+# The client stays disabled until a password is stored, so an unconfigured kit
+# never spams the broker with rejected logins.
+#
+# Topics (same layout as the Model-N WiFi fleet, collected by 00_mz_forwarder
+# 02-config/params/030_model_dbk.yml):
+#   DUSTBOY/DBK/<Kit ID>/status   JSON every 30 s: {"info": {...}, "d": {...}}
+#   DUSTBOY/DBK/<Kit ID>/lwt      online / offline (birth + will, retained)
+# No per-entity topics (topic_prefix is null) because the kit id is not known
+# at compile time. The broker user is write-only inside DUSTBOY/DBK/+/#.
 mqtt:
   id: mqtt_client
-  broker: !secret mqtt_broker
-  port: !secret mqtt_port
-  username: !secret mqtt_username
-  password: !secret mqtt_password
-  # The classroom broker account is write-only inside DUSTBOY/DBK/+/#; it cannot
-  # publish Home Assistant discovery and must not stream the log to the broker.
+  broker: ${mqtt_broker}
+  port: ${mqtt_port}
+  username: ${mqtt_username}
+  # Replaced at boot by the stored MQTT Password text (see on_value below).
+  password: ""
+  enable_on_boot: false
   discovery: false
   log_topic:
+  topic_prefix: null
+  # A kit without a password must keep measuring; never reboot for MQTT.
+  reboot_timeout: 0s
   on_connect:
     - globals.set:
         id: mqtt_connected
@@ -25,18 +36,104 @@ mqtt:
     - globals.set:
         id: mqtt_connected
         value: "false"
-  topic_prefix: DUSTBOY/DBK/${device_id}
-  birth_message:
-    topic: DUSTBOY/DBK/${device_id}/lwt
-    payload: online
-    retain: true
-  will_message:
-    topic: DUSTBOY/DBK/${device_id}/lwt
-    payload: offline
-    retain: true
 
-# One JSON snapshot per 30 s on .../status. The collector reads d.pm1, d.pm2_5 and
-# d.pm10 and takes the kit name (DBK-001) from the topic.
+text:
+  - platform: template
+    id: kit_id
+    name: Kit ID
+    icon: mdi:identifier
+    mode: text
+    optimistic: true
+    restore_value: true
+    min_length: 1
+    max_length: 24
+    entity_category: config
+    on_value:
+      - lambda: |-
+          // Birth and will follow the kit id. Restored values arrive during
+          // setup, before the MQTT client connects, so the first connect
+          // already carries the right will.
+          const std::string lwt = "DUSTBOY/DBK/" + x + "/lwt";
+          id(mqtt_client).set_birth_message({lwt, "online", 0, true});
+          id(mqtt_client).set_last_will({lwt, "offline", 0, true});
+          if (id(mqtt_client).is_connected()) {
+            id(mqtt_client).publish(lwt, "online", 0, true);
+          }
+
+  - platform: template
+    id: mqtt_password
+    name: MQTT Password
+    icon: mdi:key-variant
+    mode: password
+    optimistic: true
+    restore_value: true
+    min_length: 0
+    max_length: 64
+    entity_category: config
+    on_value:
+      - lambda: |-
+          id(mqtt_client).set_password(x);
+          // During boot the stored value is restored before the MQTT client is
+          // set up; touching it then crashes the board (boot loop seen
+          // 2026-11-06). on_boot priority -100 enables it. At runtime,
+          // reconnect with the new credentials, or stay off while empty.
+          if (!id(mqtt_client).is_ready()) {
+            return;
+          }
+          if (x.empty() && id(mqtt_client).is_connected()) {
+            // Leave a clean retained state behind before switching off.
+            id(mqtt_client).publish("DUSTBOY/DBK/" + id(kit_id).state + "/lwt", "offline", 0, true);
+          }
+          id(mqtt_client).disable();
+          if (!x.empty()) {
+            id(mqtt_client).enable();
+          }
+
+esphome:
+  on_boot:
+    # Priority 600 runs after the text entities restored their values (setup
+    # priority 800) and before Wi-Fi / MQTT set up (250), so the seeded values
+    # are in place for the first connection.
+    - priority: 600
+      then:
+        - if:
+            condition:
+              lambda: return id(kit_id).state.empty();
+            then:
+              - text.set:
+                  id: kit_id
+                  value: !lambda |-
+                    std::string configured = "${kit_id}";
+                    if (!configured.empty()) {
+                      return configured;
+                    }
+                    std::string mac = get_mac_address();  // aabbccddeeff
+                    std::string tail = mac.size() >= 4 ? mac.substr(mac.size() - 4) : mac;
+                    for (auto &c : tail) {
+                      c = static_cast<char>(toupper(c));
+                    }
+                    return "DBK-" + tail;
+        - if:
+            condition:
+              lambda: |-
+                return id(mqtt_password).state.empty() && !std::string("${mqtt_password}").empty();
+            then:
+              - text.set:
+                  id: mqtt_password
+                  value: "${mqtt_password}"
+    # After every component is set up (MQTT starts disabled: enable_on_boot
+    # false). The restored password's on_value ran before MQTT existed, so the
+    # client is switched on here when a password is stored.
+    - priority: -100
+      then:
+        - if:
+            condition:
+              lambda: return !id(mqtt_password).state.empty();
+            then:
+              - mqtt.enable:
+
+# One JSON snapshot per 30 s on .../status. The collector reads d.pm1, d.pm2_5
+# and d.pm10 and takes the kit name from the topic.
 interval:
   - interval: 30s
     then:
@@ -45,16 +142,16 @@ interval:
             mqtt.connected:
           then:
             - mqtt.publish_json:
-                topic: DUSTBOY/DBK/${device_id}/status
+                topic: !lambda return "DUSTBOY/DBK/" + id(kit_id).state + "/status";
                 retain: false
                 payload: |-
                   JsonObject info = root["info"].to<JsonObject>();
                   info["mac"] = id(wifi_mac).state;
                   info["ip"] = id(wifi_ip).state;
                   info["version"] = "${project_version}";
-                  info["device_id"] = "${device_id}";
+                  info["device_id"] = id(kit_id).state;
                   JsonObject d = root["d"].to<JsonObject>();
-                  d["myName"] = "${device_id}";
+                  d["myName"] = id(kit_id).state;
                   d["alias"] = id(device_alias).state;
                   d["pm1"] = id(pms_pm1).state;
                   d["pm2_5"] = id(pms_pm25).state;
