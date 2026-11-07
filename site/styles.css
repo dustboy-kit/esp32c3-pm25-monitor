@@ -73,3 +73,7 @@ h1,h2,h3{margin:0}p{margin:0}ul,ol{margin:0;padding:0}
 
 /* One footer only: the Laris Labs bar from ui-preferences.js. Legacy in-page footers (nav links with a top border) are gone on every page. */
 .app>footer:not(#laris-footer),footer.hubfoot,main>footer:not(#laris-footer){display:none!important}
+
+/* Buttons that share a row share a height (daisyUI btn = 3rem). */
+.button-row,.setup-actions,.actions,.card-actions,.firmware-controls>div:last-child{align-items:stretch}
+.button-row .btn,.setup-actions .btn,.actions .btn,.card-actions .btn,.action:not(.btn){min-height:3rem;height:3rem}

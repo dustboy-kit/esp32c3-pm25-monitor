@@ -6,7 +6,7 @@
   <title>Dashboard · DustBoy Kit · Kit4Kids</title>
   <meta name="description" content="ดูค่าฝุ่นสดจากเครื่อง DustBoy Kit ใน Wi-Fi วงเดียวกัน">
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css">
-  <link rel="stylesheet" href="../styles.css?v=1794044901">
+  <link rel="stylesheet" href="../styles.css?v=1794044989">
   <style>
     .dashboard-shell{display:grid;gap:20px}.control-grid{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end}.field{display:grid;gap:5px;color:var(--muted);font-size:13px}.field textarea{min-height:150px;resize:vertical}.button-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.telemetry-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px}.metric{min-height:118px;padding:16px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(145deg,var(--panel2),var(--panel))}.metric small{display:block;color:var(--muted);font-size:11px;letter-spacing:.08em;text-transform:uppercase}.metric strong{display:block;margin-top:8px;color:var(--text);font:800 clamp(25px,4vw,40px)/1 ui-monospace,SFMono-Regular,Menlo,monospace}.metric span{color:var(--muted);font-size:12px}.connection-status{margin-top:14px;padding:11px 13px;border:1px solid var(--line);border-radius:9px;background:var(--panel2);color:var(--muted)}.connection-status.ok{border-color:#bfe6cf;color:var(--green)}.connection-status.error{border-color:#f6dede;color:var(--danger)}.rpc-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.rpc-output{min-height:210px;max-height:420px;overflow:auto;margin:0;padding:14px;border:1px solid var(--line);border-radius:9px;background:#f9fafb;color:#1f2937;color:#e8e8e4;font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap}.explain{padding:13px;border-left:3px solid var(--gold);background:var(--panel2);color:var(--muted);font-size:13px}.link-row{display:flex;gap:16px;flex-wrap:wrap}.danger-button{border-color:#f6dede;background:var(--danger)}@media(max-width:800px){.control-grid,.rpc-grid{grid-template-columns:1fr}.telemetry-grid{grid-template-columns:1fr 1fr}}@media(max-width:520px){.telemetry-grid{grid-template-columns:1fr}}
   </style>
@@ -43,8 +43,8 @@
     </div>
     <div class="button-row" style="margin-top:12px">
       <button id="saveAlias" hidden type="button" class="btn btn-primary" disabled><i data-lucide="save" class="w-4 h-4"></i><span data-i18n="saveAlias">บันทึก alias ลงเครื่อง</span></button>
-      <a id="deviceUi" class="btn btn-outline btn-primary btn-sm" href="#" target="_blank" rel="noopener"><i data-lucide="external-link" class="w-4 h-4"></i><span data-i18n="openDeviceUi">เปิด ESPHome UI บนเครื่อง</span></a>
-      <a class="btn btn-outline btn-primary btn-sm" href="../wifi/?source=dashboard"><i data-lucide="wifi" class="w-4 h-4"></i><span data-i18n="setupWifi">ตั้งค่า Wi‑Fi</span></a>
+      <a id="deviceUi" class="btn btn-outline btn-primary" href="#" target="_blank" rel="noopener"><i data-lucide="external-link" class="w-4 h-4"></i><span data-i18n="openDeviceUi">เปิด ESPHome UI บนเครื่อง</span></a>
+      <a class="btn btn-outline btn-primary" href="../wifi/?source=dashboard"><i data-lucide="wifi" class="w-4 h-4"></i><span data-i18n="setupWifi">ตั้งค่า Wi‑Fi</span></a>
     </div>
     <div id="connectionStatus" class="connection-status" aria-live="polite">รอ hostname หรือ IP ของอุปกรณ์</div>
     <div class="explain" style="margin-top:12px" data-dev hidden data-i18n="networkNote">หน้า Pages นี้เรียก REST API ที่อยู่ใน LAN โดยตรง เฟิร์มแวร์เปิด CORS/PNA ไว้แล้ว หากเบราว์เซอร์ยังบล็อก HTTPS → HTTP ให้กด “เปิด ESPHome UI บนเครื่อง” ซึ่งทำงานแบบ same-origin เสมอ</div>
@@ -73,7 +73,7 @@
   "method": "telemetry.snapshot",
   "params": {}
 }</textarea></label>
-        <div class="button-row" style="margin-top:10px"><button class="btn btn-primary" id="sendRpc" type="button"><i data-lucide="send" class="w-4 h-4"></i><span data-i18n="sendRpc">ส่ง RPC</span></button><button id="discoverRpc" type="button" class="btn btn-outline btn-primary btn-sm"><i data-lucide="list" class="w-4 h-4"></i><span data-i18n="discover">ดู methods</span></button></div>
+        <div class="button-row" style="margin-top:10px"><button class="btn btn-primary" id="sendRpc" type="button"><i data-lucide="send" class="w-4 h-4"></i><span data-i18n="sendRpc">ส่ง RPC</span></button><button id="discoverRpc" type="button" class="btn btn-outline btn-primary"><i data-lucide="list" class="w-4 h-4"></i><span data-i18n="discover">ดู methods</span></button></div>
       </div>
       <div><span class="field" data-i18n="response">ผลลัพธ์</span><pre id="rpcResponse" class="rpc-output">{ "jsonrpc": "2.0", "id": null, "result": "ready" }</pre></div>
     </div>

@@ -10,7 +10,7 @@
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="./icon.svg">
   <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css">
-<link rel="stylesheet" href="../styles.css?v=1794044901">
+<link rel="stylesheet" href="../styles.css?v=1794044989">
   <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
 <script src="../ui-preferences.js?v=1794044901"></script>
   <script type="module" src="https://unpkg.com/esp-web-tools@10.2.1/dist/web/install-button.js?module"></script>
@@ -176,8 +176,8 @@
       </ol>
       <div class="actions">
         <button class="btn btn-primary" id="connect" type="button"><i data-lucide="bluetooth" class="w-4 h-4"></i><span data-i18n="btnConnect">เชื่อมต่อ DBK</span></button>
-        <button class="btn btn-outline btn-primary btn-sm" id="disconnect" type="button" hidden><i data-lucide="bluetooth-off" class="w-4 h-4"></i><span data-i18n="btnDisconnect">ตัดการเชื่อมต่อ</span></button>
-        <button class="btn btn-outline btn-primary btn-sm" id="install" type="button" hidden><i data-lucide="smartphone" class="w-4 h-4"></i><span data-i18n="btnInstall">ติดตั้งเป็นแอป</span></button>
+        <button class="btn btn-outline btn-primary" id="disconnect" type="button" hidden><i data-lucide="bluetooth-off" class="w-4 h-4"></i><span data-i18n="btnDisconnect">ตัดการเชื่อมต่อ</span></button>
+        <button class="btn btn-outline btn-primary" id="install" type="button" hidden><i data-lucide="smartphone" class="w-4 h-4"></i><span data-i18n="btnInstall">ติดตั้งเป็นแอป</span></button>
         <span class="live" id="device" data-i18n="notConnected">ยังไม่ได้เชื่อมต่อ</span>
       </div>
       <div class="tiles" aria-live="polite">
@@ -202,12 +202,12 @@
       <div class="file">
         <span data-i18n="fileLabel">ไฟล์เฟิร์มแวร์ (<code>.ota.bin</code>)</span>
         <input type="file" id="file" accept=".bin" aria-label="firmware .ota.bin">
-        <div class="row"><button class="btn btn-outline btn-primary btn-sm" id="pick" type="button"><i data-lucide="folder-open" class="w-4 h-4"></i><span data-i18n="btnPick">เลือกไฟล์จากเครื่อง</span></button><button class="btn btn-outline btn-primary btn-sm" id="latest" type="button"><i data-lucide="download" class="w-4 h-4"></i><span data-i18n="btnLatest">⬇ใช้ตัวล่าสุดจากเว็บ (dbk-ble.ota.bin)</span></button></div>
+        <div class="row"><button class="btn btn-outline btn-primary" id="pick" type="button"><i data-lucide="folder-open" class="w-4 h-4"></i><span data-i18n="btnPick">เลือกไฟล์จากเครื่อง</span></button><button class="btn btn-outline btn-primary" id="latest" type="button"><i data-lucide="download" class="w-4 h-4"></i><span data-i18n="btnLatest">⬇ใช้ตัวล่าสุดจากเว็บ (dbk-ble.ota.bin)</span></button></div>
         <div class="meta" id="fileinfo"></div>
       </div>
       <div class="actions">
         <button class="btn btn-primary" id="start" type="button" disabled><i data-lucide="upload" class="w-4 h-4"></i><span data-i18n="btnStart">⬆เริ่มอัปเดต</span></button>
-        <button class="btn btn-outline btn-primary btn-sm" id="abort" type="button" disabled><i data-lucide="x" class="w-4 h-4"></i><span data-i18n="btnAbort">ยกเลิก</span></button>
+        <button class="btn btn-outline btn-primary" id="abort" type="button" disabled><i data-lucide="x" class="w-4 h-4"></i><span data-i18n="btnAbort">ยกเลิก</span></button>
         <span class="live" id="speed"></span>
       </div>
       <progress id="bar" value="0" max="100" aria-label="OTA progress"></progress>
