@@ -37,8 +37,7 @@ code{padding:2px 6px;border:1px solid var(--line);border-radius:6px;background:v
 a{color:var(--accent)}
 .text-link{font-weight:500;text-decoration:none}
 .text-link:hover,a:hover{text-decoration:underline}
-.app>footer{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 20px;padding:24px 3px 0;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
-.app>footer nav{display:flex;gap:18px;flex-wrap:wrap}
+.app>.app>footer nav{display:flex;gap:18px;flex-wrap:wrap}
 .app>footer a{text-decoration:none}
 .facts{display:grid;gap:12px}
 .fact{padding:12px 14px;border:1px solid var(--line);border-radius:10px;font-size:14px;color:var(--muted)}
