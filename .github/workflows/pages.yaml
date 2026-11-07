@@ -23,6 +23,13 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: actions/configure-pages@v5
+      - name: Stamp build version
+        run: |
+          jq -n --arg sha "${GITHUB_SHA::7}" \
+                --arg date "$(TZ=Asia/Bangkok date '+%Y-%m-%d %H:%M +07')" \
+                --arg run "$GITHUB_RUN_NUMBER" \
+                '{sha:$sha,date:$date,run:$run}' > site/version.json
+          cat site/version.json
       - uses: actions/upload-pages-artifact@v4
         with:
           path: site
