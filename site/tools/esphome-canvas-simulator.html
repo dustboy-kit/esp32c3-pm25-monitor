@@ -1338,11 +1338,11 @@
     document.getElementById("firmwarePath").textContent = en ? "Build backend: not hosted on Pages" : "Build backend: ไม่ได้โฮสต์บน Pages";
     document.getElementById("firmwarePortState").textContent = en ? "Flash: use the release flasher" : "การแฟลช: ใช้ปุ่มติดตั้งเฟิร์มแวร์";
     document.getElementById("firmwareNotice").innerHTML = en
-      ? "<strong>Pomodoro Dial is ready:</strong> the ESP32-C3 factory image was compiled locally with ESPHome 2026.6.5. <esp-web-install-button manifest=\"../manifests/pomodoro.json\"><button slot=\"activate\" type=\"button\">Flash Pomodoro Dial</button></esp-web-install-button> Use Chrome or Edge on a computer with a data-capable USB cable."
-      : "<strong>Pomodoro Dial พร้อมติดตั้ง:</strong> factory image สำหรับ ESP32-C3 คอมไพล์ในเครื่องด้วย ESPHome 2026.6.5 แล้ว <esp-web-install-button manifest=\"../manifests/pomodoro.json\"><button slot=\"activate\" type=\"button\">แฟลช Pomodoro Dial</button></esp-web-install-button> ใช้ Chrome หรือ Edge บนคอมพิวเตอร์และสาย USB ที่ส่งข้อมูลได้";
+      ? "<strong>Pomodoro Dial is ready:</strong> the ESP32-C3 factory image was compiled locally with ESPHome 2026.6.5. <esp-web-install-button manifest=\"../manifests/canvas/pomo-dial.json\"><button slot=\"activate\" type=\"button\">Flash Pomodoro Dial</button></esp-web-install-button> Use Chrome or Edge on a computer with a data-capable USB cable."
+      : "<strong>Pomodoro Dial พร้อมติดตั้ง:</strong> factory image สำหรับ ESP32-C3 คอมไพล์ในเครื่องด้วย ESPHome 2026.6.5 แล้ว <esp-web-install-button manifest=\"../manifests/canvas/pomo-dial.json\"><button slot=\"activate\" type=\"button\">แฟลช Pomodoro Dial</button></esp-web-install-button> ใช้ Chrome หรือ Edge บนคอมพิวเตอร์และสาย USB ที่ส่งข้อมูลได้";
     document.getElementById("firmwareLog").textContent = en
-      ? "This GitHub Pages copy has no build server by design.\n\nLocal build: ESPHome 2026.6.5 — success\nFactory image: firmware/pomodoro.factory.bin\nClick Flash Pomodoro Dial above to install over Web Serial."
-      : "GitHub Pages ชุดนี้ไม่มี build server ตามการออกแบบ\n\nการ build ในเครื่อง: ESPHome 2026.6.5 — สำเร็จ\nFactory image: firmware/pomodoro.factory.bin\nคลิก แฟลช Pomodoro Dial ด้านบนเพื่อติดตั้งผ่าน Web Serial";
+      ? "This GitHub Pages copy has no build server by design.\n\nLocal build: ESPHome 2026.6.5 — success\nFactory image: firmware/canvas/pomo-dial.factory.bin\nClick Flash Pomodoro Dial above to install over Web Serial."
+      : "GitHub Pages ชุดนี้ไม่มี build server ตามการออกแบบ\n\nการ build ในเครื่อง: ESPHome 2026.6.5 — สำเร็จ\nFactory image: firmware/canvas/pomo-dial.factory.bin\nคลิก แฟลช Pomodoro Dial ด้านบนเพื่อติดตั้งผ่าน Web Serial";
   }
   if (isStaticArchive) {
     applyStaticArchiveLanguage(window.DBK_LANG);

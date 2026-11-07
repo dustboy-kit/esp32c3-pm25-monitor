@@ -1,4 +1,0 @@
-# Compatibility entry point retained for the existing Pomodoro release.
-# The authoritative Canvas-matching YAML now lives with every other example.
-packages:
-  pomodoro: !include canvas/pomo-dial.yaml
