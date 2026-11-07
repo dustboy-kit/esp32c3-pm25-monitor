@@ -490,9 +490,21 @@
   .gallery-item.active { border-color: #3b82f6; background: #eff6ff; }
   .gallery-item.active span, .card-head strong, h1 em { color: #1f2937; }
   h1, h2, h3, .card-head strong { font-family: inherit; font-style: normal; }
+  /* Tailwind preflight sets canvas/img/svg to max-width:100%; height:auto and
+     resets lists, headings and borders. Put back what the simulator relies on. */
+  #oled, .stage canvas { max-width: none; width: auto; height: auto; }
+  .gallery-item canvas { max-width: 100%; }
+  .stage { max-width: 100%; overflow: auto; }
+  .card, .gallery-browser, .notes, .example-info, .status, .firmware-card { border: 1px solid #e5e7eb; }
+  .app h1 { font-size: clamp(28px, 5vw, 40px); font-weight: 600; line-height: 1.1; }
+  .app h2, .card-head strong { font-size: 16px; font-weight: 600; }
+  .app ol, .app ul { list-style: revert; padding-left: 1.25rem; }
+  .app p { margin: .5rem 0; }
+  svg { display: inline-block; }
+  /* The few Tailwind utilities this page uses; the Tailwind runtime is not loaded here. */
+  .flex{display:flex}.items-center{align-items:center}.justify-between{justify-content:space-between}.gap-2{gap:.5rem}.mb-4{margin-bottom:1rem}.w-4{width:1rem}.h-4{height:1rem}.w-5{width:1.25rem}.h-5{height:1.25rem}
 </style>
   <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css">
-<script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="../styles.css?v=1794029502">
 <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
 <script src="../ui-preferences.js?v=1794029502"></script>
@@ -1343,6 +1355,6 @@
   requestAnimationFrame(frame);
 })();
 </script>
-<script>(function(){function r(){window.lucide&&lucide.createIcons()}document.addEventListener("DOMContentLoaded",r);new MutationObserver(r).observe(document.documentElement,{childList:true,subtree:true})})();</script>
+<script>document.addEventListener("DOMContentLoaded",function(){window.lucide&&lucide.createIcons()});</script>
 </body>
 </html>
