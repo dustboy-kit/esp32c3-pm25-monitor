@@ -37,20 +37,7 @@
   
   
   button, input, select, textarea { font: inherit; }
-  button, select, input[type="number"] {
-    border: 1px solid var(--line);
-    border-radius: 7px;
-    background: var(--panel2);
-    color: var(--text);
-  }
-  button { padding: 8px 12px; cursor: pointer; }
-  button:hover { border-color: var(--line); background: var(--panel2); }
-  button.primary { border-color: var(--line); background: var(--panel2); }
-  button.primary:hover { background: var(--line); }
-  button.danger { border-color: var(--line); background: var(--panel2); }
-  button.danger:hover { background: var(--panel2); }
   button:disabled { cursor: not-allowed; opacity: .48; }
-  select, input[type="number"] { padding: 7px 9px; }
   code, pre, textarea {
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   }
@@ -143,7 +130,7 @@
   }
   .gallery-grid {
     display: grid;
-    grid-template-columns: repeat(5, minmax(170px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 9px;
   }
   .gallery-item {
@@ -252,14 +239,14 @@
   }
   .state-grid label { color: var(--muted); font-size: 11px; }
   .state-grid input[type="number"] { display: block; width: 100%; margin-top: 4px; }
-  .toggle {
+  .sim-toggle {
     min-height: 57px;
     padding: 7px 9px;
     border: 1px solid var(--line);
     border-radius: 7px;
     background: linear-gradient(145deg, var(--panel2), var(--panel2));
   }
-  .toggle input { margin-top: 8px; }
+  .sim-toggle input { margin-top: 8px; }
   .stage {
     overflow: auto;
     min-height: 250px;
@@ -313,22 +300,6 @@
     margin-top: 8px;
   }
   .selected-flash-actions esp-web-install-button { display: inline-flex; }
-  .selected-flash-button {
-    min-width: 220px;
-    min-height: 44px;
-    padding: 10px 18px;
-    border: 1px solid var(--text);
-    border-radius: 9px;
-    color: var(--panel2);
-    background: linear-gradient(145deg, var(--accent), var(--accent));
-    font-weight: 850;
-    box-shadow: 0 0 0 2px var(--line);
-  }
-  .selected-flash-button:hover {
-    color: var(--panel2);
-    border-color: var(--text);
-    background: linear-gradient(145deg, var(--text), var(--accent));
-  }
   .selected-icon-action {
     display: inline-flex;
     width: 38px;
@@ -446,14 +417,6 @@
     color: var(--text);
     white-space: pre-wrap;
   }
-  button, select, input[type="number"] {
-    border-color: var(--line);
-    background: linear-gradient(150deg, var(--panel2), var(--panel2));
-  }
-  button:hover { border-color: var(--gold); background: linear-gradient(150deg, var(--line), var(--panel2)); }
-  button.primary { border-color: var(--accent); color: var(--text); background: linear-gradient(145deg, var(--line), var(--line) 48%, var(--panel2)); }
-  button.primary:hover { background: linear-gradient(145deg, var(--muted), var(--line) 48%, var(--line)); }
-  button.danger { border-color: var(--line); background: linear-gradient(145deg, var(--panel2), var(--panel2)); }
   input[type="checkbox"], input[type="range"] { accent-color: var(--gold); }
   ::selection { color: var(--panel2); background: var(--gold); }
 
@@ -466,25 +429,18 @@
     .gallery-item { transition: none; }
   }
   @media (max-width: 1050px) {
-    .gallery-grid { grid-template-columns: repeat(3, minmax(150px, 1fr)); }
+    .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
     .layout { grid-template-columns: 1fr; }
     .firmware-controls { grid-template-columns: 1fr 1fr; }
     textarea { min-height: 480px; }
   }
   @media (max-width: 620px) {
     .app { padding: 14px; }
-    .gallery-grid { grid-template-columns: repeat(2, minmax(120px, 1fr)); }
+    .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
   }
 
   /* daisyUI-look overrides (light theme, 2026-11-07) */
   body { background: #fff; color: #1f2937; }
-  button, select, input[type="number"], input[type="text"], textarea { border: 1px solid #d1d5db; border-radius: .5rem; background: #fff; color: #1f2937; box-shadow: none; }
-  button { font-weight: 600; font-size: .875rem; padding: 8px 14px; }
-  button:hover { background: #f3f4f6; border-color: #9ca3af; }
-  button.primary, .selected-flash-button, button.btn-primary { background: #3b82f6; border-color: #3b82f6; color: #fff; }
-  button.primary:hover, .selected-flash-button:hover { background: #2563eb; border-color: #2563eb; }
-  button.danger { background: #fff; border-color: #ef4444; color: #ef4444; }
-  button.danger:hover { background: #fef2f2; }
   .card, .gallery-browser, .notes, .example-info, .status { box-shadow: none; }
   .gallery-item { background: #f9fafb; }
   .gallery-item.active { border-color: #3b82f6; background: #eff6ff; }
@@ -501,8 +457,16 @@
   .app ol, .app ul { list-style: revert; padding-left: 1.25rem; }
   .app p { margin: .5rem 0; }
   svg { display: inline-block; }
+  #source { min-height: 360px; }
+  .gallery-browser-head { flex-wrap: wrap; gap: 8px 14px; }
+  @media (max-width: 620px) { .gallery-browser-head span { flex-basis: 100%; } }
+  #engineBadge { display: none !important; }
+  /* This page is a workbench: wider than the rest of the site (shared styles.css caps .app at 760px). */
+  main.app { width: min(1400px, 100%); margin: 0 auto; }
+  .gallery-item { width: 100%; max-width: 100%; box-sizing: border-box; }
+  .gallery-browser, .card, .layout { min-width: 0; max-width: 100%; }
   /* The few Tailwind utilities this page uses; the Tailwind runtime is not loaded here. */
-  .flex{display:flex}.items-center{align-items:center}.justify-between{justify-content:space-between}.gap-2{gap:.5rem}.mb-4{margin-bottom:1rem}.w-4{width:1rem}.h-4{height:1rem}.w-5{width:1.25rem}.h-5{height:1.25rem}
+  .flex{display:flex}.items-center{align-items:center}.justify-between{justify-content:space-between}.gap-2{gap:.5rem}.mb-4{margin-bottom:1rem}.w-4{width:1rem}.h-4{height:1rem}.w-5{width:1.25rem}.h-5{height:1.25rem}.w-full{width:100%}.font-mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.text-sm{font-size:.875rem}
 </style>
   <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css">
 <link rel="stylesheet" href="../styles.css?v=1794029502">
@@ -519,7 +483,7 @@
       <h1><em>ESPHome</em> Canvas Simulator</h1>
       <p data-sim-i18n="intro">เขียน <code>display.lambda</code> แบบ ESPHome แปลงชุดคำสั่ง C++ ที่รองรับเป็น JavaScript และเรนเดอร์ด้วยบัฟเฟอร์ OLED ขาวดำกับเอนจินฟอนต์เดียวกับแกลเลอรี DBK</p>
     </div>
-    <div class="header-tools"><div class="join" aria-label="Language"><button type="button" class="btn btn-sm join-item" data-lang="th">ไทย</button><button type="button" class="btn btn-sm join-item" data-lang="en">EN</button></div><div class="badge" id="engineBadge">กำลังโหลดเอนจิน…</div></div>
+    <div class="header-tools"><div class="join" aria-label="Language"><button type="button" class="btn btn-sm join-item" data-lang="th">ไทย</button><button type="button" class="btn btn-sm join-item" data-lang="en">EN</button></div><div class="badge" id="engineBadge" hidden title="dev self-test">กำลังโหลดเอนจิน…</div></div>
   </header>
 
   <section class="gallery-browser" aria-labelledby="galleryTitle">
@@ -527,7 +491,7 @@
       <strong id="galleryTitle" data-sim-i18n="galleryTitle">แกลเลอรีหน้าจอ DBK ต้นฉบับ</strong>
       <div class="gallery-browser-actions">
         <span data-sim-i18n="galleryHint">คลิกหน้าจอ 128×32 เพื่อเรนเดอร์และดูโค้ดที่แก้ไขได้</span>
-        <label><input id="galleryAnimateToggle" type="checkbox" checked> <span data-sim-i18n="animate20">เคลื่อนไหว · 20 FPS</span></label>
+        <label><input id="galleryAnimateToggle" class="checkbox checkbox-primary checkbox-sm" type="checkbox" checked> <span data-sim-i18n="animate20">เคลื่อนไหว · 20 FPS</span></label>
       </div>
     </div>
     <div id="galleryGrid" class="gallery-grid"></div>
@@ -538,7 +502,7 @@
       <div class="card-head">
         <strong data-sim-i18n="yamlTitle">ESPHome YAML / display lambda</strong>
         <div class="actions">
-          <select id="exampleSelect" aria-label="Example">
+          <select class="select select-bordered select-sm" id="exampleSelect" aria-label="Example">
             <optgroup label="Simulator basics">
               <option value="readings">DBK readings</option>
               <option value="animation">Animated sweep</option>
@@ -546,11 +510,11 @@
             </optgroup>
             <optgroup id="galleryOptions" label="Original gallery — 30 displays"></optgroup>
           </select>
-          <button id="resetButton" type="button" data-sim-i18n="reload">โหลดที่เลือกใหม่</button>
-          <button id="compileButton" class="primary" type="button" data-sim-i18n="compileRender">คอมไพล์และเรนเดอร์</button>
+          <button id="resetButton" class="btn btn-outline btn-sm" type="button" data-sim-i18n="reload">โหลดที่เลือกใหม่</button>
+          <button id="compileButton" class="btn btn-primary btn-sm" type="button" data-sim-i18n="compileRender">คอมไพล์และเรนเดอร์</button>
         </div>
       </div>
-      <textarea id="source" spellcheck="false" aria-label="ESPHome YAML source"></textarea>
+      <textarea class="textarea textarea-bordered font-mono text-sm" id="source" spellcheck="false" aria-label="ESPHome YAML source"></textarea>
     </section>
 
     <section class="card">
@@ -560,22 +524,22 @@
       </div>
       <div class="preview-body">
         <div class="controls">
-          <label><span data-sim-i18n="scale">ขนาด</span> <input id="scale" type="range" min="1" max="10" step="1" value="4"> <output id="scaleValue">4×</output></label>
-          <label><input id="fitWidthToggle" type="checkbox" checked> <span data-sim-i18n="fitWidth">พอดีความกว้าง</span></label>
-          <label><input id="gridToggle" type="checkbox" checked> <span data-sim-i18n="pixelGrid">ตารางพิกเซล</span></label>
-          <label><input id="bloomToggle" type="checkbox" checked> <span data-sim-i18n="bloom">แสงฟุ้ง</span></label>
-          <label><input id="animateToggle" type="checkbox" checked> <span data-sim-i18n="animate">เคลื่อนไหว</span></label>
-          <label><input id="panelOnlyToggle" type="checkbox" checked> <span data-sim-i18n="fullPanel">เต็มจอ / ไม่มีขอบ</span></label>
+          <label><span data-sim-i18n="scale">ขนาด</span> <input id="scale" class="range range-primary range-xs" type="range" min="1" max="10" step="1" value="4"> <output id="scaleValue">4×</output></label>
+          <label><input id="fitWidthToggle" class="checkbox checkbox-primary checkbox-sm" type="checkbox" checked> <span data-sim-i18n="fitWidth">พอดีความกว้าง</span></label>
+          <label><input id="gridToggle" class="checkbox checkbox-primary checkbox-sm" type="checkbox" checked> <span data-sim-i18n="pixelGrid">ตารางพิกเซล</span></label>
+          <label><input id="bloomToggle" class="checkbox checkbox-primary checkbox-sm" type="checkbox" checked> <span data-sim-i18n="bloom">แสงฟุ้ง</span></label>
+          <label><input id="animateToggle" class="checkbox checkbox-primary checkbox-sm" type="checkbox" checked> <span data-sim-i18n="animate">เคลื่อนไหว</span></label>
+          <label><input id="panelOnlyToggle" class="checkbox checkbox-primary checkbox-sm" type="checkbox" checked> <span data-sim-i18n="fullPanel">เต็มจอ / ไม่มีขอบ</span></label>
         </div>
 
         <div id="exampleInfo" class="example-info" data-sim-i18n="exampleInfo">เลือกหนึ่งใน 30 หน้าจอ DBK หรือแก้ไข lambda โดยตรง</div>
 
         <div class="state-grid" aria-label="Simulated ESPHome state">
-          <label>PM1<input id="pm1" type="number" value="7" step="1"></label>
-          <label>PM2.5<input id="pm25" type="number" value="42" step="1"></label>
-          <label>PM10<input id="pm10" type="number" value="100" step="1"></label>
-          <label class="toggle">Wi-Fi<br><input id="wifi" type="checkbox" checked></label>
-          <label class="toggle">MQTT<br><input id="mqtt" type="checkbox" checked></label>
+          <label>PM1<input id="pm1" class="input input-bordered input-sm w-full" type="number" value="7" step="1"></label>
+          <label>PM2.5<input id="pm25" class="input input-bordered input-sm w-full" type="number" value="42" step="1"></label>
+          <label>PM10<input id="pm10" class="input input-bordered input-sm w-full" type="number" value="100" step="1"></label>
+          <label class="sim-toggle">Wi-Fi<br><input id="wifi" class="checkbox checkbox-primary checkbox-sm" type="checkbox" checked></label>
+          <label class="sim-toggle">MQTT<br><input id="mqtt" class="checkbox checkbox-primary checkbox-sm" type="checkbox" checked></label>
         </div>
 
         <div class="stage panel-only" id="previewStage">
@@ -606,11 +570,11 @@
     </div>
     <div class="firmware-body">
       <div class="firmware-controls">
-        <label><span data-sim-i18n="deviceConfig">การตั้งค่าอุปกรณ์</span><select id="firmwareConfig" aria-label="ESPHome configuration"></select></label>
-        <label><span data-sim-i18n="flashTarget">เป้าหมายการแฟลช</span><select id="firmwareTarget" aria-label="Flash target"></select></label>
-        <button id="firmwareRefresh" type="button" data-sim-i18n="refresh">รีเฟรช</button>
-        <button id="firmwareCompile" class="primary" type="button" data-sim-i18n="compileFirmware">คอมไพล์เฟิร์มแวร์</button>
-        <button id="firmwareFlash" class="danger" type="button" data-sim-i18n="compileFlash">คอมไพล์และแฟลช</button>
+        <label><span data-sim-i18n="deviceConfig">การตั้งค่าอุปกรณ์</span><select class="select select-bordered select-sm" id="firmwareConfig" aria-label="ESPHome configuration"></select></label>
+        <label><span data-sim-i18n="flashTarget">เป้าหมายการแฟลช</span><select class="select select-bordered select-sm" id="firmwareTarget" aria-label="Flash target"></select></label>
+        <button id="firmwareRefresh" class="btn btn-outline btn-sm" type="button" data-sim-i18n="refresh">รีเฟรช</button>
+        <button id="firmwareCompile" class="btn btn-primary btn-sm" type="button" data-sim-i18n="compileFirmware">คอมไพล์เฟิร์มแวร์</button>
+        <button id="firmwareFlash" class="btn btn-error btn-outline btn-sm" type="button" data-sim-i18n="compileFlash">คอมไพล์และแฟลช</button>
       </div>
       <div class="firmware-meta">
         <span id="firmwareVersion">ESPHome: กำลังตรวจ…</span>
@@ -620,7 +584,7 @@
       <div id="firmwareNotice" class="example-info">เลือกการตั้งค่าเพื่อดูขอบเขตการแฟลช</div>
       <pre id="firmwareLog" class="firmware-log" aria-live="polite">บริการ build ใช้งานได้จากเซิร์ฟเวอร์ Python บน localhost เท่านั้น</pre>
       <div class="actions" style="margin-top:10px">
-        <button id="firmwareCancel" type="button" disabled data-sim-i18n="cancel">ยกเลิกงานที่กำลังทำ</button>
+        <button id="firmwareCancel" class="btn btn-outline btn-sm" type="button" disabled data-sim-i18n="cancel">ยกเลิกงานที่กำลังทำ</button>
       </div>
     </div>
   </section>
@@ -1052,7 +1016,7 @@
     var button = document.createElement("button");
     button.type = "button";
     button.slot = "activate";
-    button.className = "selected-flash-button";
+    button.className = "selected-flash-button btn btn-primary btn-sm";
     button.title = en ? "Flash " + selected.name : "แฟลช " + selected.name;
     button.setAttribute("aria-label", button.title);
     button.textContent = en ? "Flash " + selected.name : "แฟลช " + selected.name;
@@ -1334,8 +1298,8 @@
     document.getElementById("firmwarePath").textContent = en ? "Build backend: not hosted on Pages" : "Build backend: ไม่ได้โฮสต์บน Pages";
     document.getElementById("firmwarePortState").textContent = en ? "Flash: use the release flasher" : "การแฟลช: ใช้ปุ่มติดตั้งเฟิร์มแวร์";
     document.getElementById("firmwareNotice").innerHTML = en
-      ? "<strong>Pomodoro Dial is ready:</strong> the ESP32-C3 factory image was compiled locally with ESPHome 2026.6.5. <esp-web-install-button manifest=\"../manifests/canvas/pomo-dial.json\"><button slot=\"activate\" type=\"button\">Flash Pomodoro Dial</button></esp-web-install-button> Use Chrome or Edge on a computer with a data-capable USB cable."
-      : "<strong>Pomodoro Dial พร้อมติดตั้ง:</strong> factory image สำหรับ ESP32-C3 คอมไพล์ในเครื่องด้วย ESPHome 2026.6.5 แล้ว <esp-web-install-button manifest=\"../manifests/canvas/pomo-dial.json\"><button slot=\"activate\" type=\"button\">แฟลช Pomodoro Dial</button></esp-web-install-button> ใช้ Chrome หรือ Edge บนคอมพิวเตอร์และสาย USB ที่ส่งข้อมูลได้";
+      ? "<strong>Pomodoro Dial is ready:</strong> the ESP32-C3 factory image was compiled locally with ESPHome 2026.6.5. <esp-web-install-button manifest=\"../manifests/canvas/pomo-dial.json\"><button slot=\"activate\" type=\"button\" class=\"btn btn-primary btn-sm\">Flash Pomodoro Dial</button></esp-web-install-button> Use Chrome or Edge on a computer with a data-capable USB cable."
+      : "<strong>Pomodoro Dial พร้อมติดตั้ง:</strong> factory image สำหรับ ESP32-C3 คอมไพล์ในเครื่องด้วย ESPHome 2026.6.5 แล้ว <esp-web-install-button manifest=\"../manifests/canvas/pomo-dial.json\"><button slot=\"activate\" type=\"button\" class=\"btn btn-primary btn-sm\">แฟลช Pomodoro Dial</button></esp-web-install-button> ใช้ Chrome หรือ Edge บนคอมพิวเตอร์และสาย USB ที่ส่งข้อมูลได้";
     document.getElementById("firmwareLog").textContent = en
       ? "This GitHub Pages copy has no build server by design.\n\nLocal build: ESPHome 2026.6.5 — success\nFactory image: firmware/canvas/pomo-dial.factory.bin\nClick Flash Pomodoro Dial above to install over Web Serial."
       : "GitHub Pages ชุดนี้ไม่มี build server ตามการออกแบบ\n\nการ build ในเครื่อง: ESPHome 2026.6.5 — สำเร็จ\nFactory image: firmware/canvas/pomo-dial.factory.bin\nคลิก แฟลช Pomodoro Dial ด้านบนเพื่อติดตั้งผ่าน Web Serial";
