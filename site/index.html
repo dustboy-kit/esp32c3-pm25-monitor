@@ -91,6 +91,7 @@
           <li><a href="./ble/" data-i18n="devBle">DBK Bluetooth (รุ่นไม่ใช้ Wi-Fi)</a></li>
           <li><a href="./dashboard/" data-i18n="devDash">Dashboard</a></li>
           <li><a href="./wifi/recovery/" data-i18n="devRecovery">กู้เครื่องที่แฟลชไม่ขึ้น</a></li>
+          <li><a href="./sitemap/" data-i18n="devSitemap">แผนผังเว็บ (ทุกหน้า)</a></li>
           <li><a href="https://github.com/dustboy-kit/esp32c3-pm25-monitor" data-i18n="devSource">ซอร์สบน GitHub</a></li>
         </ul>
       </div>
@@ -105,13 +106,13 @@
       s2Title:'ต่อ Wi-Fi',s2Body:'ปิดหน้าต่างแฟลช แล้วเปิดหน้าตั้งค่า เลือกชื่อ Wi-Fi ของโรงเรียนและใส่รหัส ถ้าหาเครื่องไม่เจอ ให้ถอด-เสียบ USB 1 ครั้ง',s2Link:'เปิดหน้าตั้งค่า Wi-Fi',
       s3Title:'ใส่ Kit ID และรหัสจากครู',s3Body:'อยู่ในหน้าเดียวกับขั้น 2 ใส่เลขเครื่อง DBK-001, DBK-002 … และรหัสที่ครูให้ เครื่องจะเริ่มส่งค่าฝุ่นขึ้นระบบเอง',s3Link:'ดูค่าฝุ่นสดจากเครื่อง',
       usbNotice:'ใช้ Chrome หรือ Edge บนคอมพิวเตอร์ (มือถือใช้ไม่ได้) สาย USB ต้องเป็นสายข้อมูล ไม่ใช่สายชาร์จอย่างเดียว',
-      devTitle:'สำหรับนักพัฒนา',devSim:'Canvas Simulator (ออกแบบลายจอ 128×32)',devBle:'DBK Bluetooth (รุ่นไม่ใช้ Wi-Fi)',devDash:'Dashboard',devRecovery:'กู้เครื่องที่แฟลชไม่ขึ้น',devSource:'ซอร์สบน GitHub'},
+      devTitle:'สำหรับนักพัฒนา',devSim:'Canvas Simulator (ออกแบบลายจอ 128×32)',devBle:'DBK Bluetooth (รุ่นไม่ใช้ Wi-Fi)',devDash:'Dashboard',devRecovery:'กู้เครื่องที่แฟลชไม่ขึ้น',devSitemap:'แผนผังเว็บ (ทุกหน้า)',devSource:'ซอร์สบน GitHub'},
     en:{eyebrow:'KIT4KIDS · Classroom dust monitor',lede:'Set up the classroom PM2.5 monitor in 3 steps with a computer running Chrome or Edge and one USB cable.',teacherLink:'Teachers: what to prepare before class',st1:'Flash',st2:'Join Wi-Fi',st3:'Enter Kit ID',
       s1Title:'Plug in USB and flash the firmware',s1Body:'Connect the kit, press the button and pick the port that appears. About one minute.',flash:'Flash DustBoy Kit',s1Note:'Want another screen design (33 designs)?',s1Link:'Pick one and flash from the Canvas page',
       s2Title:'Join Wi-Fi',s2Body:'Close the flash window, open the setup page, choose the school Wi-Fi and enter its password. If the kit is not found, unplug and replug the USB cable once.',s2Link:'Open Wi-Fi setup',
       s3Title:'Enter the Kit ID and the teacher’s password',s3Body:'Same page as step 2. Type the kit number (DBK-001, DBK-002 …) and the password from the teacher. The kit then uploads readings by itself.',s3Link:'See live readings from the kit',
       usbNotice:'Chrome or Edge on a computer (not a phone). The USB cable must carry data, not charge only.',
-      devTitle:'For developers',devSim:'Canvas Simulator (design the 128×32 screen)',devBle:'DBK Bluetooth (no Wi-Fi variant)',devDash:'Dashboard',devRecovery:'Recover a kit that will not flash',devSource:'Source on GitHub'}
+      devTitle:'For developers',devSim:'Canvas Simulator (design the 128×32 screen)',devBle:'DBK Bluetooth (no Wi-Fi variant)',devDash:'Dashboard',devRecovery:'Recover a kit that will not flash',devSitemap:'Site map (every page)',devSource:'Source on GitHub'}
   };
   let currentLang='th';
   window.t=function(key){return copy[currentLang][key]||copy.th[key]||key;};

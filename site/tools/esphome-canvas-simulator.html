@@ -472,7 +472,7 @@
   .gallery-item { width: 100%; max-width: 100%; box-sizing: border-box; }
   .gallery-browser, .card, .layout { min-width: 0; max-width: 100%; }
   /* The few Tailwind utilities this page uses; the Tailwind runtime is not loaded here. */
-  .flex{display:flex}.items-center{align-items:center}.justify-between{justify-content:space-between}.gap-2{gap:.5rem}.mb-4{margin-bottom:1rem}.w-4{width:1rem}.h-4{height:1rem}.w-5{width:1.25rem}.h-5{height:1.25rem}.w-full{width:100%}.font-mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.text-sm{font-size:.875rem}
+  .flex{display:flex}.items-center{align-items:center}.justify-between{justify-content:space-between}.gap-2{gap:.5rem}.mb-4{margin-bottom:1rem}.w-4{width:1rem}.h-4{height:1rem}.w-5{width:1.25rem}.h-5{height:1.25rem}.w-full{width:100%}.inline-flex{display:inline-flex}.text-sm{font-size:.875rem}.font-mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.text-sm{font-size:.875rem}
 </style>
   <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css">
 <link rel="stylesheet" href="../styles.css?v=1794029502">
@@ -482,7 +482,7 @@
 </head>
 <body>
 <main class="app">
-  <nav class="flex gap-2 mb-4"><a class="btn btn-sm btn-ghost back-home" href="../"><i data-lucide="arrow-left" class="w-4 h-4"></i>หน้าแรก</a></nav>
+  <nav class="flex items-center gap-2 mb-4"><div class="breadcrumbs text-sm"><ul><li><a href="../"><i data-lucide="home" class="w-4 h-4"></i>หน้าแรก</a></li><li><span class="inline-flex items-center gap-2"><i data-lucide="palette" class="w-4 h-4"></i>เลือกลายหน้าจอ</span></li></ul></div></nav>
 <header>
     <div>
       <div class="eyebrow" data-sim-i18n="eyebrow">DUSTBOY KIT · 30 ลาย</div>
