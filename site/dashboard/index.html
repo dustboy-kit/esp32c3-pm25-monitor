@@ -108,7 +108,8 @@ async function sendRpc(request){if(!rpc){await connect();if(!rpc)return}const re
 
 const params=new URLSearchParams(location.search);$('deviceHost').value=params.get('host')||localStorage.getItem('dbk-device-host')||'';$('deviceAlias').value=params.get('alias')||localStorage.getItem('dbk-device-alias')||'';
 try{if($('deviceHost').value)$('deviceUi').href=normalizeDeviceUrl($('deviceHost').value)+'/'}catch{}
-if(!$('deviceHost').value.trim()){$('gate').hidden=false;document.querySelectorAll('main > section.feature:not(#gate)').forEach(el=>el.hidden=true)}
+const devMode=params.get('dev')==='1'||(params.get('dev')!=='0'&&localStorage.getItem('dbk-dev')==='1');
+if(!$('deviceHost').value.trim()&&!devMode){$('gate').hidden=false;document.querySelectorAll('main > section.feature:not(#gate)').forEach(el=>el.hidden=true)}
 setLang(params.get('lang')||localStorage.getItem('dbk-lang')||'th');document.querySelectorAll('[data-lang]').forEach(button=>button.addEventListener('click',()=>setLang(button.dataset.lang)));
 $('connectButton').addEventListener('click',connect);$('saveAlias').addEventListener('click',saveAlias);$('deviceHost').addEventListener('keydown',event=>{if(event.key==='Enter')connect()});
 $('sendRpc').addEventListener('click',()=>{try{sendRpc(JSON.parse($('rpcRequest').value))}catch(error){$('rpcResponse').textContent=JSON.stringify({jsonrpc:'2.0',id:null,error:{code:-32700,message:error.message}},null,2)}});
