@@ -26,6 +26,14 @@
     <div class="hero-tools"><div class="join" aria-label="Language"><button type="button" class="btn btn-sm join-item" data-lang="th">ไทย</button><button type="button" class="btn btn-sm join-item" data-lang="en">EN</button></div></div>
   </header>
 
+  <section class="feature" id="gate" hidden>
+    <div class="section-head"><div><span class="kicker">ยังดูไม่ได้</span><h2>ต้องทำขั้น 1 และ 2 ก่อน</h2></div></div>
+    <p>หน้านี้ดูค่าฝุ่นจากเครื่องที่แฟลชแล้วและต่อ Wi-Fi แล้วเท่านั้น ทำตามลำดับ แล้วกด "ดูค่าฝุ่นสด" จากหน้าตั้งค่า Wi-Fi ที่อยู่ของเครื่องจะถูกส่งมาให้เอง</p>
+    <ul class="steps steps-vertical lg:steps-horizontal w-full" style="margin:8px 0 16px">
+      <li class="step step-primary">แฟลช</li><li class="step step-primary">ต่อ Wi-Fi + Kit ID</li><li class="step">ดูค่าฝุ่นสด</li>
+    </ul>
+    <div class="button-row"><a class="btn btn-primary" href="../"><i data-lucide="zap" class="w-4 h-4"></i>ขั้น 1 แฟลช</a><a class="btn btn-outline btn-primary" href="../wifi/"><i data-lucide="wifi" class="w-4 h-4"></i>ขั้น 2 ต่อ Wi-Fi</a></div>
+  </section>
   <section class="feature">
     <div class="section-head"><div><span class="kicker" data-i18n="connectKicker">01 · เชื่อมต่อในเครือข่ายเดียวกัน</span><h2 data-i18n="connectTitle">ต่อกับเครื่อง</h2></div><span class="status" id="liveBadge">ยังไม่เชื่อมต่อ</span></div>
     <p data-i18n="connectBody">ใส่ที่อยู่ที่หน้าตั้งค่า Wi-Fi แสดงไว้ (เช่น 192.168.1.23) คอมพิวเตอร์ต้องอยู่ Wi-Fi วงเดียวกับเครื่อง</p>
@@ -100,6 +108,7 @@ async function sendRpc(request){if(!rpc){await connect();if(!rpc)return}const re
 
 const params=new URLSearchParams(location.search);$('deviceHost').value=params.get('host')||localStorage.getItem('dbk-device-host')||'';$('deviceAlias').value=params.get('alias')||localStorage.getItem('dbk-device-alias')||'';
 try{if($('deviceHost').value)$('deviceUi').href=normalizeDeviceUrl($('deviceHost').value)+'/'}catch{}
+if(!$('deviceHost').value.trim()){$('gate').hidden=false;document.querySelectorAll('main > section.feature:not(#gate)').forEach(el=>el.hidden=true)}
 setLang(params.get('lang')||localStorage.getItem('dbk-lang')||'th');document.querySelectorAll('[data-lang]').forEach(button=>button.addEventListener('click',()=>setLang(button.dataset.lang)));
 $('connectButton').addEventListener('click',connect);$('saveAlias').addEventListener('click',saveAlias);$('deviceHost').addEventListener('keydown',event=>{if(event.key==='Enter')connect()});
 $('sendRpc').addEventListener('click',()=>{try{sendRpc(JSON.parse($('rpcRequest').value))}catch(error){$('rpcResponse').textContent=JSON.stringify({jsonrpc:'2.0',id:null,error:{code:-32700,message:error.message}},null,2)}});
