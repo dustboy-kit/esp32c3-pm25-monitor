@@ -49,3 +49,6 @@ a{color:var(--accent)}
 em,i:not([data-lucide]),.hero h1 em,.kicker,h1,h2,h3{font-style:normal!important}
 
 
+
+/* The hidden attribute must win over daisyUI display rules (.btn, .input, .card are inline-flex/flex). */
+[hidden]{display:none!important}
