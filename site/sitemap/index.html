@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="th" data-theme="corporate">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <title>แผนผังเว็บ · DustBoy Kit · Kit4Kids</title>
+  <meta name="description" content="ทุกหน้าของเว็บ DustBoy Kit">
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../ui-preferences.js"></script>
+</head>
+<body class="min-h-screen bg-base-100 text-base-content">
+  <main class="max-w-2xl mx-auto px-5 py-10 space-y-6">
+    <nav class="flex items-center gap-2"><div class="breadcrumbs text-sm"><ul><li><a href="../"><i data-lucide="home" class="w-4 h-4"></i>หน้าแรก</a></li><li><span class="inline-flex items-center gap-2"><i data-lucide="map" class="w-4 h-4"></i>แผนผังเว็บ</span></li></ul></div></nav>
+    <header class="space-y-1">
+      <p class="text-xs tracking-widest uppercase opacity-60">DUSTBOY KIT · KIT4KIDS</p>
+      <h1 class="text-3xl sm:text-4xl font-semibold">แผนผังเว็บ</h1>
+      <p class="opacity-75">ทุกหน้าที่มี เรียงตามลำดับที่ใช้</p>
+    </header>
+    <section class="card bg-base-100 border border-base-300"><div class="card-body gap-1">
+      <h2 class="card-title">หน้าสำหรับครูและนักเรียน</h2>
+      <ul class="menu menu-lg p-0 [&_li>a]:items-start"><li><a href="../"><i data-lucide="home" class="w-5 h-5 text-primary"></i><span><strong>หน้าแรก</strong><span class="block text-sm opacity-70">ติดตั้งใน 3 ขั้น: แฟลช → Wi-Fi → Kit ID</span><code class="text-xs opacity-60">/</code></span></a></li><li><a href="../wifi/"><i data-lucide="wifi" class="w-5 h-5 text-primary"></i><span><strong>ตั้งค่า Wi-Fi</strong><span class="block text-sm opacity-70">ต่อเครื่องเข้า Wi-Fi ผ่าน USB แล้วใส่ Kit ID + รหัสจากครู</span><code class="text-xs opacity-60">/wifi/</code></span></a></li><li><a href="../wifi/recovery/"><i data-lucide="life-buoy" class="w-5 h-5 text-primary"></i><span><strong>กู้เครื่อง</strong><span class="block text-sm opacity-70">ถ้าต่อ Wi-Fi ไม่สำเร็จ</span><code class="text-xs opacity-60">/wifi/recovery/</code></span></a></li><li><a href="../dashboard/"><i data-lucide="activity" class="w-5 h-5 text-primary"></i><span><strong>ค่าฝุ่นสด</strong><span class="block text-sm opacity-70">ใส่ที่อยู่เครื่อง ดู PM1 / PM2.5 / PM10</span><code class="text-xs opacity-60">/dashboard/</code></span></a></li><li><a href="../teacher/"><i data-lucide="graduation-cap" class="w-5 h-5 text-primary"></i><span><strong>สำหรับผู้สอน</strong><span class="block text-sm opacity-70">ต้องเตรียมอะไรบ้างก่อนสอน (พิมพ์ได้)</span><code class="text-xs opacity-60">/teacher/</code></span></a></li><li><a href="../tools/esphome-canvas-simulator.html"><i data-lucide="palette" class="w-5 h-5 text-primary"></i><span><strong>เลือกลายหน้าจอ</strong><span class="block text-sm opacity-70">30 ลาย ดูตัวอย่างแล้วแฟลช</span><code class="text-xs opacity-60">/tools/esphome-canvas-simulator.html</code></span></a></li><li><a href="../ble/"><i data-lucide="bluetooth" class="w-5 h-5 text-primary"></i><span><strong>DBK Bluetooth</strong><span class="block text-sm opacity-70">รุ่นไม่ใช้ Wi-Fi: แฟลช อ่านค่า อัปเดตผ่าน Bluetooth</span><code class="text-xs opacity-60">/ble/</code></span></a></li><li><a href="../sitemap/"><i data-lucide="map" class="w-5 h-5 text-primary"></i><span><strong>แผนผังเว็บ</strong><span class="block text-sm opacity-70">หน้านี้</span><code class="text-xs opacity-60">/sitemap/</code></span></a></li></ul>
+    </div></section>
+    <details class="collapse collapse-arrow border border-base-300">
+      <summary class="collapse-title text-sm opacity-70">สำหรับนักพัฒนา</summary>
+      <div class="collapse-content"><ul class="menu p-0 [&_li>a]:items-start"><li><a href="../?dev=1"><i data-lucide="code" class="w-5 h-5 opacity-60"></i><span><strong>โหมดนักพัฒนา</strong><span class="block text-sm opacity-70">เปิดส่วนที่ซ่อน (YAML, RPC console, build server) ทุกหน้า · ปิดด้วย ?dev=0</span></span></a></li><li><a href="../version.json"><i data-lucide="file-json" class="w-5 h-5 opacity-60"></i><span><strong>version.json</strong><span class="block text-sm opacity-70">build ที่ขึ้นเว็บอยู่</span></span></a></li><li><a href="../sitemap.xml"><i data-lucide="file-text" class="w-5 h-5 opacity-60"></i><span><strong>sitemap.xml</strong><span class="block text-sm opacity-70">สำหรับ search engine</span></span></a></li><li><a href="https://github.com/dustboy-kit/esp32c3-pm25-monitor"><i data-lucide="github" class="w-5 h-5 opacity-60"></i><span><strong>GitHub</strong><span class="block text-sm opacity-70">ซอร์ส, PR, เฟิร์มแวร์</span></span></a></li></ul></div>
+    </details>
+  </main>
+<script>document.addEventListener("DOMContentLoaded",function(){window.lucide&&lucide.createIcons()});</script>
+</body>
+</html>

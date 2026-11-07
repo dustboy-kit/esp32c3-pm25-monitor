@@ -11,6 +11,7 @@ const pages = [
   ["site/wifi/recovery/index.html", "../../ui-preferences.js", true],
   ["site/ble/index.html", "../ui-preferences.js", false],
   ["site/tools/esphome-canvas-simulator.html", "../ui-preferences.js", true],
+  ["site/sitemap/index.html", "../ui-preferences.js", false],
 ];
 
 for (const [path, scriptSrc, hasLangSwitch] of pages) {
