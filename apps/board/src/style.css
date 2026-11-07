@@ -1,5 +1,6 @@
 @import "tailwindcss";
-.wire-svg{height:auto}.part-label{font:600 17px system-ui,sans-serif}.pin{font:700 13px system-ui,sans-serif}
+.wire-svg{height:auto}.part-label{font:600 12px system-ui,sans-serif;white-space:nowrap}.svg-pin{font:700 11px system-ui,sans-serif}
 @media print {
  .no-print,#laris-footer,#viewer-controls{display:none!important}body{padding-bottom:0!important}.print-card{break-inside:avoid;box-shadow:none!important}.diagram-wrap{overflow:visible!important}.wire-svg{min-width:0!important}#viewer{height:240px!important;background:white!important}
 }
+@media (max-width: 639px){.mobile-target{width:100%}}
