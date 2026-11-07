@@ -1,58 +1,55 @@
 <!doctype html>
-<html lang="th" data-theme="plain">
+<html lang="th" data-theme="corporate">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#040818">
+  <meta name="theme-color" content="#ffffff">
   <meta name="description" content="DBK Bluetooth: เครื่องวัด PM2.5 DustBoy Kit รุ่นไม่ใช้ Wi-Fi แฟลช อ่านค่า และอัปเดตเฟิร์มแวร์จากเบราว์เซอร์ผ่าน Bluetooth">
-  <title>DBK Bluetooth · DustBoy Kit</title>
+  <title>DBK Bluetooth · DustBoy Kit · Kit4Kids</title>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="./icon.svg">
-  <link rel="stylesheet" href="../styles.css">
-  <link rel="stylesheet" href="../theme.css">
-  <script src="../ui-preferences.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="../styles.css?v=1794029502">
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<script src="../ui-preferences.js?v=1794029502"></script>
   <script type="module" src="https://unpkg.com/esp-web-tools@10.2.1/dist/web/install-button.js?module"></script>
   <style>
     .hub { position: relative; z-index: 1; width: min(880px, 100%); margin: auto; padding: clamp(22px, 5vw, 56px) 18px 48px; }
-    .hub ::selection { background: var(--gold); color: #1a1200; }
+    .hub ::selection { background: var(--gold); color: var(--panel2); }
     .hub :focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; border-radius: 6px; }
-    .hub h1 { margin: 10px 0 0; font: italic 800 clamp(40px, 9vw, 72px)/.95 Georgia, "Times New Roman", serif; letter-spacing: -.03em; text-wrap: balance; }
+    .hub h1 { margin: 10px 0 0; font: 800 clamp(40px, 9vw, 72px)/.95 inherit; letter-spacing: -.03em; text-wrap: balance; }
     .hub h1 em { color: var(--gold); font-style: inherit; }
-    .hub h2 { margin: 0 0 6px; color: #fff4ba; font: italic 750 clamp(24px, 4.5vw, 32px)/1.1 Georgia, serif; letter-spacing: -.02em; text-wrap: balance; }
-    .hub p { margin: 8px 0; color: #b8c8e9; max-width: 68ch; }
+    .hub h2 { margin: 0 0 6px; color: var(--text); font: 750 clamp(24px, 4.5vw, 32px)/1.1 inherit; letter-spacing: -.02em; text-wrap: balance; }
+    .hub p { margin: 8px 0; color: var(--muted); max-width: 68ch; }
     .hub section { margin-top: clamp(34px, 7vw, 56px); scroll-margin-top: 16px; }
     .hub .lede { font-size: clamp(16px, 2.4vw, 19px); margin-top: 14px; }
-    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-    .topbar a.home { color: var(--muted); text-decoration: none; font-size: 13px; }
-    .topbar a.home:hover { color: var(--text); }
-    .pref { display: inline-flex; align-items: center; gap: 8px; }
-    .pref .theme-toggle { width: 36px; height: 36px; padding: 0; border-radius: 999px; }
 
     .hero-ble { display: grid; gap: 18px; }
     .jump { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
-    .jump a { border: 1px solid var(--line); border-radius: 999px; padding: 7px 13px; color: var(--text); text-decoration: none; font-size: 13px; background: rgba(4, 12, 31, .55); }
-    .jump a:hover { border-color: var(--gold); color: #fff0a6; }
-    .state { border: 1px solid rgba(247, 206, 70, .55); border-radius: 14px; padding: 14px 16px; background: linear-gradient(145deg, rgba(60, 44, 6, .55), rgba(9, 24, 57, .7)); box-shadow: 0 18px 40px -30px #000; }
-    .state strong { color: #ffe387; }
+    .jump a { border: 1px solid var(--line); border-radius: 999px; padding: 7px 13px; color: var(--text); text-decoration: none; font-size: 13px; background: var(--panel2); }
+    .jump a:hover { border-color: var(--gold); color: var(--text); }
+    .state { border: 1px solid var(--accent); border-radius: 14px; padding: 14px 16px; background: linear-gradient(145deg, var(--panel2), var(--panel2)); box-shadow: 0 18px 40px -30px #000; }
+    .state strong { color: var(--accent); }
     .state p { margin: 4px 0 0; font-size: 14px; }
 
     .cmp { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 10px; font-variant-numeric: tabular-nums; }
-    .cmp th, .cmp td { text-align: left; padding: 10px 10px; border-bottom: 1px solid rgba(88, 137, 226, .35); vertical-align: top; }
-    .cmp th { color: #ffe387; font-weight: 700; }
+    .cmp th, .cmp td { text-align: left; padding: 10px 10px; border-bottom: 1px solid var(--muted); vertical-align: top; }
+    .cmp th { color: var(--accent); font-weight: 700; }
     .cmp th:first-child, .cmp td:first-child { color: var(--muted); width: 32%; }
     .cmp tr:last-child td { border-bottom: 0; }
     @media (max-width: 520px) { .cmp { font-size: 13px; } .cmp th, .cmp td { padding: 8px 6px; } }
 
-    .tool { border: 1px solid rgba(88, 137, 226, .55); border-radius: 18px; padding: 20px; background: linear-gradient(145deg, rgba(9, 24, 57, .9), rgba(4, 12, 31, .92)); box-shadow: 0 24px 60px -40px #000; }
-    .tool ol { margin: 10px 0 0; padding-left: 22px; color: #b8c8e9; }
+    .tool { border: 1px solid var(--muted); border-radius: 18px; padding: 20px; background: linear-gradient(145deg, var(--panel2), var(--panel2)); box-shadow: 0 24px 60px -40px #000; }
+    .tool ol { margin: 10px 0 0; padding-left: 22px; color: var(--muted); }
     .tool ol li { margin: 6px 0; }
     .tool ol li::marker { color: var(--gold); font-weight: 700; }
     .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 14px; }
     .meta { display: inline-block; margin-top: 8px; color: var(--muted); font-size: 13px; }
 
     .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
-    .tile { border: 1px solid rgba(88, 137, 226, .45); border-radius: 12px; padding: 12px 8px; text-align: center; background: #071126; }
+    .tile { border: 1px solid var(--muted); border-radius: 12px; padding: 12px 8px; text-align: center; background: var(--panel2); }
     .tile .v { font: 700 clamp(28px, 7vw, 40px)/1.05 ui-sans-serif, system-ui, sans-serif; font-variant-numeric: tabular-nums; color: var(--text); }
     .tile .l { margin-top: 4px; font-size: 12px; color: var(--muted); }
     .level { margin-top: 12px; font-size: 18px; font-weight: 700; }
@@ -66,57 +63,62 @@
     .file .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 8px; }
     .level:empty, .otastat:empty { display: none; }
     .uuids { white-space: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    progress { width: 100%; height: 14px; border: 0; border-radius: 999px; overflow: hidden; background: #071126; accent-color: var(--gold); margin-top: 12px; }
-    progress::-webkit-progress-bar { background: #071126; border-radius: 999px; }
-    progress::-webkit-progress-value { background: linear-gradient(90deg, #d9a920, var(--gold)); border-radius: 999px; transition: width .25s ease-out; }
+    progress { width: 100%; height: 14px; border: 0; border-radius: 999px; overflow: hidden; background: var(--panel2); accent-color: var(--gold); margin-top: 12px; }
+    progress::-webkit-progress-bar { background: var(--panel2); border-radius: 999px; }
+    progress::-webkit-progress-value { background: var(--accent); border-radius: 999px; transition: width .25s ease-out; }
     .otastat { margin-top: 8px; font-size: 15px; color: var(--text); white-space: pre-wrap; }
-    .passcode { margin-top: 14px; padding: 12px 14px; border: 1px solid rgba(255, 123, 118, .6); border-radius: 12px; background: rgba(78, 20, 18, .35); color: #ffd9d7; font-size: 14px; }
-    .passcode strong { color: #ffb5b1; }
+    .passcode { margin-top: 14px; padding: 12px 14px; border: 1px solid var(--muted); border-radius: 12px; background: var(--panel2); color: var(--text); font-size: 14px; }
+    .passcode strong { color: var(--muted); }
 
     .facts { display: grid; gap: 10px; margin-top: 12px; }
-    .fact { display: grid; grid-template-columns: 22px 1fr; gap: 10px; align-items: start; color: #b8c8e9; font-size: 14.5px; }
+    .fact { display: grid; grid-template-columns: 22px 1fr; gap: 10px; align-items: start; color: var(--muted); font-size: 14.5px; }
     .fact svg { width: 20px; height: 20px; margin-top: 2px; }
     .fact b { color: var(--text); }
-    details { border: 1px solid rgba(88, 137, 226, .45); border-radius: 12px; padding: 10px 14px; background: rgba(7, 17, 38, .7); margin-top: 10px; }
-    details summary { cursor: pointer; color: #fff0a6; font-weight: 700; }
+    details { border: 1px solid var(--muted); border-radius: 12px; padding: 10px 14px; background: var(--panel2); margin-top: 10px; }
+    details summary { cursor: pointer; color: var(--text); font-weight: 700; }
     details p { font-size: 14px; }
-    .uuids { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; color: #d9e8ff; line-height: 1.7; }
-    .uuids b { color: #ffe387; font-weight: 600; }
-    .unsupported { border: 1px solid rgba(255, 123, 118, .6); border-radius: 12px; padding: 10px 14px; color: #ffb5b1; background: rgba(78, 20, 18, .35); font-size: 14px; margin-top: 12px; }
-    footer.hubfoot { margin-top: 48px; padding-top: 18px; border-top: 1px solid rgba(88, 137, 226, .3); color: #8295bd; font-size: 12px; display: flex; flex-wrap: wrap; gap: 14px; justify-content: space-between; }
+    .uuids { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; color: var(--text); line-height: 1.7; }
+    .uuids b { color: var(--accent); font-weight: 600; }
+    .unsupported { border: 1px solid var(--muted); border-radius: 12px; padding: 10px 14px; color: var(--muted); background: var(--panel2); font-size: 14px; margin-top: 12px; }
+    footer.hubfoot { margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--muted); color: var(--muted); font-size: 12px; display: flex; flex-wrap: wrap; gap: 14px; justify-content: space-between; }
     @media (prefers-reduced-motion: reduce) { progress::-webkit-progress-value { transition: none; } }
     [hidden] { display: none !important; }
-  </style>
+  
+  /* daisyUI-look overrides (light theme, 2026-11-07) */
+  body { background: #fff; color: #1f2937; }
+  button, select, input[type="number"], input[type="text"], textarea { border: 1px solid #d1d5db; border-radius: .5rem; background: #fff; color: #1f2937; box-shadow: none; }
+  button { font-weight: 600; font-size: .875rem; padding: 8px 14px; }
+  button:hover { background: #f3f4f6; border-color: #9ca3af; }
+  button.primary, .selected-flash-button, button.btn-primary { background: #3b82f6; border-color: #3b82f6; color: #fff; }
+  button.primary:hover, .selected-flash-button:hover { background: #2563eb; border-color: #2563eb; }
+  button.danger { background: #fff; border-color: #ef4444; color: #ef4444; }
+  button.danger:hover { background: #fef2f2; }
+  .card, .gallery-browser, .notes, .example-info, .status { box-shadow: none; }
+  .gallery-item { background: #f9fafb; }
+  .gallery-item.active { border-color: #3b82f6; background: #eff6ff; }
+  .gallery-item.active span, .card-head strong, h1 em { color: #1f2937; }
+  h1, h2, h3, .card-head strong { font-family: inherit; font-style: normal; }
+</style>
 </head>
 <body>
 <main class="hub">
-  <div class="topbar">
-    <a class="home" href="../" data-i18n="home">← DustBoy Kit</a>
-    <div class="pref">
-      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Theme"><span aria-hidden="true" data-theme-icon>◐</span></button>
-      <div class="lang-switch" aria-label="Language">
-        <button type="button" data-lang="th">ไทย</button>
-        <button type="button" data-lang="en">EN</button>
-      </div>
-    </div>
-  </div>
-
-  <header class="hero-ble">
+  <nav class="flex items-center justify-between gap-2 mb-4"><a class="btn btn-sm btn-ghost back-home" href="../"><i data-lucide="arrow-left" class="w-4 h-4"></i><span data-i18n="home">หน้าแรก</span></a><div class="join" aria-label="Language"><button type="button" class="btn btn-sm join-item" data-lang="th">ไทย</button><button type="button" class="btn btn-sm join-item" data-lang="en">EN</button></div></nav>
+<header class="hero-ble">
     <div>
       <h1 data-i18n="h1">DBK <em>Bluetooth</em></h1>
       <p class="lede" data-i18n="lede">เครื่องวัด PM2.5 DustBoy Kit รุ่นที่ไม่ต้องมี Wi-Fi: แฟลช อ่านค่า และอัปเดตเฟิร์มแวร์ ทั้งหมดจากเบราว์เซอร์ผ่าน Bluetooth</p>
       <nav class="jump" aria-label="sections">
-        <a href="#flash" data-i18n="jFlash">1 · แฟลชผ่าน USB</a>
-        <a href="#read" data-i18n="jRead">2 · อ่านค่าสด</a>
-        <a href="#ota" data-i18n="jOta">3 · อัปเดตไร้สาย</a>
-        <a href="#req" data-i18n="jReq">ข้อกำหนด</a>
-        <a href="#safety" data-i18n="jSafety">ความปลอดภัย</a>
-        <a href="#help" data-i18n="jHelp">แก้ปัญหา</a>
+        <a href="#flash"><i data-lucide="usb" class="w-4 h-4"></i><span data-i18n="jFlash">1 · แฟลชผ่าน USB</span></a>
+        <a href="#read"><i data-lucide="activity" class="w-4 h-4"></i><span data-i18n="jRead">2 · อ่านค่าสด</span></a>
+        <a href="#ota"><i data-lucide="upload-cloud" class="w-4 h-4"></i><span data-i18n="jOta">3 · อัปเดตไร้สาย</span></a>
+        <a href="#req"><i data-lucide="clipboard-list" class="w-4 h-4"></i><span data-i18n="jReq">ข้อกำหนด</span></a>
+        <a href="#safety"><i data-lucide="shield" class="w-4 h-4"></i><span data-i18n="jSafety">ความปลอดภัย</span></a>
+        <a href="#help"><i data-lucide="life-buoy" class="w-4 h-4"></i><span data-i18n="jHelp">แก้ปัญหา</span></a>
       </nav>
     </div>
     <div class="state" role="status">
       <strong data-i18n="stateHead">สถานะ: ยังไม่ได้ทดสอบบนบอร์ดจริง</strong>
-      <p data-i18n="stateBody">เฟิร์มแวร์ 0.2.0-ble คอมไพล์ผ่านและขึ้นเว็บแล้ว (5 พ.ย. 2026) แต่ยังไม่มีใครแฟลชลงบอร์ด DBK แล้วลองอ่านค่าหรือ OTA จริง ใครทดสอบแล้วบอกผลในห้อง dustboy-kit จะอัปเดตกล่องนี้</p>
+      <p data-i18n="stateBody">เฟิร์มแวร์ 0.2.0-ble คอมพิวเตอร์ไพล์ผ่านและขึ้นเว็บแล้ว (5 พ.ย. 2026) แต่ยังไม่มีใครแฟลชลงบอร์ด DBK แล้วลองอ่านค่าหรือ OTA จริง ใครทดสอบแล้วบอกผลในห้อง dustboy-kit จะอัปเดตกล่องนี้</p>
     </div>
   </header>
 
@@ -145,20 +147,20 @@
       <div class="fact"><svg viewBox="0 0 24 24" fill="none" stroke="#62c8df" stroke-width="2" aria-hidden="true"><path d="M12 2v20M7 7l10 10M17 7 7 17"/></svg><span data-i18n="req3"><b>ไม่ต้องจับคู่ (pair) ในตั้งค่าเครื่อง</b> กดปุ่มเชื่อมต่อในหน้านี้ เลือก <code>DBK-xxxxxx</code> จากรายการ เท่านั้น</span></div>
       <div class="fact"><svg viewBox="0 0 24 24" fill="none" stroke="#f7ce46" stroke-width="2" aria-hidden="true"><path d="M12 3 2 21h20L12 3z"/><path d="M12 10v5M12 18h.01"/></svg><span data-i18n="req4"><b>แฟลชครั้งแรกต้องใช้สาย USB</b> (ข้อ 1) บอร์ดที่ยังเป็นเฟิร์มแวร์ Wi-Fi หรือรุ่นก่อน 0.2.0-ble ไม่มี Bluetooth OTA ให้ใช้</span></div>
     </div>
-    <p id="unsupported" class="unsupported" hidden data-i18n="unsupported">เบราว์เซอร์นี้ไม่มี Web Bluetooth: ข้อ 2 และ 3 ใช้ไม่ได้ที่นี่ เปิดหน้านี้ใน Chrome หรือ Edge บนคอม/Android</p>
+    <p id="unsupported" class="unsupported" hidden data-i18n="unsupported">เบราว์เซอร์นี้ไม่มี Web Bluetooth: ข้อ 2 และ 3 ใช้ไม่ได้ที่นี่ เปิดหน้านี้ใน Chrome หรือ Edge บนคอมพิวเตอร์/Android</p>
   </section>
 
   <section id="flash">
     <div class="tool">
       <h2 data-i18n="t1Head">1 · แฟลชเฟิร์มแวร์ผ่าน USB</h2>
-      <p data-i18n="t1Body">ครั้งแรก และทุกครั้งที่บอร์ดบูตไม่ขึ้น ใช้ทางนี้ Chrome/Edge บนคอมเท่านั้น (Web Serial)</p>
+      <p data-i18n="t1Body">ครั้งแรก และทุกครั้งที่บอร์ดบูตไม่ขึ้น ใช้ทางนี้ Chrome/Edge บนคอมพิวเตอร์เท่านั้น (Web Serial)</p>
       <ol>
-        <li data-i18n="t1s1">เสียบบอร์ด DBK เข้าคอมด้วยสาย USB ที่ส่งข้อมูลได้</li>
+        <li data-i18n="t1s1">เสียบบอร์ด DBK เข้าคอมพิวเตอร์ด้วยสาย USB ที่ส่งข้อมูลได้</li>
         <li data-i18n="t1s2">กด "แฟลช DBK Bluetooth" เลือกพอร์ตของบอร์ด แล้วรอจนเสร็จ</li>
         <li data-i18n="t1s3">ถอดแล้วเสียบใหม่ จอจะโชว์ "Dustboy Kit For Kids" แล้วแถวบนมีไอคอน Bluetooth</li>
       </ol>
       <div class="actions">
-        <esp-web-install-button manifest="../manifests/dbk-ble.json"><button class="action" slot="activate" data-i18n="t1Btn">⚡ แฟลช DBK Bluetooth</button></esp-web-install-button>
+        <esp-web-install-button manifest="../manifests/dbk-ble.json"><button class="btn btn-primary" slot="activate"><i data-lucide="zap" class="w-4 h-4"></i><span data-i18n="t1Btn">แฟลช DBK Bluetooth</span></button></esp-web-install-button>
         <span class="meta">dbk-ble.factory.bin · 0.2.0-ble · ESP32-C3</span>
       </div>
     </div>
@@ -174,9 +176,9 @@
         <li data-i18n="t2s3">ค่าจะขึ้นด้านล่าง กด "ติดตั้งเป็นแอป" ถ้าอยากเปิดจากหน้าจอโฮม</li>
       </ol>
       <div class="actions">
-        <button class="action" id="connect" type="button" data-i18n="btnConnect">🔵 เชื่อมต่อ DBK</button>
-        <button class="action secondary" id="disconnect" type="button" hidden data-i18n="btnDisconnect">ตัดการเชื่อมต่อ</button>
-        <button class="action secondary" id="install" type="button" hidden data-i18n="btnInstall">📱 ติดตั้งเป็นแอป</button>
+        <button class="btn btn-primary" id="connect" type="button"><i data-lucide="bluetooth" class="w-4 h-4"></i><span data-i18n="btnConnect">เชื่อมต่อ DBK</span></button>
+        <button class="btn btn-outline btn-primary btn-sm" id="disconnect" type="button" hidden><i data-lucide="bluetooth-off" class="w-4 h-4"></i><span data-i18n="btnDisconnect">ตัดการเชื่อมต่อ</span></button>
+        <button class="btn btn-outline btn-primary btn-sm" id="install" type="button" hidden><i data-lucide="smartphone" class="w-4 h-4"></i><span data-i18n="btnInstall">ติดตั้งเป็นแอป</span></button>
         <span class="live" id="device" data-i18n="notConnected">ยังไม่ได้เชื่อมต่อ</span>
       </div>
       <div class="tiles" aria-live="polite">
@@ -201,12 +203,12 @@
       <div class="file">
         <span data-i18n="fileLabel">ไฟล์เฟิร์มแวร์ (<code>.ota.bin</code>)</span>
         <input type="file" id="file" accept=".bin" aria-label="firmware .ota.bin">
-        <div class="row"><button class="action secondary" id="pick" type="button" data-i18n="btnPick">📂 เลือกไฟล์จากเครื่อง</button><button class="action secondary" id="latest" type="button" data-i18n="btnLatest">⬇️ ใช้ตัวล่าสุดจากเว็บ (dbk-ble.ota.bin)</button></div>
+        <div class="row"><button class="btn btn-outline btn-primary btn-sm" id="pick" type="button"><i data-lucide="folder-open" class="w-4 h-4"></i><span data-i18n="btnPick">เลือกไฟล์จากเครื่อง</span></button><button class="btn btn-outline btn-primary btn-sm" id="latest" type="button"><i data-lucide="download" class="w-4 h-4"></i><span data-i18n="btnLatest">⬇ใช้ตัวล่าสุดจากเว็บ (dbk-ble.ota.bin)</span></button></div>
         <div class="meta" id="fileinfo"></div>
       </div>
       <div class="actions">
-        <button class="action" id="start" type="button" disabled data-i18n="btnStart">⬆️ เริ่มอัปเดต</button>
-        <button class="action secondary" id="abort" type="button" disabled data-i18n="btnAbort">ยกเลิก</button>
+        <button class="btn btn-primary" id="start" type="button" disabled><i data-lucide="upload" class="w-4 h-4"></i><span data-i18n="btnStart">⬆เริ่มอัปเดต</span></button>
+        <button class="btn btn-outline btn-primary btn-sm" id="abort" type="button" disabled><i data-lucide="x" class="w-4 h-4"></i><span data-i18n="btnAbort">ยกเลิก</span></button>
         <span class="live" id="speed"></span>
       </div>
       <progress id="bar" value="0" max="100" aria-label="OTA progress"></progress>
@@ -229,7 +231,7 @@
   <section id="help">
     <h2 data-i18n="helpHead">แก้ปัญหา</h2>
     <details><summary data-i18n="h1q">ไม่เห็น DBK ในรายการอุปกรณ์</summary><p data-i18n="h1a">เช็คว่าจอบอร์ดมีไอคอน Bluetooth (ถ้าไม่มี = ยังเป็นเฟิร์มแวร์ Wi-Fi ให้ทำข้อ 1) · ปิดแอปอื่นที่ค้างเชื่อมต่อกับบอร์ดอยู่ (บอร์ดรับได้ 2 คนพร้อมกัน) · เข้าใกล้กว่า 5 เมตร · Android ต้องให้สิทธิ์ Location/Nearby devices กับ Chrome</p></details>
-    <details><summary data-i18n="h2q">กดเชื่อมต่อแล้วล้มเหลว หรือหลุดทันที</summary><p data-i18n="h2a">ปิด-เปิด Bluetooth ของเครื่อง แล้วลองใหม่ · ถ้าเคยจับคู่ไว้ในตั้งค่าเครื่อง ให้ลบ (forget) ก่อน · บนคอม Windows ต้องเป็น Windows 10 ขึ้นไปและมี Bluetooth 4.0+</p></details>
+    <details><summary data-i18n="h2q">กดเชื่อมต่อแล้วล้มเหลว หรือหลุดทันที</summary><p data-i18n="h2a">ปิด-เปิด Bluetooth ของเครื่อง แล้วลองใหม่ · ถ้าเคยจับคู่ไว้ในตั้งค่าเครื่อง ให้ลบ (forget) ก่อน · บนคอมพิวเตอร์ Windows ต้องเป็น Windows 10 ขึ้นไปและมี Bluetooth 4.0+</p></details>
     <details><summary data-i18n="h3q">OTA ค้างกลางทาง หรือขึ้น ERR</summary><p data-i18n="h3a">ERR sha mismatch = ไฟล์ไม่ตรง โหลดใหม่จาก "ใช้ตัวล่าสุดจากเว็บ" · ERR bad begin = รหัสผิดหรือรูปแบบไฟล์ผิด ใช้ .ota.bin ไม่ใช่ .factory.bin · ค้างที่ RX = ลิงก์หลุด กดยกเลิก เชื่อมต่อใหม่ เริ่มใหม่ (บอร์ดยังเป็นเฟิร์มแวร์เดิม) · ขึ้น OK แล้วบอร์ดไม่กลับมา = แฟลช USB ข้อ 1</p></details>
     <details><summary data-i18n="h4q">iPhone / iPad</summary><p data-i18n="h4a">Safari และ Chrome บน iOS ไม่มี Web Bluetooth ใช้แอป Bluefy (App Store) เปิด URL หน้านี้ข้างในแอป ข้อ 2 ใช้ได้ ข้อ 3 ใช้ได้แต่ช้ากว่า</p></details>
   </section>
@@ -249,7 +251,7 @@
 
   <footer class="hubfoot">
     <span>DustBoy Kit · CCDC</span>
-    <span><a href="../">DustBoy Kit</a> · <a href="../dashboard/" data-i18n="fWifi">Dashboard (Wi-Fi)</a> · <a href="https://github.com/dustboy-kit/esp32c3-pm25-monitor" data-i18n="fSrc">ซอร์ส</a></span>
+    <span><a href="../">DustBoy Kit</a> · <a href="../dashboard/"><i data-lucide="activity" class="w-4 h-4"></i><span data-i18n="fWifi">Dashboard (Wi-Fi)</span></a> · <a href="https://github.com/dustboy-kit/esp32c3-pm25-monitor"><i data-lucide="github" class="w-4 h-4"></i><span data-i18n="fSrc">ซอร์ส</span></a></span>
   </footer>
 </main>
 
@@ -277,13 +279,13 @@
       unsupported: 'This browser has no Web Bluetooth: steps 2 and 3 will not work here. Open this page in Chrome or Edge on a computer or Android.',
       t1Head: '1 · Flash firmware by USB', t1Body: 'The first time, and whenever the board will not boot, use this. Chrome/Edge on a computer only (Web Serial).',
       t1s1: 'Plug the DBK board into the computer with a data-capable USB cable', t1s2: 'Press "Flash DBK Bluetooth", pick the board\'s port and wait', t1s3: 'Unplug and replug: the display shows "Dustboy Kit For Kids", then a Bluetooth icon on the top row',
-      t1Btn: '⚡ Flash DBK Bluetooth',
+      t1Btn: 'Flash DBK Bluetooth',
       t2Head: '2 · Live reading over Bluetooth', t2Body: 'PM1 / PM2.5 / PM10 arrive every second from a board within about 10 m.',
       t2s1: 'Turn on Bluetooth, then press "Connect DBK"', t2s2: 'Pick <code>DBK-xxxxxx</code> (the suffix matches the board display) and confirm in Chrome\'s dialog', t2s3: 'Values appear below. Press "Install as app" to open it from the home screen',
-      btnConnect: '🔵 Connect DBK', btnDisconnect: 'Disconnect', btnInstall: '📱 Install as app', notConnected: 'Not connected',
+      btnConnect: 'Connect DBK', btnDisconnect: 'Disconnect', btnInstall: 'Install as app', notConnected: 'Not connected',
       t3Head: '3 · Wireless firmware update (OTA over Bluetooth)', t3Body: 'Send new firmware to the board without a cable. Works on boards running 0.2.0-ble or newer. About 1–2 minutes.',
       t3s1: 'Connect the board with step 2 first (same button)', t3s2: 'Choose a <code>.ota.bin</code> file or press "Use latest from the site"', t3s3: 'Press "Start update", wait for the bar to fill and OK; the board reboots and advertises again under the same name',
-      fileLabel: 'Firmware file (<code>.ota.bin</code>)', btnPick: '📂 Choose a file', btnLatest: '⬇️ Use latest from the site (dbk-ble.ota.bin)', btnStart: '⬆️ Start update', btnAbort: 'Cancel',
+      fileLabel: 'Firmware file (<code>.ota.bin</code>)', btnPick: 'Choose a file', btnLatest: '⬇️ Use latest from the site (dbk-ble.ota.bin)', btnStart: '⬆️ Start update', btnAbort: 'Cancel',
       passcode: '<strong>The OTA passcode is fixed ("dbk") and public in the repository.</strong> It only guards against sending to the wrong board. It does not stop someone in Bluetooth range from sending their own firmware on purpose. For use outside the classroom, wait for the per-device passcode version.',
       safeHead: 'How safe is OTA',
       safe1: '<b>Written to the idle slot.</b> The board has two firmware slots (app0/app1, 1.75 MB each); the running one is untouched during transfer',
@@ -307,7 +309,7 @@
     const dict = T[lang] || T.th;
     document.querySelectorAll('[data-i18n]').forEach((el) => { const k = el.dataset.i18n; if (dict[k] != null) el.innerHTML = dict[k]; });
     root.lang = lang;
-    document.querySelectorAll('[data-lang]').forEach((b) => b.classList.toggle('active', b.dataset.lang === lang));
+    document.querySelectorAll('[data-lang]').forEach((b) => b.classList.toggle('btn-active', b.dataset.lang === lang));
     try { localStorage.setItem('dbk-lang', lang); } catch (_) {}
   }
   document.querySelectorAll('[data-lang]').forEach((b) => b.addEventListener('click', () => setLang(b.dataset.lang)));
@@ -414,5 +416,6 @@
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 })();
 </script>
+<script>(function(){function r(){window.lucide&&lucide.createIcons()}document.addEventListener("DOMContentLoaded",r);new MutationObserver(r).observe(document.documentElement,{childList:true,subtree:true})})();</script>
 </body>
 </html>
