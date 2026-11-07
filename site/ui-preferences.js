@@ -77,7 +77,39 @@
 
   applyTheme(theme, false);
 
+  // Build stamp: pages.yaml writes site/version.json on every deploy, so the
+  // footer shows which commit is live. Missing file (local checkout) = no badge.
+  function showVersion() {
+    const script = versionBase || document.querySelector('script[src$="ui-preferences.js"]');
+    const base = script && script.src ? new URL(".", script.src) : new URL("./", location.href);
+    fetch(new URL("version.json", base), { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((v) => {
+        if (!v || !v.sha) return;
+        const badge = document.createElement("a");
+        badge.className = "build-badge";
+        badge.href = "https://github.com/dustboy-kit/esp32c3-pm25-monitor/commit/" + v.sha;
+        badge.target = "_blank";
+        badge.rel = "noopener";
+        badge.textContent = "build " + v.sha + " · " + v.date;
+        badge.style.cssText = "font:12px/1.4 ui-monospace,monospace;color:var(--muted,#888);text-decoration:none;opacity:.85";
+        const footer = document.querySelector("footer");
+        if (footer) {
+          const span = document.createElement("span");
+          span.style.cssText = "display:block;width:100%;margin-top:6px";
+          span.appendChild(badge);
+          footer.appendChild(span);
+        } else {
+          badge.style.cssText += ";position:fixed;right:10px;bottom:8px;z-index:9";
+          document.body.appendChild(badge);
+        }
+      })
+      .catch(() => {});
+  }
+  const versionBase = document.currentScript;
+
   function mount() {
+    showVersion();
     document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
       button.addEventListener("click", () => applyTheme(theme === "plain" ? "starry" : "plain"));
     });

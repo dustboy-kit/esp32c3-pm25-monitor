@@ -5,3 +5,4 @@ workshop.yaml
 mqtt-workshop.md
 *.bin
 !site/firmware/*.bin
+site/version.json
