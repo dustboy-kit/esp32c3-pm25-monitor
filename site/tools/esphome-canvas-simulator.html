@@ -1030,7 +1030,7 @@
     document.getElementById("selectedFlashInstall").replaceChildren(installer);
 
     var wifi = document.getElementById("selectedWifiLink");
-    wifi.href = "../wifi/?source=canvas&firmware=" + encodeURIComponent(selected.id);
+    wifi.href = "../wifi/?from=canvas&design=" + encodeURIComponent(selected.id);
     wifi.title = en ? "Set up Wi-Fi after flashing " + selected.name : "ตั้งค่า Wi-Fi หลังแฟลช " + selected.name;
     wifi.setAttribute("aria-label", wifi.title);
 

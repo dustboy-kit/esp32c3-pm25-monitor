@@ -52,3 +52,25 @@ em,i:not([data-lucide]),.hero h1 em,.kicker,h1,h2,h3{font-style:normal!important
 
 /* The hidden attribute must win over daisyUI display rules (.btn, .input, .card are inline-flex/flex). */
 [hidden]{display:none!important}
+
+/* Utility classes used by the pages. Hand-written so the Tailwind Play CDN
+   runtime is not needed: that script stalled page load in Safari and
+   headless Chrome (Nat 2026-11-07 "it keeps spinning", nazt_ on the Canvas page). */
+.flex{display:flex}.inline-flex{display:inline-flex}.block{display:block}
+.items-center{align-items:center}.items-start{align-items:flex-start}.justify-between{justify-content:space-between}
+.gap-1{gap:.25rem}.gap-2{gap:.5rem}.gap-3{gap:.75rem}.gap-4{gap:1rem}
+.shrink-0{flex-shrink:0}.w-full{width:100%}.w-4{width:1rem}.h-4{height:1rem}.w-5{width:1.25rem}.h-5{height:1.25rem}.w-6{width:1.5rem}.h-6{height:1.5rem}
+.mt-1{margin-top:.25rem}.mt-2{margin-top:.5rem}.mb-4{margin-bottom:1rem}.p-0{padding:0}.px-5{padding-left:1.25rem;padding-right:1.25rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-10{padding-top:2.5rem;padding-bottom:2.5rem}
+.mx-auto{margin-left:auto;margin-right:auto}.max-w-2xl{max-width:42rem}.min-h-screen{min-height:100vh}.overflow-x-auto{overflow-x:auto}
+.space-y-1>*+*{margin-top:.25rem}.space-y-2>*+*{margin-top:.5rem}.space-y-3>*+*{margin-top:.75rem}.space-y-6>*+*{margin-top:1.5rem}.space-y-8>*+*{margin-top:2rem}
+.text-xs{font-size:.75rem;line-height:1rem}.text-sm{font-size:.875rem;line-height:1.25rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}
+@media(min-width:640px){.sm\:text-4xl{font-size:2.25rem;line-height:2.5rem}.sm\:text-5xl{font-size:3rem;line-height:1}}
+.font-semibold{font-weight:600}.font-mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.uppercase{text-transform:uppercase}.tracking-widest{letter-spacing:.1em}
+.opacity-60{opacity:.6}.opacity-70{opacity:.7}.opacity-75{opacity:.75}
+.text-primary{color:#3b82f6}.bg-base-100{background:#fff}.text-base-content{color:#1f2937}.border{border-width:1px;border-style:solid}.border-base-300{border-color:#e5e7eb}
+.\[\&_li\>a\]\:items-start li>a{align-items:flex-start}
+h1,h2,h3{margin:0}p{margin:0}ul,ol{margin:0;padding:0}
+.card-title,.card-body p{margin:0}
+
+/* One footer only: the Laris Labs bar from ui-preferences.js. Legacy in-page footers (nav links with a top border) are gone on every page. */
+.app>footer:not(#laris-footer),footer.hubfoot,main>footer:not(#laris-footer){display:none!important}

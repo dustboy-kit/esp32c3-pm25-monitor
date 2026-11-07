@@ -6,8 +6,7 @@
   <meta name="theme-color" content="#040818">
   <title>กู้เครื่อง · DustBoy Kit · Kit4Kids</title>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="../../styles.css?v=1794040661">
+  <link rel="stylesheet" href="../../styles.css?v=1794043742">
   <style>
     .recovery-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.route{padding:18px;border:1px solid var(--line);border-radius:14px;background:var(--panel2)}.route h3{margin:0 0 8px;color:var(--text)}.route p,.route li{color:var(--muted)}.route ol{padding-left:20px}.route code{white-space:nowrap}.button-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.diagnosis{margin:16px 0;padding:14px;border-left:3px solid var(--gold);background:var(--panel2);color:var(--muted)}@media(max-width:720px){.recovery-grid{grid-template-columns:1fr}}
   </style>
@@ -46,7 +45,7 @@ th:{eyebrow:'วงจรแห่งดวงดาว · กู้คืนก
 en:{eyebrow:'THE STARRY CIRCUIT · CONNECTION RECOVERY',lede:'If หน้าต่างต่อ Wi-Fi identifies the board and lists networks but reports Unable to connect, USB already works; the failure is during router association.',statusKicker:'Symptom diagnosis',statusTitle:'USB succeeded; Wi-Fi did not',diagnosis:'If the dialog shows dbk-canvas-xxxxxx and scans ชื่อ Wi-Fis, USB, the USB cable, and the program on the kit are working. Changing browsers will not fix the router connection.',retryTitle:'1 · Retry with compatible settings',band:'Choose a 2.4 GHz ชื่อ Wi-Fi only.',password:'Retype the password; check O/0, I/l, and letter case.',distance:'Move the board near the router and temporarily disable VPN/Private Relay.',security:'Use WPA/WPA2 Personal; avoid Wi-Fi that needs a web login or a username.',retry:'Open หน้าต่างต่อ Wi-Fi again',portalTitle:'2 · Use Captive Portal without USB',wait:'Reconnect power and wait about 90 seconds.',join:'Join DBK-Canvas Setup or DBK Wi-Fi.',portal:'Open 192.168.4.1, choose the ชื่อ Wi-Fi, and enter its password.',return:'Return to Dashboard after the board comes online.',openPortal:'Open 192.168.4.1',dashboard:'Dashboard',footer:'DustBoy Kit · Wi-Fi credentials go directly to the board',home:'Home',wifi:'Wi-Fi setup'}};
 let lang='th';function setLang(next){lang=next==='en'?'en':'th';document.documentElement.lang=lang;localStorage.setItem('dbk-lang',lang);document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=copy[lang][el.dataset.i18n]||el.dataset.i18n);document.querySelectorAll('[data-lang]').forEach(b=>b.classList.toggle('btn-active',b.dataset.lang===lang))}setLang(new URLSearchParams(location.search).get('lang')||localStorage.getItem('dbk-lang')||'th');document.querySelectorAll('[data-lang]').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
 </script>
-<script>(function(){function r(){window.lucide&&lucide.createIcons()}document.addEventListener("DOMContentLoaded",r);new MutationObserver(r).observe(document.documentElement,{childList:true,subtree:true})})();</script>
-<script>(function(){function r(){window.lucide&&lucide.createIcons()}document.addEventListener("DOMContentLoaded",r);new MutationObserver(r).observe(document.documentElement,{childList:true,subtree:true})})();</script>
+<script>document.addEventListener("DOMContentLoaded",function(){window.lucide&&lucide.createIcons()});</script>
+<script>document.addEventListener("DOMContentLoaded",function(){window.lucide&&lucide.createIcons()});</script>
 </body>
 </html>
