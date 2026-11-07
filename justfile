@@ -15,3 +15,7 @@ canvas-build:
 
 canvas-verify:
     @python3 {{justfile_directory()}}/tools/canvas-firmware.py --verify
+
+# Build the React/Tailwind board lesson into the committed Pages site output.
+board-build:
+    @cd {{justfile_directory()}}/apps/board && bun install && bun run build

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://dustboy-kit.github.io/esp32c3-pm25-monitor/</loc></url>
+  <url><loc>https://dustboy-kit.github.io/esp32c3-pm25-monitor/board/</loc></url>
   <url><loc>https://dustboy-kit.github.io/esp32c3-pm25-monitor/wifi/</loc></url>
   <url><loc>https://dustboy-kit.github.io/esp32c3-pm25-monitor/wifi/recovery/</loc></url>
   <url><loc>https://dustboy-kit.github.io/esp32c3-pm25-monitor/dashboard/</loc></url>
