@@ -10,8 +10,7 @@
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="./icon.svg">
   <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css">
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="../styles.css?v=1794040661">
+<link rel="stylesheet" href="../styles.css?v=1794043742">
   <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
 <script src="../ui-preferences.js?v=1794029502"></script>
   <script type="module" src="https://unpkg.com/esp-web-tools@10.2.1/dist/web/install-button.js?module"></script>
@@ -416,6 +415,6 @@
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 })();
 </script>
-<script>(function(){function r(){window.lucide&&lucide.createIcons()}document.addEventListener("DOMContentLoaded",r);new MutationObserver(r).observe(document.documentElement,{childList:true,subtree:true})})();</script>
+<script>document.addEventListener("DOMContentLoaded",function(){window.lucide&&lucide.createIcons()});</script>
 </body>
 </html>

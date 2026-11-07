@@ -18,7 +18,7 @@ for (const [path, scriptSrc, hasLangSwitch] of pages) {
   const source = await readFile(new URL(`../${path}`, import.meta.url), "utf8");
   assert.match(source, /<html lang="th" data-theme="corporate">/, `${path} must default to Thai and daisyUI corporate`);
   assert.match(source, /daisyui@/, `${path} loads daisyUI`);
-  if (!path.includes("canvas-simulator")) assert.match(source, /cdn\.tailwindcss\.com/, `${path} loads Tailwind`);
+  assert.doesNotMatch(source, /cdn\.tailwindcss\.com/, `${path} must not load the Tailwind runtime (it stalls page load)`);
   assert.match(source, /lucide\.min\.js/, `${path} loads Lucide`);
   assert.match(source, new RegExp(`src=["']${scriptSrc.replaceAll(".", "\\.")}(\\?v=\\d+)?["']`), `${path} shared script`);
   assert.doesNotMatch(source, /theme\.css|data-theme-toggle|preference-bar/, `${path} has no old theme toggle`);
