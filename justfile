@@ -19,3 +19,7 @@ canvas-verify:
 # Build the React/Tailwind board lesson into the committed Pages site output.
 board-build:
     @cd {{justfile_directory()}}/apps/board && bun install && bun run build
+
+# Deploy site/ to the Cloudflare Worker dustboy-kit-site (mirror of GitHub Pages).
+cf-deploy:
+    @cd {{justfile_directory()}} && bunx wrangler deploy
