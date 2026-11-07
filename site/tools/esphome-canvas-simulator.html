@@ -475,7 +475,7 @@
   .flex{display:flex}.items-center{align-items:center}.justify-between{justify-content:space-between}.gap-2{gap:.5rem}.mb-4{margin-bottom:1rem}.w-4{width:1rem}.h-4{height:1rem}.w-5{width:1.25rem}.h-5{height:1.25rem}.w-full{width:100%}.inline-flex{display:inline-flex}.text-sm{font-size:.875rem}.font-mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.text-sm{font-size:.875rem}
 </style>
   <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css">
-<link rel="stylesheet" href="../styles.css?v=1794044901">
+<link rel="stylesheet" href="../styles.css?v=1794044989">
 <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
 <script src="../ui-preferences.js?v=1794044901"></script>
   <script type="module" src="https://unpkg.com/esp-web-tools@10.2.1/dist/web/install-button.js?module"></script>
@@ -516,8 +516,8 @@
             </optgroup>
             <optgroup id="galleryOptions" label="Original gallery — 30 displays"></optgroup>
           </select>
-          <button id="resetButton" class="btn btn-outline btn-sm" type="button" data-sim-i18n="reload">โหลดที่เลือกใหม่</button>
-          <button id="compileButton" class="btn btn-primary btn-sm" type="button" data-sim-i18n="compileRender">คอมไพล์และเรนเดอร์</button>
+          <button id="resetButton" class="btn btn-outline" type="button" data-sim-i18n="reload">โหลดที่เลือกใหม่</button>
+          <button id="compileButton" class="btn btn-primary" type="button" data-sim-i18n="compileRender">คอมไพล์และเรนเดอร์</button>
         </div>
       </div>
       <textarea class="textarea textarea-bordered font-mono text-sm" id="source" spellcheck="false" aria-label="ESPHome YAML source"></textarea>
@@ -578,9 +578,9 @@
       <div class="firmware-controls">
         <label><span data-sim-i18n="deviceConfig">การตั้งค่าอุปกรณ์</span><select class="select select-bordered select-sm" id="firmwareConfig" aria-label="ESPHome configuration"></select></label>
         <label><span data-sim-i18n="flashTarget">เป้าหมายการแฟลช</span><select class="select select-bordered select-sm" id="firmwareTarget" aria-label="Flash target"></select></label>
-        <button id="firmwareRefresh" class="btn btn-outline btn-sm" type="button" data-sim-i18n="refresh">รีเฟรช</button>
-        <button id="firmwareCompile" class="btn btn-primary btn-sm" type="button" data-sim-i18n="compileFirmware">คอมไพล์เฟิร์มแวร์</button>
-        <button id="firmwareFlash" class="btn btn-error btn-outline btn-sm" type="button" data-sim-i18n="compileFlash">คอมไพล์และแฟลช</button>
+        <button id="firmwareRefresh" class="btn btn-outline" type="button" data-sim-i18n="refresh">รีเฟรช</button>
+        <button id="firmwareCompile" class="btn btn-primary" type="button" data-sim-i18n="compileFirmware">คอมไพล์เฟิร์มแวร์</button>
+        <button id="firmwareFlash" class="btn btn-error btn-outline" type="button" data-sim-i18n="compileFlash">คอมไพล์และแฟลช</button>
       </div>
       <div class="firmware-meta">
         <span id="firmwareVersion">ESPHome: กำลังตรวจ…</span>
@@ -590,7 +590,7 @@
       <div id="firmwareNotice" class="example-info">เลือกการตั้งค่าเพื่อดูขอบเขตการแฟลช</div>
       <pre id="firmwareLog" class="firmware-log" aria-live="polite">บริการ build ใช้งานได้จากเซิร์ฟเวอร์ Python บน localhost เท่านั้น</pre>
       <div class="actions" style="margin-top:10px">
-        <button id="firmwareCancel" class="btn btn-outline btn-sm" type="button" disabled data-sim-i18n="cancel">ยกเลิกงานที่กำลังทำ</button>
+        <button id="firmwareCancel" class="btn btn-outline" type="button" disabled data-sim-i18n="cancel">ยกเลิกงานที่กำลังทำ</button>
       </div>
     </div>
   </section>
@@ -1022,7 +1022,7 @@
     var button = document.createElement("button");
     button.type = "button";
     button.slot = "activate";
-    button.className = "selected-flash-button btn btn-primary btn-sm";
+    button.className = "selected-flash-button btn btn-primary";
     button.title = en ? "Flash " + selected.name : "แฟลช " + selected.name;
     button.setAttribute("aria-label", button.title);
     button.textContent = en ? "Flash " + selected.name : "แฟลช " + selected.name;
