@@ -53,9 +53,23 @@
       .catch(() => {});
   }
 
+  // Developer blocks (YAML, RPC console, build server, fallback AP, ...) are
+  // marked data-dev and hidden for teachers and students. ?dev=1 shows them
+  // and remembers it; ?dev=0 forgets.
+  function revealDev() {
+    const q = new URLSearchParams(location.search).get("dev");
+    try {
+      if (q === "1") localStorage.setItem("dbk-dev", "1");
+      if (q === "0") localStorage.removeItem("dbk-dev");
+    } catch {}
+    let on = q === "1";
+    try { on = on || localStorage.getItem("dbk-dev") === "1"; } catch {}
+    if (on) document.querySelectorAll("[data-dev]").forEach((el) => { el.hidden = false; });
+  }
+  function mount() { revealDev(); mountFooter(); }
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", mountFooter, { once: true });
+    document.addEventListener("DOMContentLoaded", mount, { once: true });
   } else {
-    mountFooter();
+    mount();
   }
 })();
