@@ -23,6 +23,12 @@ substitutions:
   warmup_seconds: "30"
   stale_seconds: "10"
 
+# DustBoy fork of improv_serial: Kit ID + MQTT password over USB (components/).
+external_components:
+  - source:
+      type: local
+      path: components
+
 packages:
   board: !include packages/board.yaml
   connectivity: !include packages/connectivity.yaml

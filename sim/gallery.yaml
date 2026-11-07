@@ -159,8 +159,17 @@ wifi:
 # error and had the unplanned benefit that Improv reaches AUTHORIZED with no
 # physical button press — which matters on a board whose only button is the
 # strapping pin.
+# DustBoy fork of improv_serial (Kit ID + MQTT password over USB). Path is
+# relative to sim/canvas/, where tools/canvas-firmware.py writes the compiled copies.
+external_components:
+  - source:
+      type: local
+      path: ../../components
+
 improv_serial:
   next_url: "https://dustboy-kit.github.io/esp32c3-pm25-monitor/dashboard/?host={{device_name}}.local"
+  kit_id_text: kit_id
+  mqtt_password_text: mqtt_password
 esp32_improv:
   authorizer: none
   identify_duration: 10s

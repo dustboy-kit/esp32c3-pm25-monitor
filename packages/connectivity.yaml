@@ -46,6 +46,9 @@ time:
 
 improv_serial:
   next_url: "https://dustboy-kit.github.io/esp32c3-pm25-monitor/dashboard/?host={{device_name}}.local"
+  # DustBoy fork (components/improv_serial): the setup page sets these over USB.
+  kit_id_text: kit_id
+  mqtt_password_text: mqtt_password
 
 esp32_improv:
   authorizer: none

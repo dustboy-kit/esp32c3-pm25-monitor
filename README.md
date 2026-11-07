@@ -160,6 +160,22 @@ address, open the embedded on-device UI instead.
 
 ## MQTT (fleet upload to CCDC)
 
+### Kit ID and MQTT password over USB (no network needed)
+
+`components/improv_serial/` is a fork of ESPHome's `improv_serial` that adds two RPC
+commands on the same USB serial link the Wi-Fi credentials use (so the https setup page
+never has to call the kit over http):
+
+| RPC | Payload | Response strings |
+|-----|---------|------------------|
+| `0x10` set | `[len][kit id][len][mqtt password]` (empty string = keep) | `[kit id, ip]` |
+| `0x11` get | none | `[kit id, ip]` |
+
+Framing is Improv Serial's (`IMPROV` + version 1 + type 3 + length + data + checksum +
+newline). `dbk.yaml` and `sim/gallery.yaml` enable it with `kit_id_text` /
+`mqtt_password_text` pointing at the two text entities. Kits flashed before 2026-11-07
+do not have it and need a fresh flash.
+
 - Every image, including the prebuilt ones on the site, carries the broker host
   and user name (`mqtt.laris.co`, user `dbk`, write-only inside `DUSTBOY/DBK/+/#`).
   The **password** and the **Kit ID** are not in the image: they are stored on the
