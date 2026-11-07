@@ -6,18 +6,20 @@
   <title>ตั้งค่า Wi-Fi · DustBoy Kit · Kit4Kids</title>
   <meta name="description" content="ต่อเครื่อง DustBoy Kit เข้า Wi-Fi ผ่านสาย USB แล้วตั้ง Kit ID">
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css">
-  <link rel="stylesheet" href="../styles.css?v=1794045854">
+  <link rel="stylesheet" href="../styles.css?v=1794047206">
   <script type="module" src="https://unpkg.com/improv-wifi-serial-sdk@2.8.1/dist/web/serial-launch-button.js"></script>
   <style>
-    .setup-shell{display:grid;gap:20px}.step{display:grid;grid-template-columns:44px 1fr;gap:14px;padding:18px 0;border-top:1px solid var(--line)}.step:first-of-type{border-top:0}.step-number{display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--accent);border-radius:50%;color:var(--gold);background:var(--panel2);font:600 17px "Mitr",sans-serif}.step h3{margin:0 0 5px;color:var(--text)}.step p{margin:0 0 12px}.wide-action{width:min(380px,100%);min-height:49px}.disabled-step{opacity:.42;pointer-events:none}.setup-status{min-height:24px;color:var(--muted);font-size:12px}.setup-status.ok{color:var(--green)}.setup-status.error{color:var(--danger)}.alias-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:10px;max-width:760px}.alias-grid label{display:grid;gap:5px;color:var(--muted);font-size:12px}.alias-grid input{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--text);font:13px ui-monospace,monospace}.setup-actions{display:flex;gap:10px;flex-wrap:wrap}.facts{display:grid;grid-template-columns:1fr 1fr;gap:12px}.fact{padding:14px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);color:var(--muted);font-size:13px}.fact strong{display:block;margin-bottom:4px;color:var(--text)}.why{padding:14px;border-left:3px solid var(--gold);background:var(--panel2);color:var(--muted);font-size:13px}@media(max-width:650px){.step{grid-template-columns:34px 1fr}.step-number{width:30px;height:30px}.alias-grid,.facts{grid-template-columns:1fr}}
+    .setup-shell{display:grid;gap:20px}.step{display:grid;grid-template-columns:44px 1fr;gap:14px;padding:18px 0;border-top:1px solid var(--line)}.step:first-of-type{border-top:0}.step-number{display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--accent);border-radius:50%;color:var(--gold);background:var(--panel2);font:600 17px "Mitr",sans-serif}.step h3{margin:0 0 5px;color:var(--text)}.step p{margin:0 0 12px}.wide-action{width:min(380px,100%);min-height:49px}.disabled-step{opacity:.42;pointer-events:none}.setup-status{min-height:24px;color:var(--muted);font-size:12px}.setup-status.ok{color:var(--green)}.setup-status.error{color:var(--danger)}.alias-grid{display:grid;grid-template-columns:1fr;gap:12px}.alias-grid label{display:grid;gap:5px;color:var(--muted);font-size:12px}.alias-grid input{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--text);font:13px ui-monospace,monospace}.setup-actions{display:flex;gap:10px;flex-wrap:wrap}.facts{display:grid;grid-template-columns:1fr 1fr;gap:12px}.fact{padding:14px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);color:var(--muted);font-size:13px}.fact strong{display:block;margin-bottom:4px;color:var(--text)}.why{padding:14px;border-left:3px solid var(--gold);background:var(--panel2);color:var(--muted);font-size:13px}@media(max-width:650px){.step{grid-template-columns:34px 1fr}.step-number{width:30px;height:30px}.alias-grid,.facts{grid-template-columns:1fr}}
   .field-hint{display:block;margin-top:4px;color:var(--muted);font-size:12px;line-height:1.4}
 .alias-grid .kit-row{display:flex;flex-wrap:nowrap;align-items:center;gap:6px}
 .alias-grid .kit-prefix{flex:0 0 auto;font:600 14px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--text);white-space:nowrap}
-.alias-grid .kit-row input{flex:0 0 auto;width:7ch;-webkit-appearance:none;text-align:center}
+.alias-grid .kit-row input{flex:1 1 auto;width:100%;-webkit-appearance:none;text-align:left}
 .alias-grid .pass-row{display:flex;flex-wrap:nowrap;align-items:center;gap:6px}
 .alias-grid .pass-row input{flex:1 1 auto;min-width:0}
 .alias-grid .eye{flex:0 0 auto;width:40px;height:40px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--text);font-size:16px;cursor:pointer}
 .alias-grid .eye.on{background:var(--line)}
+
+.alias-grid label{display:block;width:100%}.alias-grid .kit-row,.alias-grid .join{width:100%}
 </style>
   <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
 <script src="../ui-preferences.js?v=1794044901"></script>
