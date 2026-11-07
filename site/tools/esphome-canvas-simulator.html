@@ -182,7 +182,7 @@
     display: grid;
     grid-template-columns: minmax(420px, 1fr) minmax(500px, 1.18fr);
     gap: 18px;
-    align-items: start;
+    align-items: stretch;
   }
   .card {
     overflow: hidden;
@@ -457,7 +457,10 @@
   .app ol, .app ul { list-style: revert; padding-left: 1.25rem; }
   .app p { margin: .5rem 0; }
   svg { display: inline-block; }
-  #source { min-height: 360px; }
+  /* Cards that share a row get the same height; the YAML box fills its card. */
+  .layout > .card { display: flex; flex-direction: column; min-height: 0; }
+  .layout > .card > *:last-child { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; }
+  #source { flex: 1 1 auto; min-height: 360px; height: auto; }
   .gallery-browser-head { flex-wrap: wrap; gap: 8px 14px; }
   @media (max-width: 620px) { .gallery-browser-head span { flex-basis: 100%; } }
   #engineBadge { display: none !important; }
