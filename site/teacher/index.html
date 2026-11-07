@@ -39,7 +39,7 @@
         <ul class="space-y-1">
         <li class="flex gap-3"><i data-lucide="check" class="w-5 h-5 text-primary shrink-0 mt-1"></i><span>คอมพิวเตอร์ Windows / Mac / Linux ที่มี <strong>Chrome หรือ Edge</strong> <span class="opacity-60 text-sm">(iPad, มือถือ, Safari, Firefox ใช้แฟลชไม่ได้)</span></span></li>
         <li class="flex gap-3"><i data-lucide="check" class="w-5 h-5 text-primary shrink-0 mt-1"></i><span>1 เครื่องต่อนักเรียน 2–4 คน (แฟลช 1 ชุดประมาณ 2 นาที)</span></li>
-        <li class="flex gap-3"><i data-lucide="check" class="w-5 h-5 text-primary shrink-0 mt-1"></i><span>คอมพิวเตอร์ต่อ Wi-Fi วงเดียวกับที่เครื่องจะใช้ <span class="opacity-60 text-sm">(<a class="link link-primary" href="../wifi/">ขั้นตั้ง Kit ID</a> คุยกับเครื่องผ่าน Wi-Fi)</span></span></li>
+        <li class="flex gap-3"><i data-lucide="check" class="w-5 h-5 text-primary shrink-0 mt-1"></i><span>ถ้าจะเปิดดูค่าฝุ่นสดจากคอมพิวเตอร์ คอมพิวเตอร์ต้องอยู่ Wi-Fi วงเดียวกับเครื่อง <span class="opacity-60 text-sm">(ขั้นตั้ง Kit ID ส่งผ่านสาย USB ไม่ต้องใช้ Wi-Fi)</span></span></li>
         <li class="flex gap-3"><i data-lucide="check" class="w-5 h-5 text-primary shrink-0 mt-1"></i><span>เปิด <a class="link link-primary" href="../">หน้าแรก</a> ลองแฟลชชุดของครูเอง 1 ชุดก่อนวันจริง</span></li>
         </ul>
       </div>
@@ -51,7 +51,6 @@
         <ul class="space-y-1">
         <li class="flex gap-3"><i data-lucide="check" class="w-5 h-5 text-primary shrink-0 mt-1"></i><span>ชื่อ Wi-Fi (SSID) และรหัสผ่าน เขียนบนกระดาน <span class="opacity-60 text-sm">(ต้องเป็น <strong>2.4 GHz</strong> เครื่องมองไม่เห็นวง 5 GHz)</span></span></li>
         <li class="flex gap-3"><i data-lucide="check" class="w-5 h-5 text-primary shrink-0 mt-1"></i><span>วงที่ใส่รหัสแล้วใช้ได้เลย <span class="opacity-60 text-sm">(วงที่ล็อกอินผ่านหน้าเว็บ หรือใช้ชื่อผู้ใช้ + รหัส / WPA2-Enterprise ใช้ไม่ได้)</span></span></li>
-        <li class="flex gap-3"><i data-lucide="check" class="w-5 h-5 text-primary shrink-0 mt-1"></i><span>เราเตอร์ไม่บล็อกอุปกรณ์คุยกันเอง (AP isolation ปิด) <span class="opacity-60 text-sm">(ถ้าเปิด คอมพิวเตอร์จะหาเครื่องไม่เจอตอนตั้ง Kit ID)</span></span></li>
         <li class="flex gap-3"><i data-lucide="check" class="w-5 h-5 text-primary shrink-0 mt-1"></i><span>ออกอินเทอร์เน็ตได้ตามปกติ (เครื่องส่งค่าขึ้นระบบเอง)</span></li>
         <li class="flex gap-3"><i data-lucide="check" class="w-5 h-5 text-primary shrink-0 mt-1"></i><span>ทางสำรอง: hotspot จากมือถือ 1 เครื่อง (ตั้งเป็น 2.4 GHz) ให้ทั้งห้องใช้</span></li>
         </ul>
@@ -94,7 +93,7 @@
               <tr><td>กดแฟลชแล้วไม่เห็นพอร์ต</td><td>เปลี่ยนสาย USB ก่อน (สายชาร์จอย่างเดียว) แล้วลองพอร์ต USB อื่นของคอมพิวเตอร์</td></tr>
               <tr><td>แฟลชค้าง / ขึ้น error</td><td>เปลี่ยนสาย/พอร์ต USB แล้วแฟลชใหม่ ถ้ายังไม่ได้ใช้หน้า <a class="link link-primary" href="../wifi/recovery/">กู้เครื่อง</a></td></tr>
               <tr><td>Wi-Fi ไม่ขึ้นในรายการ</td><td>เป็นวง 5 GHz หรืออยู่ไกล ใช้ hotspot มือถือแทน</td></tr>
-              <tr><td>จอโชว์ค่าแต่ <a class="link link-primary" href="../dashboard/">Dashboard</a> หาเครื่องไม่เจอ</td><td>คอมพิวเตอร์กับเครื่องคนละวง Wi-Fi หรือเราเตอร์เปิด AP isolation</td></tr>
+              <tr><td>จอโชว์ค่าแต่ <a class="link link-primary" href="../dashboard/">Dashboard</a> หาเครื่องไม่เจอ</td><td>คอมพิวเตอร์กับเครื่องอยู่คนละวง Wi-Fi หรือเราเตอร์ของโรงเรียนไม่ให้อุปกรณ์คุยกันเอง</td></tr>
               <tr><td>จอขึ้น "---" หรือค่าไม่เปลี่ยน</td><td>สายเซนเซอร์หลวม ถอดแล้วเสียบใหม่ให้แน่น</td></tr>
             </tbody>
           </table>
