@@ -21,7 +21,7 @@ export const boardLesson = {
     {from:'sensor',fromPin:'TX',boardPin:'GPIO6',to:'board',color:'#f97316'}, {from:'sensor',fromPin:'RX',boardPin:'GPIO7',to:'board',color:'#2563eb'},
     {from:'sensor',fromPin:'SET',boardPin:'GPIO5',to:'board',color:'#16a34a'}, {from:'sensor',fromPin:'RESET',boardPin:'GPIO8',to:'board',color:'#9333ea'},
     {from:'oled',fromPin:'3V3',boardPin:'3V3',to:'board',color:'#ef4444'}, {from:'oled',fromPin:'GND',boardPin:'GND',to:'board',color:'#111827'}, {from:'oled',fromPin:'SDA',boardPin:'GPIO9',to:'board',color:'#a855f7'}, {from:'oled',fromPin:'SCL',boardPin:'GPIO10',to:'board',color:'#0284c7'},
-    {from:'led',fromPin:'DATA',boardPin:'GPIO2',to:'board',color:'#eab308'},
+    {from:'led',fromPin:'5V',boardPin:'5V',to:'board',color:'#ef4444'}, {from:'led',fromPin:'GND',boardPin:'GND',to:'board',color:'#111827'}, {from:'led',fromPin:'DATA',boardPin:'GPIO2',to:'board',color:'#eab308'},
   ],
   sensor: {uart:'UART 9600 8N1', warmupSeconds:30, noDataSeconds:10},
   colors: [{max:25,color:'#16a34a',label:'ดี'}, {max:50,color:'#eab308',label:'เริ่มสูง'}, {max:150,color:'#dc2626',label:'สูง'}],
