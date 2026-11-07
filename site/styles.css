@@ -2,6 +2,11 @@
    this file adds the Thai font and shims for the older pages' class names
    (wifi, dashboard, recovery) so they match without rewriting their JS. */
 @import url("https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&display=swap");
+/* Tailwind-preflight pieces daisyUI relies on (the runtime is gone): borders default to solid 0, so .input-bordered, .card border, .btn-outline etc. show up. */
+*,::before,::after{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}
+img,svg,canvas,video{display:block;vertical-align:middle}
+button,input,select,textarea{font-family:inherit;font-size:100%;margin:0;color:inherit}
+button{background:transparent;cursor:pointer}
 :root{--line:#e5e7eb;--muted:#6b7280;--text:#1f2937;--panel:#fff;--panel2:#f9fafb;--accent:#3b82f6;--gold:#3b82f6;--cyan:#3b82f6;--danger:#ef4444;--green:#16a34a}
 html{font-family:"Mitr",ui-sans-serif,system-ui,sans-serif}
 body{font-family:"Mitr",ui-sans-serif,system-ui,sans-serif;font-size:16px;line-height:1.6}
