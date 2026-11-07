@@ -4,66 +4,99 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#040818">
-  <title>DustBoy OLED Studio</title>
+  <title>DustBoy Kit</title>
+  <meta name="description" content="ติดตั้งเครื่องวัดฝุ่น DustBoy Kit ใน 3 ขั้น: แฟลชผ่าน USB, ต่อ Wi-Fi, ใส่ Kit ID">
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./theme.css">
   <script src="./ui-preferences.js"></script>
   <script type="module" src="https://unpkg.com/esp-web-tools@10.2.1/dist/web/install-button.js?module"></script>
+  <style>
+    .steps{display:grid;gap:14px;margin-top:6px}
+    .step{display:grid;grid-template-columns:44px 1fr;gap:14px;align-items:start;padding:18px 18px 18px 14px;border:1px solid var(--line);border-radius:16px;background:var(--panel2)}
+    .step-number{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--gold);color:#1a1200;font-weight:800;font-size:20px}
+    .step h3{margin:2px 0 6px;font-size:19px}
+    .step p{margin:0 0 12px;color:var(--muted);font-size:14px;line-height:1.55}
+    .step .action{margin-right:8px}
+    .step-note{display:block;margin-top:10px;color:var(--muted);font-size:13px}
+    .big-action{font-size:17px;padding:14px 22px}
+    .dev{margin-top:4px}
+    .dev summary{cursor:pointer;color:var(--muted);font-size:14px;padding:8px 0}
+    .dev ul{list-style:none;padding:0;margin:8px 0 0;display:flex;flex-wrap:wrap;gap:8px 18px}
+    .dev li a{color:var(--cyan);font-size:14px}
+    @media (max-width:520px){.step{grid-template-columns:36px 1fr;gap:10px;padding:14px}.step-number{width:36px;height:36px;font-size:17px}}
+  </style>
 </head>
 <body>
   <main class="app">
     <header class="hero">
       <div>
-        <p class="eyebrow" data-i18n="eyebrow">วงจรแห่งดวงดาว · DUSTBOY KIT · ESP32-C3</p>
-        <h1><em>DustBoy</em> OLED Studio</h1>
-        <p class="lede" data-i18n="lede">ดูตัวอย่างหน้าจอ 128×32 ต้นฉบับ แล้วติดตั้งเฟิร์มแวร์ ESPHome ที่คอมไพล์ในเครื่องผ่านเบราว์เซอร์ Chromium ได้โดยตรง</p>
+        <p class="eyebrow" data-i18n="eyebrow">DUSTBOY KIT · ESP32-C3 · PMS7003</p>
+        <h1><em>DustBoy</em> Kit</h1>
+        <p class="lede" data-i18n="lede">ติดตั้งเครื่องวัดฝุ่น PM2.5 ของห้องเรียนใน 3 ขั้น ใช้คอมที่มี Chrome หรือ Edge กับสาย USB เส้นเดียว</p>
       </div>
-      <div class="hero-tools"><div class="preference-bar"><button class="theme-toggle" type="button" data-theme-toggle><span aria-hidden="true" data-theme-icon>◐</span></button><div class="lang-switch" aria-label="Language"><button type="button" data-lang="th">ไทย</button><button type="button" data-lang="en">EN</button></div></div><span class="badge" data-i18n="badge">30 แบบต้นฉบับ · 3 เฟิร์มแวร์</span></div>
+      <div class="hero-tools"><div class="preference-bar"><button class="theme-toggle" type="button" data-theme-toggle><span aria-hidden="true" data-theme-icon>◐</span></button><div class="lang-switch" aria-label="Language"><button type="button" data-lang="th">ไทย</button><button type="button" data-lang="en">EN</button></div></div></div>
     </header>
 
-    <section class="feature simulator-card">
-      <div class="section-head"><div><span class="kicker" data-i18n="labKicker">✦ ห้องทดลองออกแบบ</span><h2>ESPHome Canvas Simulator</h2></div><span class="status">128×32 · 20 FPS</span></div>
-      <p data-i18n="labBody">สำรวจหน้าจอ DBK ทั้ง 30 แบบ แก้ไข lambda แบบ ESPHome <code>display:</code> และเรนเดอร์ผ่านบัฟเฟอร์ OLED ขาวดำและเอนจินฟอนต์เดียวกับแกลเลอรี</p>
-      <a class="action secondary" href="./tools/esphome-canvas-simulator.html" data-i18n="openSimulator">เปิด OLED Canvas Simulator ↗</a>
+    <section class="feature">
+      <div class="section-head"><div><span class="kicker" data-i18n="kicker">ทำตามลำดับ</span><h2 data-i18n="title">3 ขั้น จากกล่องถึงค่าฝุ่นบนจอ</h2></div><span class="status ready" data-i18n="ready">พร้อมใช้</span></div>
+      <div class="steps">
+        <div class="step">
+          <span class="step-number">1</span>
+          <div>
+            <h3 data-i18n="s1Title">เสียบ USB แล้วแฟลชเฟิร์มแวร์</h3>
+            <p data-i18n="s1Body">เสียบบอร์ดกับคอม กดปุ่ม แล้วเลือกพอร์ตที่เด้งขึ้นมา ใช้เวลาประมาณ 1 นาที บอร์ดทุกเครื่องใช้ไฟล์เดียวกัน</p>
+            <esp-web-install-button manifest="./manifests/dbk.json"><button class="action big-action" slot="activate" data-i18n="flash">⚡ แฟลช DustBoy Kit</button></esp-web-install-button>
+            <span class="step-note"><span data-i18n="s1Note">อยากได้หน้าจอลายอื่น (33 ลาย):</span> <a class="text-link" href="./tools/esphome-canvas-simulator.html" data-i18n="s1Link">เลือกลายแล้วแฟลชจากหน้า Canvas ↗</a></span>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <div>
+            <h3 data-i18n="s2Title">ต่อ Wi-Fi</h3>
+            <p data-i18n="s2Body">ถอดสายแล้วเสียบใหม่ 1 ครั้ง เปิดหน้าตั้งค่า เลือกชื่อ Wi-Fi ของโรงเรียนแล้วใส่รหัส บอร์ดจะบอก IP กลับมาเมื่อต่อได้</p>
+            <a class="action secondary" href="./wifi/" data-i18n="s2Link">📶 เปิดหน้าตั้งค่า Wi-Fi</a>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <div>
+            <h3 data-i18n="s3Title">ใส่ Kit ID และรหัสจากครู</h3>
+            <p data-i18n="s3Body">อยู่ในหน้าเดียวกับขั้น 2 ใส่เลขเครื่อง DBK-001, DBK-002 … ชื่อเล่นที่จะโชว์บนจอ และรหัส MQTT ที่ครูให้ เครื่องจะเริ่มส่งค่าฝุ่นขึ้นระบบเอง</p>
+            <a class="text-link" href="./dashboard/" data-i18n="s3Link">ดูค่าฝุ่นสดจากเครื่อง →</a>
+          </div>
+        </div>
+      </div>
+      <div class="notice" style="margin-top:16px" data-i18n="usbNotice">ใช้ Chrome หรือ Edge บนคอม (มือถือใช้ไม่ได้) สาย USB ต้องเป็นสายข้อมูล ไม่ใช่สายชาร์จอย่างเดียว</div>
     </section>
 
-    <div class="flash-grid">
-      <section class="feature flash-card">
-        <div class="section-head"><div><span class="kicker" data-i18n="monitorKicker">01 · เครื่องวัด</span><h2>DustBoy PM2.5</h2></div><span class="status ready" data-i18n="ready">พร้อมใช้</span></div>
-        <p data-i18n="monitorBody">เฟิร์มแวร์เครื่องวัด ESP32-C3 สำหรับ PMS7003 และหน้าจอ SSD1306 ขนาด 128×32</p>
-        <div class="notice" data-i18n="usbNotice">Chrome หรือ Edge · HTTPS · สาย USB ที่ส่งข้อมูลได้ · ใช้กับ ESP32-C3 ที่รองรับเท่านั้น</div>
-        <esp-web-install-button manifest="./manifests/dbk.json"><button class="action" slot="activate" data-i18n="flashDbk">เชื่อมต่อและแฟลช DBK</button></esp-web-install-button>
-        <p class="note"><esp-web-install-button manifest="./manifests/dbk-tx11.json"><button class="action secondary" slot="activate" data-i18n="flashTx11">ทดสอบ Wi-Fi 11 dBm</button></esp-web-install-button></p>
-      </section>
+    <details class="dev">
+      <summary data-i18n="devTitle">สำหรับนักพัฒนา</summary>
+      <ul>
+        <li><a href="./tools/esphome-canvas-simulator.html" data-i18n="devSim">Canvas Simulator (ออกแบบลายจอ 128×32)</a></li>
+        <li><a href="./ble/" data-i18n="devBle">DBK Bluetooth (รุ่นไม่ใช้ Wi-Fi)</a></li>
+        <li><a href="./dashboard/" data-i18n="devDash">Dashboard / JSON-RPC</a></li>
+        <li><a href="./wifi/recovery/" data-i18n="devRecovery">กู้บอร์ดที่แฟลชไม่ขึ้น</a></li>
+        <li><a href="https://github.com/dustboy-kit/esp32c3-pm25-monitor" data-i18n="devSource">ซอร์สบน GitHub</a></li>
+      </ul>
+    </details>
 
-      <section class="feature flash-card pomodoro">
-        <div class="section-head"><div><span class="kicker" data-i18n="pomoKicker">02 · ตัวจับเวลาโฟกัส</span><h2>Pomodoro Dial</h2></div><span class="status local" data-i18n="localBuild">คอมไพล์ในเครื่อง</span></div>
-        <p data-i18n="pomoBody">หน้าปัดโฟกัส 25 นาที / พัก 5 นาที ที่คอมไพล์ในเครื่องและแสดงใน Canvas Simulator</p>
-        <div class="artifact"><strong>ESPHome 2026.6.5</strong><span data-i18n="artifact">factory image · 1.34 MiB · ESP32-C3</span></div>
-        <esp-web-install-button manifest="./manifests/pomodoro.json"><button class="action gold" slot="activate" data-i18n="flashPomo">แฟลช Pomodoro Dial</button></esp-web-install-button>
-      </section>
-      <section class="feature flash-card ble">
-        <div class="section-head"><div><span class="kicker" data-i18n="bleKicker">03 · Bluetooth</span><h2>DBK Bluetooth</h2></div><span class="status local" data-i18n="localBuild">คอมไพล์ในเครื่อง</span></div>
-        <p data-i18n="bleBody">เวอร์ชันไม่ใช้ Wi-Fi: บอร์ดส่งค่า PM1 / PM2.5 / PM10 ผ่าน Bluetooth LE อ่านจาก Chrome บนมือถือหรือคอมได้ทันที</p>
-        <div class="notice" data-i18n="usbNotice">Chrome หรือ Edge · HTTPS · สาย USB ที่ส่งข้อมูลได้ · ใช้กับ ESP32-C3 ที่รองรับเท่านั้น</div>
-        <esp-web-install-button manifest="./manifests/dbk-ble.json"><button class="action" slot="activate" data-i18n="flashBle">แฟลช DBK Bluetooth</button></esp-web-install-button>
-        <p><a class="text-link" href="./ble/" data-i18n="bleLink">เปิดหน้า DBK Bluetooth →</a> · <a class="text-link" href="./ble/#ota" data-i18n="bleOtaLink">อัปเดตเฟิร์มแวร์ผ่าน Bluetooth →</a></p>
-      </section>
-    </div>
-
-    <section class="feature aftercare">
-      <div class="section-head"><div><span class="kicker" data-i18n="afterKicker">✦ หลังติดตั้ง</span><h2 data-i18n="wifiTitle">เชื่อมต่อ Wi-Fi</h2></div></div>
-      <p data-i18n="wifiBody">ถอดและเสียบบอร์ดใหม่หลังแฟลช ตั้ง Wi-Fi ผ่าน Improv Serial แล้วดู telemetry จากหน้าเว็บบนบอร์ดหรือ Dashboard</p>
-      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><a class="action secondary" href="./wifi/" data-i18n="wifiLink">📶 ตั้งค่า Wi-Fi ผ่าน USB</a><a class="text-link" href="./dashboard/" data-i18n="telemetryLink">เปิด Telemetry Dashboard →</a></div>
-    </section>
-
-    <footer><span data-i18n="footer">DustBoy Kit · คลัง Starry Circuit</span><nav><a href="https://github.com/dustboy-kit/esp32c3-pm25-monitor" data-i18n="source">ซอร์สบน GitHub</a><a href="https://the-oracle-keeps-the-human-human.github.io/kru32-oracle/" data-i18n="kru32">อ้างอิง KRU32</a></nav></footer>
+    <footer><span data-i18n="footer">DustBoy Kit · Kit4Kids</span><nav><a href="https://github.com/dustboy-kit/esp32c3-pm25-monitor">GitHub</a></nav></footer>
   </main>
 <script>
 (function(){
   const copy={
-    th:{eyebrow:'วงจรแห่งดวงดาว · DUSTBOY KIT · ESP32-C3',lede:'ดูตัวอย่างหน้าจอ 128×32 ต้นฉบับ แล้วติดตั้งเฟิร์มแวร์ ESPHome ที่คอมไพล์ในเครื่องผ่านเบราว์เซอร์ Chromium ได้โดยตรง',badge:'30 แบบต้นฉบับ · 3 เฟิร์มแวร์',labKicker:'✦ ห้องทดลองออกแบบ',labBody:'สำรวจหน้าจอ DBK ทั้ง 30 แบบ แก้ไข lambda แบบ ESPHome display: และเรนเดอร์ผ่านบัฟเฟอร์ OLED ขาวดำและเอนจินฟอนต์เดียวกับแกลเลอรี',openSimulator:'เปิด OLED Canvas Simulator ↗',monitorKicker:'01 · เครื่องวัด',ready:'พร้อมใช้',monitorBody:'เฟิร์มแวร์เครื่องวัด ESP32-C3 สำหรับ PMS7003 และหน้าจอ SSD1306 ขนาด 128×32',usbNotice:'Chrome หรือ Edge · HTTPS · สาย USB ที่ส่งข้อมูลได้ · ใช้กับ ESP32-C3 ที่รองรับเท่านั้น',flashDbk:'เชื่อมต่อและแฟลช DBK',pomoKicker:'02 · ตัวจับเวลาโฟกัส',localBuild:'คอมไพล์ในเครื่อง',pomoBody:'หน้าปัดโฟกัส 25 นาที / พัก 5 นาที ที่คอมไพล์ในเครื่องและแสดงใน Canvas Simulator',artifact:'factory image · 1.34 MiB · ESP32-C3',flashPomo:'แฟลช Pomodoro Dial',afterKicker:'✦ หลังติดตั้ง',wifiTitle:'เชื่อมต่อ Wi-Fi',wifiBody:'ถอดและเสียบบอร์ดใหม่หลังแฟลช ตั้ง Wi-Fi ผ่าน Improv Serial แล้วดู telemetry จากหน้าเว็บบนบอร์ดหรือ Dashboard',wifiLink:'📶 ตั้งค่า Wi-Fi ผ่าน USB',telemetryLink:'เปิด Telemetry Dashboard →',footer:'DustBoy Kit · คลัง Starry Circuit',source:'ซอร์สบน GitHub',kru32:'อ้างอิง KRU32',bleKicker:'03 · Bluetooth',bleBody:'เวอร์ชันไม่ใช้ Wi-Fi: บอร์ดส่งค่า PM1 / PM2.5 / PM10 ผ่าน Bluetooth LE อ่านจาก Chrome บนมือถือหรือคอมได้ทันที',flashBle:'แฟลช DBK Bluetooth',bleLink:'เปิดหน้า DBK Bluetooth →',flashTx11:'ทดสอบ Wi-Fi 11 dBm'},
-    en:{eyebrow:'THE STARRY CIRCUIT · DUSTBOY KIT · ESP32-C3',lede:'Preview the original 128×32 display collection, then install a locally compiled ESPHome image directly from a Chromium browser.',badge:'30 originals · 3 flash images',labKicker:'✦ Design laboratory',labBody:'Explore all thirty DBK screens, edit the ESPHome-style display: lambda, and render it through the same one-bit OLED buffer and glyph engine used by the gallery.',openSimulator:'Open OLED Canvas Simulator ↗',monitorKicker:'01 · Monitor',ready:'ready',monitorBody:'The complete ESP32-C3 monitor firmware for PMS7003 and the SSD1306 128×32 display.',usbNotice:'Chrome or Edge · HTTPS · data-capable USB cable · supported ESP32-C3 only',flashDbk:'Connect & flash DBK',pomoKicker:'02 · Focus timer',localBuild:'local build',pomoBody:'The locally compiled 25-minute focus / 5-minute break dial shown in the Canvas Simulator.',artifact:'factory image · 1.34 MiB · ESP32-C3',flashPomo:'Flash Pomodoro Dial',afterKicker:'✦ After installation',wifiTitle:'Connect Wi-Fi',wifiBody:'Reconnect after flashing, provision Wi-Fi through Improv Serial, then view telemetry in the on-device UI or Dashboard.',wifiLink:'📶 Set up Wi-Fi over USB',telemetryLink:'Open Telemetry Dashboard →',footer:'DustBoy Kit · Starry Circuit archive',source:'Source on GitHub',kru32:'KRU32 reference',bleKicker:'03 · Bluetooth',bleBody:'No Wi-Fi version: the board publishes PM1 / PM2.5 / PM10 over Bluetooth LE, readable from Chrome on a phone or laptop.',flashBle:'Flash DBK Bluetooth',bleLink:'Open the DBK Bluetooth page →',flashTx11:'Test Wi-Fi at 11 dBm'}
+    th:{eyebrow:'DUSTBOY KIT · ESP32-C3 · PMS7003',lede:'ติดตั้งเครื่องวัดฝุ่น PM2.5 ของห้องเรียนใน 3 ขั้น ใช้คอมที่มี Chrome หรือ Edge กับสาย USB เส้นเดียว',kicker:'ทำตามลำดับ',title:'3 ขั้น จากกล่องถึงค่าฝุ่นบนจอ',ready:'พร้อมใช้',
+      s1Title:'เสียบ USB แล้วแฟลชเฟิร์มแวร์',s1Body:'เสียบบอร์ดกับคอม กดปุ่ม แล้วเลือกพอร์ตที่เด้งขึ้นมา ใช้เวลาประมาณ 1 นาที บอร์ดทุกเครื่องใช้ไฟล์เดียวกัน',flash:'⚡ แฟลช DustBoy Kit',s1Note:'อยากได้หน้าจอลายอื่น (33 ลาย):',s1Link:'เลือกลายแล้วแฟลชจากหน้า Canvas ↗',
+      s2Title:'ต่อ Wi-Fi',s2Body:'ถอดสายแล้วเสียบใหม่ 1 ครั้ง เปิดหน้าตั้งค่า เลือกชื่อ Wi-Fi ของโรงเรียนแล้วใส่รหัส บอร์ดจะบอก IP กลับมาเมื่อต่อได้',s2Link:'📶 เปิดหน้าตั้งค่า Wi-Fi',
+      s3Title:'ใส่ Kit ID และรหัสจากครู',s3Body:'อยู่ในหน้าเดียวกับขั้น 2 ใส่เลขเครื่อง DBK-001, DBK-002 … ชื่อเล่นที่จะโชว์บนจอ และรหัส MQTT ที่ครูให้ เครื่องจะเริ่มส่งค่าฝุ่นขึ้นระบบเอง',s3Link:'ดูค่าฝุ่นสดจากเครื่อง →',
+      usbNotice:'ใช้ Chrome หรือ Edge บนคอม (มือถือใช้ไม่ได้) สาย USB ต้องเป็นสายข้อมูล ไม่ใช่สายชาร์จอย่างเดียว',
+      devTitle:'สำหรับนักพัฒนา',devSim:'Canvas Simulator (ออกแบบลายจอ 128×32)',devBle:'DBK Bluetooth (รุ่นไม่ใช้ Wi-Fi)',devDash:'Dashboard / JSON-RPC',devRecovery:'กู้บอร์ดที่แฟลชไม่ขึ้น',devSource:'ซอร์สบน GitHub',footer:'DustBoy Kit · Kit4Kids'},
+    en:{eyebrow:'DUSTBOY KIT · ESP32-C3 · PMS7003',lede:'Set up the classroom PM2.5 monitor in 3 steps with a computer running Chrome or Edge and one USB cable.',kicker:'In order',title:'3 steps from the box to dust on the screen',ready:'Ready',
+      s1Title:'Plug in USB and flash the firmware',s1Body:'Connect the board, press the button and pick the port that appears. About one minute. Every board uses the same image.',flash:'⚡ Flash DustBoy Kit',s1Note:'Want another screen design (33 designs)?',s1Link:'Pick one and flash from the Canvas page ↗',
+      s2Title:'Join Wi-Fi',s2Body:'Unplug and plug the board back in once, open the setup page, choose the school Wi-Fi and enter its password. The board reports its IP when connected.',s2Link:'📶 Open Wi-Fi setup',
+      s3Title:'Enter the Kit ID and the teacher’s password',s3Body:'Same page as step 2. Type the kit number (DBK-001, DBK-002 …), the nickname shown on the screen and the MQTT password from the teacher. The kit then uploads readings by itself.',s3Link:'See live readings from the kit →',
+      usbNotice:'Chrome or Edge on a computer (not a phone). The USB cable must carry data, not charge only.',
+      devTitle:'For developers',devSim:'Canvas Simulator (design the 128×32 screen)',devBle:'DBK Bluetooth (no Wi-Fi variant)',devDash:'Dashboard / JSON-RPC',devRecovery:'Recover a board that will not flash',devSource:'Source on GitHub',footer:'DustBoy Kit · Kit4Kids'}
   };
   let currentLang='th';
   window.t=function(key){return copy[currentLang][key]||copy.th[key]||key;};
