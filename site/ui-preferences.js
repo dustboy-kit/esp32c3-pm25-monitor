@@ -20,7 +20,7 @@
     const base = siteBase();
     const style = document.createElement("style");
     style.textContent =
-      "#laris-footer{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;margin:48px auto 24px;padding:0 20px;color:#6b7280;font:13px/1.4 system-ui,-apple-system,'Segoe UI',sans-serif}" +
+      "#laris-footer{border:0;box-shadow:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;margin:48px auto 24px;padding:0 20px;color:#6b7280;font:13px/1.4 system-ui,-apple-system,'Segoe UI',sans-serif}" +
       "#laris-footer img{height:26px;width:auto;display:block;opacity:.9}" +
       "#laris-footer .copy{color:#6b7280}" +
       "#laris-footer .build-badge{color:#9ca3af;font:11px/1.4 ui-monospace,monospace;text-decoration:none}";

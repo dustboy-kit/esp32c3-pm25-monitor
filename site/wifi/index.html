@@ -6,7 +6,7 @@
   <title>ตั้งค่า Wi-Fi · DustBoy Kit · Kit4Kids</title>
   <meta name="description" content="ต่อเครื่อง DustBoy Kit เข้า Wi-Fi ผ่านสาย USB แล้วตั้งเลขเครื่อง">
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css">
-  <link rel="stylesheet" href="../styles.css?v=1794043742">
+  <link rel="stylesheet" href="../styles.css?v=1794044901">
   <script type="module" src="https://unpkg.com/improv-wifi-serial-sdk@2.8.1/dist/web/serial-launch-button.js"></script>
   <style>
     .setup-shell{display:grid;gap:20px}.step{display:grid;grid-template-columns:44px 1fr;gap:14px;padding:18px 0;border-top:1px solid var(--line)}.step:first-of-type{border-top:0}.step-number{display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--accent);border-radius:50%;color:var(--gold);background:var(--panel2);font:600 17px "Mitr",sans-serif}.step h3{margin:0 0 5px;color:var(--text)}.step p{margin:0 0 12px}.wide-action{width:min(380px,100%);min-height:49px}.disabled-step{opacity:.42;pointer-events:none}.setup-status{min-height:24px;color:var(--muted);font-size:12px}.setup-status.ok{color:var(--green)}.setup-status.error{color:var(--danger)}.alias-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:10px;max-width:760px}.alias-grid label{display:grid;gap:5px;color:var(--muted);font-size:12px}.alias-grid input{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--text);font:13px ui-monospace,monospace}.setup-actions{display:flex;gap:10px;flex-wrap:wrap}.facts{display:grid;grid-template-columns:1fr 1fr;gap:12px}.fact{padding:14px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);color:var(--muted);font-size:13px}.fact strong{display:block;margin-bottom:4px;color:var(--text)}.why{padding:14px;border-left:3px solid var(--gold);background:var(--panel2);color:var(--muted);font-size:13px}@media(max-width:650px){.step{grid-template-columns:34px 1fr}.step-number{width:30px;height:30px}.alias-grid,.facts{grid-template-columns:1fr}}
@@ -20,7 +20,7 @@
 .alias-grid .eye.on{background:var(--line)}
 </style>
   <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
-<script src="../ui-preferences.js?v=1794029502"></script>
+<script src="../ui-preferences.js?v=1794044901"></script>
 </head>
 <body>
 <main class="app setup-shell">
@@ -42,7 +42,6 @@
   </section>
 
   <section class="feature" data-dev hidden><div class="section-head"><div><span class="kicker" data-i18n="fallbackKicker">ทางสำรอง</span><h2 data-i18n="fallbackTitle">Captive portal และหน้าเว็บบนเครื่อง</h2></div></div><div class="facts"><div class="fact"><strong data-i18n="fallbackAp">Fallback AP</strong><span data-i18n="fallbackBody">หากไม่มี Wi‑Fi เดิม ให้เชื่อมต่อ DBK หรือ DBK‑Canvas Setup แล้วเปิด 192.168.4.1 รหัสผ่านของ DBK ปกติคือ 12345678</span></div><div class="fact"><strong data-i18n="deviceUiTitle">หน้าเว็บในเครื่อง ในตัว</strong><span data-i18n="deviceUiBody">เมื่อออนไลน์ เปิด http://dbk-a1b2c3.local/ เพื่อดู sensor, diagnostics, alias และคำสั่ง restart โดยไม่ต้องผ่าน cloud</span></div></div></section>
-  <footer><span data-i18n="footer">DustBoy Kit · Wi‑Fi credentials อยู่บนเครื่องเท่านั้น</span><nav><a href="../"><i data-lucide="arrow-left" class="w-4 h-4"></i><span data-i18n="back">หน้าแรก</span></a><a href="../dashboard/"><i data-lucide="activity" class="w-4 h-4"></i><span data-i18n="dashboard">Telemetry</span></a></nav></footer>
 </main>
 
 <script type="module">
