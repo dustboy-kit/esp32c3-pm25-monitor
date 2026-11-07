@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Dashboard · DustBoy Kit · Kit4Kids</title>
-  <meta name="description" content="หน้าเว็บอ่าน telemetry และเรียก ESPHome Web API ผ่าน JSON-RPC 2.0 adapter">
+  <meta name="description" content="ดูค่าฝุ่นสดจากเครื่อง DustBoy Kit ใน Wi-Fi วงเดียวกัน">
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="../styles.css?v=1794029502">
@@ -19,28 +19,28 @@
   <nav class="flex gap-2 mb-4"><a class="btn btn-sm btn-ghost back-home" href="../"><i data-lucide="arrow-left" class="w-4 h-4"></i>หน้าแรก</a><a class="btn btn-sm btn-ghost" href="../wifi/"><i data-lucide="wifi" class="w-4 h-4"></i>ตั้งค่า Wi-Fi</a></nav>
 <header class="hero">
     <div>
-      <p class="eyebrow" data-i18n="eyebrow">วงจรแห่งดวงดาว · ESPHOME WEB API</p>
-      <h1>DustBoy <em>Telemetry</em></h1>
-      <p class="lede" data-i18n="lede">อ่าน PM1, PM2.5, PM10 และข้อมูลวินิจฉัยจากบอร์ดโดยตรง พร้อม JSON‑RPC 2.0 adapter ในเบราว์เซอร์</p>
+      <p class="eyebrow" data-i18n="eyebrow">DustBoy Kit · ดูค่าสด</p>
+      <h1>ค่าฝุ่น<em>สด</em></h1>
+      <p class="lede" data-i18n="lede">ใส่ที่อยู่ของเครื่อง (จากหน้าตั้งค่า Wi-Fi) แล้วดูค่า PM1 / PM2.5 / PM10 สด ๆ</p>
     </div>
-    <div class="hero-tools"><div class="join" aria-label="Language"><button type="button" class="btn btn-sm join-item" data-lang="th">ไทย</button><button type="button" class="btn btn-sm join-item" data-lang="en">EN</button></div><span class="badge">REST JSON · RPC</span></div>
+    <div class="hero-tools"><div class="join" aria-label="Language"><button type="button" class="btn btn-sm join-item" data-lang="th">ไทย</button><button type="button" class="btn btn-sm join-item" data-lang="en">EN</button></div></div>
   </header>
 
   <section class="feature">
-    <div class="section-head"><div><span class="kicker" data-i18n="connectKicker">01 · เชื่อมต่อในเครือข่ายเดียวกัน</span><h2 data-i18n="connectTitle">เปิดลิงก์ตรงถึง ESPHome</h2></div><span class="status" id="liveBadge">ยังไม่เชื่อมต่อ</span></div>
-    <p data-i18n="connectBody">ใส่ hostname ที่ Improv แสดงหลังตั้งค่า Wi‑Fi เช่น dbk-a1b2c3.local หรือ IP จากเราเตอร์</p>
+    <div class="section-head"><div><span class="kicker" data-i18n="connectKicker">01 · เชื่อมต่อในเครือข่ายเดียวกัน</span><h2 data-i18n="connectTitle">ต่อกับเครื่อง</h2></div><span class="status" id="liveBadge">ยังไม่เชื่อมต่อ</span></div>
+    <p data-i18n="connectBody">ใส่ที่อยู่ที่หน้าตั้งค่า Wi-Fi แสดงไว้ (เช่น 192.168.1.23) คอมพิวเตอร์ต้องอยู่ Wi-Fi วงเดียวกับเครื่อง</p>
     <div class="control-grid">
-      <label class="field"><span data-i18n="deviceAddress">Hostname หรือ IP ของบอร์ด</span><input class="input input-bordered w-full" id="deviceHost" inputmode="url" autocomplete="url" placeholder="dbk-a1b2c3.local"></label>
-      <label class="field"><span data-i18n="deviceAlias">ชื่อเรียก / alias</span><input class="input input-bordered w-full" id="deviceAlias" maxlength="32" placeholder="ห้องเรียน 2"></label>
+      <label class="field"><span data-i18n="deviceAddress">Hostname หรือ IP ของเครื่อง</span><input class="input input-bordered w-full" id="deviceHost" inputmode="url" autocomplete="url" placeholder="dbk-a1b2c3.local"></label>
+      <label class="field" hidden><span data-i18n="deviceAlias">ชื่อเรียก / alias</span><input class="input input-bordered w-full" id="deviceAlias" maxlength="32" placeholder="ห้องเรียน 2"></label>
       <div class="button-row"><button class="btn btn-primary" id="connectButton" type="button"><i data-lucide="plug-zap" class="w-4 h-4"></i><span data-i18n="connect">เชื่อมต่อ</span></button></div>
     </div>
     <div class="button-row" style="margin-top:12px">
-      <button id="saveAlias" type="button" class="btn btn-primary" disabled><i data-lucide="save" class="w-4 h-4"></i><span data-i18n="saveAlias">บันทึก alias ลงบอร์ด</span></button>
-      <a id="deviceUi" class="btn btn-outline btn-primary btn-sm" href="#" target="_blank" rel="noopener"><i data-lucide="external-link" class="w-4 h-4"></i><span data-i18n="openDeviceUi">เปิด ESPHome UI บนบอร์ด</span></a>
+      <button id="saveAlias" hidden type="button" class="btn btn-primary" disabled><i data-lucide="save" class="w-4 h-4"></i><span data-i18n="saveAlias">บันทึก alias ลงเครื่อง</span></button>
+      <a id="deviceUi" class="btn btn-outline btn-primary btn-sm" href="#" target="_blank" rel="noopener" data-dev hidden><i data-lucide="external-link" class="w-4 h-4"></i><span data-i18n="openDeviceUi">เปิด ESPHome UI บนเครื่อง</span></a>
       <a class="btn btn-outline btn-primary btn-sm" href="../wifi/?source=dashboard"><i data-lucide="wifi" class="w-4 h-4"></i><span data-i18n="setupWifi">ตั้งค่า Wi‑Fi</span></a>
     </div>
     <div id="connectionStatus" class="connection-status" aria-live="polite">รอ hostname หรือ IP ของอุปกรณ์</div>
-    <div class="explain" style="margin-top:12px" data-i18n="networkNote">หน้า Pages นี้เรียก REST API ที่อยู่ใน LAN โดยตรง เฟิร์มแวร์เปิด CORS/PNA ไว้แล้ว หากเบราว์เซอร์ยังบล็อก HTTPS → HTTP ให้กด “เปิด ESPHome UI บนบอร์ด” ซึ่งทำงานแบบ same-origin เสมอ</div>
+    <div class="explain" style="margin-top:12px" data-dev hidden data-i18n="networkNote">หน้า Pages นี้เรียก REST API ที่อยู่ใน LAN โดยตรง เฟิร์มแวร์เปิด CORS/PNA ไว้แล้ว หากเบราว์เซอร์ยังบล็อก HTTPS → HTTP ให้กด “เปิด ESPHome UI บนเครื่อง” ซึ่งทำงานแบบ same-origin เสมอ</div>
   </section>
 
   <section class="feature">
@@ -51,13 +51,13 @@
       <article class="metric"><small>PM10</small><strong id="pm10">—</strong><span>µg/m³</span></article>
       <article class="metric"><small data-i18n="airQuality">คุณภาพอากาศ</small><strong id="airQuality">—</strong><span>state</span></article>
       <article class="metric"><small>Wi‑Fi RSSI</small><strong id="wifiRssi">—</strong><span>dBm</span></article>
-      <article class="metric"><small data-i18n="uptime">เวลาทำงาน</small><strong id="uptime">—</strong><span id="deviceMeta">ESPHome</span></article>
+      <article class="metric"><small data-i18n="uptime">เวลาทำงาน</small><strong id="uptime">—</strong><span id="deviceMeta"></span></article>
     </div>
   </section>
 
-  <section class="feature">
+  <section class="feature" data-dev hidden>
     <div class="section-head"><div><span class="kicker" data-i18n="rpcKicker">03 · JSON‑RPC 2.0</span><h2 data-i18n="rpcTitle">คอนโซลอ่านและสั่งงาน</h2></div><span class="status">browser adapter</span></div>
-    <p data-i18n="rpcBody">ESPHome มี REST JSON โดยตรง ส่วน adapter นี้รวมหลาย endpoint ให้เรียกด้วยรูปแบบ JSON‑RPC และอ่านค่าทุก 5 วินาที โดยข้อมูลยังวิ่งตรงระหว่างเบราว์เซอร์กับบอร์ด</p>
+    <p data-i18n="rpcBody">ESPHome มี REST JSON โดยตรง ส่วน adapter นี้รวมหลาย endpoint ให้เรียกด้วยรูปแบบ JSON‑RPC และอ่านค่าทุก 5 วินาที โดยข้อมูลยังวิ่งตรงระหว่างเบราว์เซอร์กับเครื่อง</p>
     <div class="rpc-grid">
       <div>
         <label class="field"><span data-i18n="request">คำขอ</span><textarea class="textarea textarea-bordered w-full font-mono text-sm" id="rpcRequest" spellcheck="false">{
@@ -72,15 +72,15 @@
     </div>
   </section>
 
-  <footer><span data-i18n="footer">DustBoy Kit · telemetry อยู่ในเครือข่ายของคุณ</span><nav><a href="../"><i data-lucide="arrow-left" class="w-4 h-4"></i><span data-i18n="home">หน้าแรก</span></a><a href="https://github.com/dustboy-kit/esp32c3-pm25-monitor">GitHub</a><a href="https://esphome.io/web-api/index.html" target="_blank" rel="noopener">ESPHome Web API</a></nav></footer>
+  <footer><span data-i18n="footer">DustBoy Kit · telemetry อยู่ในเครือข่ายของคุณ</span><nav><a href="../"><i data-lucide="arrow-left" class="w-4 h-4"></i><span data-i18n="home">หน้าแรก</span></a><a href="https://github.com/dustboy-kit/esp32c3-pm25-monitor">GitHub</a></nav></footer>
 </main>
 
 <script type="module">
 import { DbkEspHomeRpc, normalizeDeviceUrl } from "../tools/dbk-esphome-rpc.js?v=1";
 
 const copy = {
-  th:{eyebrow:'วงจรแห่งดวงดาว · ESPHOME WEB API',lede:'อ่าน PM1, PM2.5, PM10 และข้อมูลวินิจฉัยจากบอร์ดโดยตรง พร้อม JSON‑RPC 2.0 adapter ในเบราว์เซอร์',connectKicker:'01 · เชื่อมต่อในเครือข่ายเดียวกัน',connectTitle:'เปิดลิงก์ตรงถึง ESPHome',idle:'ยังไม่เชื่อมต่อ',connectBody:'ใส่ hostname ที่ Improv แสดงหลังตั้งค่า Wi‑Fi เช่น dbk-a1b2c3.local หรือ IP จากเราเตอร์',deviceAddress:'Hostname หรือ IP ของบอร์ด',deviceAlias:'ชื่อเรียก / alias',connect:'เชื่อมต่อ',saveAlias:'บันทึก alias ลงบอร์ด',openDeviceUi:'เปิด ESPHome UI บนบอร์ด',setupWifi:'ตั้งค่า Wi‑Fi',idleHelp:'รอ hostname หรือ IP ของอุปกรณ์',networkNote:'หน้า Pages นี้อ่าน REST API ทุก 5 วินาทีเพื่อไม่ทิ้ง SSE socket ค้างในบอร์ด เฟิร์มแวร์เปิด CORS/PNA ไว้แล้ว หากเบราว์เซอร์ยังบล็อก HTTPS → HTTP ให้กด “เปิด ESPHome UI บนบอร์ด” ซึ่งทำงานแบบ same-origin เสมอ',telemetryKicker:'02 · Telemetry สด',airQuality:'คุณภาพอากาศ',uptime:'เวลาทำงาน',rpcKicker:'03 · JSON‑RPC 2.0',rpcTitle:'คอนโซลอ่านและสั่งงาน',rpcBody:'ESPHome มี REST JSON โดยตรง ส่วน adapter นี้รวมหลาย endpoint ให้เรียกด้วยรูปแบบ JSON‑RPC และอ่านค่าทุก 5 วินาที โดยข้อมูลยังวิ่งตรงระหว่างเบราว์เซอร์กับบอร์ด',request:'คำขอ',sendRpc:'ส่ง RPC',discover:'ดู methods',response:'ผลลัพธ์',footer:'DustBoy Kit · telemetry อยู่ในเครือข่ายของคุณ',home:'หน้าแรก',connecting:'กำลังเชื่อมต่อ…',connected:'เชื่อมต่อแล้ว',polling:'เชื่อมต่อแล้ว · polling ทุก 5 วินาที',connectError:'เชื่อมต่อไม่ได้: '},
-  en:{eyebrow:'THE STARRY CIRCUIT · ESPHOME WEB API',lede:'Read PM1, PM2.5, PM10, and diagnostics directly from the board through a browser JSON-RPC 2.0 adapter.',connectKicker:'01 · Same-network connection',connectTitle:'Open a direct ESPHome link',idle:'not connected',connectBody:'Enter the hostname shown by Improv after Wi-Fi setup, such as dbk-a1b2c3.local, or the IP from your router.',deviceAddress:'Board hostname or IP',deviceAlias:'Friendly alias',connect:'Connect',saveAlias:'Save alias to board',openDeviceUi:'Open on-device ESPHome UI',setupWifi:'Set up Wi-Fi',idleHelp:'Waiting for a device hostname or IP address',networkNote:'This Pages app polls the board REST API every 5 seconds instead of leaving an SSE socket on the board. Firmware enables CORS/PNA. If the browser still blocks HTTPS → HTTP, open the on-device ESPHome UI; that route is always same-origin.',telemetryKicker:'02 · Live telemetry',airQuality:'Air quality',uptime:'Uptime',rpcKicker:'03 · JSON‑RPC 2.0',rpcTitle:'Read and command console',rpcBody:'ESPHome exposes REST JSON directly. This adapter combines its endpoints behind JSON-RPC and polls every 5 seconds while data still travels directly between browser and board.',request:'Request',sendRpc:'Send RPC',discover:'Discover methods',response:'Response',footer:'DustBoy Kit · telemetry stays on your network',home:'Home',connecting:'connecting…',connected:'connected',polling:'connected · polling every 5 seconds',connectError:'Connection failed: '}
+  th:{eyebrow:'DustBoy Kit · ดูค่าสด',lede:'ใส่ที่อยู่ของเครื่อง (จากหน้าตั้งค่า Wi-Fi) แล้วดูค่า PM1 / PM2.5 / PM10 สด ๆ',connectKicker:'01 · เชื่อมต่อในเครือข่ายเดียวกัน',connectTitle:'ต่อกับเครื่อง',idle:'ยังไม่เชื่อมต่อ',connectBody:'ใส่ที่อยู่ที่หน้าตั้งค่า Wi-Fi แสดงไว้ (เช่น 192.168.1.23) คอมพิวเตอร์ต้องอยู่ Wi-Fi วงเดียวกับเครื่อง',deviceAddress:'Hostname หรือ IP ของเครื่อง',deviceAlias:'ชื่อเรียก / alias',connect:'เชื่อมต่อ',saveAlias:'บันทึก alias ลงเครื่อง',openDeviceUi:'เปิดหน้าเว็บในเครื่อง',setupWifi:'ตั้งค่า Wi‑Fi',idleHelp:'รอ hostname หรือ IP ของอุปกรณ์',networkNote:'หน้า Pages นี้อ่าน REST API ทุก 5 วินาทีเพื่อไม่ทิ้ง SSE socket ค้างในเครื่อง เฟิร์มแวร์เปิด CORS/PNA ไว้แล้ว หากเบราว์เซอร์ยังบล็อก HTTPS → HTTP ให้กด “เปิด ESPHome UI บนเครื่อง” ซึ่งทำงานแบบ same-origin เสมอ',telemetryKicker:'02 · Telemetry สด',airQuality:'คุณภาพอากาศ',uptime:'เวลาทำงาน',rpcKicker:'03 · JSON‑RPC 2.0',rpcTitle:'คอนโซลอ่านและสั่งงาน',rpcBody:'ESPHome มี REST JSON โดยตรง ส่วน adapter นี้รวมหลาย endpoint ให้เรียกด้วยรูปแบบ JSON‑RPC และอ่านค่าทุก 5 วินาที โดยข้อมูลยังวิ่งตรงระหว่างเบราว์เซอร์กับเครื่อง',request:'คำขอ',sendRpc:'ส่ง RPC',discover:'ดู methods',response:'ผลลัพธ์',footer:'DustBoy Kit · telemetry อยู่ในเครือข่ายของคุณ',home:'หน้าแรก',connecting:'กำลังเชื่อมต่อ…',connected:'เชื่อมต่อแล้ว',polling:'เชื่อมต่อแล้ว · polling ทุก 5 วินาที',connectError:'เชื่อมต่อไม่ได้: '},
+  en:{eyebrow:'DustBoy Kit · Live readings',lede:'Enter the kit address (from the Wi-Fi setup page) and watch PM1 / PM2.5 / PM10 live.',connectKicker:'01 · Same-network connection',connectTitle:'ต่อกับเครื่อง',idle:'not connected',connectBody:'ใส่ที่อยู่ที่หน้าตั้งค่า Wi-Fi แสดงไว้ (เช่น 192.168.1.23) คอมพิวเตอร์ต้องอยู่ Wi-Fi วงเดียวกับเครื่อง',deviceAddress:'Board hostname or IP',deviceAlias:'Friendly alias',connect:'Connect',saveAlias:'Save alias to board',openDeviceUi:'เปิดหน้าเว็บในเครื่อง',setupWifi:'Set up Wi-Fi',idleHelp:'Waiting for a device hostname or IP address',networkNote:'This Pages app polls the board REST API every 5 seconds instead of leaving an SSE socket on the board. Firmware enables CORS/PNA. If the browser still blocks HTTPS → HTTP, open the on-device ESPHome UI; that route is always same-origin.',telemetryKicker:'02 · Live telemetry',airQuality:'Air quality',uptime:'Uptime',rpcKicker:'03 · JSON‑RPC 2.0',rpcTitle:'Read and command console',rpcBody:'ESPHome exposes REST JSON directly. This adapter combines its endpoints behind JSON-RPC and polls every 5 seconds while data still travels directly between browser and board.',request:'Request',sendRpc:'Send RPC',discover:'Discover methods',response:'Response',footer:'DustBoy Kit · telemetry stays on your network',home:'Home',connecting:'connecting…',connected:'connected',polling:'connected · polling every 5 seconds',connectError:'Connection failed: '}
 };
 
 let lang='th', rpc=null, pollTimer=0;

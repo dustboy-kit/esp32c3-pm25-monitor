@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Canvas Simulator · DustBoy Kit · Kit4Kids</title>
+<title>เลือกลายหน้าจอ · DustBoy Kit · Kit4Kids</title>
 <style>
   :root {
     color-scheme: light;
@@ -458,6 +458,9 @@
   .app p { margin: .5rem 0; }
   svg { display: inline-block; }
   /* Cards that share a row get the same height; the YAML box fills its card. */
+  .layout > .card[hidden], .firmware-card[hidden], .example-info[hidden], .notes[hidden] { display: none !important; }
+  .layout:has(> .card[hidden]) { grid-template-columns: 1fr; }
+  .layout:has(> .card[hidden]) .stage { margin: 0 auto; }
   .layout > .card { display: flex; flex-direction: column; min-height: 0; }
   .layout > .card > *:last-child { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; }
   #source { flex: 1 1 auto; min-height: 360px; height: auto; }
@@ -482,9 +485,9 @@
   <nav class="flex gap-2 mb-4"><a class="btn btn-sm btn-ghost back-home" href="../"><i data-lucide="arrow-left" class="w-4 h-4"></i>หน้าแรก</a></nav>
 <header>
     <div>
-      <div class="eyebrow" data-sim-i18n="eyebrow">วงจรแห่งดวงดาว · การศึกษา OLED หมายเลข 128×32</div>
-      <h1><em>ESPHome</em> Canvas Simulator</h1>
-      <p data-sim-i18n="intro">เขียน <code>display.lambda</code> แบบ ESPHome แปลงชุดคำสั่ง C++ ที่รองรับเป็น JavaScript และเรนเดอร์ด้วยบัฟเฟอร์ OLED ขาวดำกับเอนจินฟอนต์เดียวกับแกลเลอรี DBK</p>
+      <div class="eyebrow" data-sim-i18n="eyebrow">DUSTBOY KIT · 30 ลาย</div>
+      <h1>เลือก<em>ลายหน้าจอ</em></h1>
+      <p data-sim-i18n="intro">กดลายที่ชอบ ดูตัวอย่างบนจอจำลอง แล้วกดปุ่ม "แฟลช" เพื่อใส่ลายนั้นลงเครื่อง</p>
     </div>
     <div class="header-tools"><div class="join" aria-label="Language"><button type="button" class="btn btn-sm join-item" data-lang="th">ไทย</button><button type="button" class="btn btn-sm join-item" data-lang="en">EN</button></div><div class="badge" id="engineBadge" hidden title="dev self-test">กำลังโหลดเอนจิน…</div></div>
   </header>
@@ -501,7 +504,7 @@
   </section>
 
   <div class="layout" id="workspace">
-    <section class="card">
+    <section class="card" data-dev hidden>
       <div class="card-head">
         <strong data-sim-i18n="yamlTitle">ESPHome YAML / display lambda</strong>
         <div class="actions">
@@ -535,7 +538,7 @@
           <label><input id="panelOnlyToggle" class="checkbox checkbox-primary checkbox-sm" type="checkbox" checked> <span data-sim-i18n="fullPanel">เต็มจอ / ไม่มีขอบ</span></label>
         </div>
 
-        <div id="exampleInfo" class="example-info" data-sim-i18n="exampleInfo">เลือกหนึ่งใน 30 หน้าจอ DBK หรือแก้ไข lambda โดยตรง</div>
+        <div id="exampleInfo" class="example-info" data-sim-i18n="exampleInfo" data-dev hidden>เลือกหนึ่งใน 30 หน้าจอ DBK หรือแก้ไข lambda โดยตรง</div>
 
         <div class="state-grid" aria-label="Simulated ESPHome state">
           <label>PM1<input id="pm1" class="input input-bordered input-sm w-full" type="number" value="7" step="1"></label>
@@ -558,7 +561,7 @@
           </a>
         </div>
         <div id="status" class="status" data-sim-i18n="waiting">กำลังรอเอนจิน…</div>
-        <details class="developer-details">
+        <details class="developer-details" data-dev hidden>
           <summary title="JavaScript ที่แปลงแล้ว / Translated JavaScript" aria-label="JavaScript ที่แปลงแล้ว / Translated JavaScript">&lt;/&gt;</summary>
           <pre id="translated"></pre>
         </details>
@@ -566,7 +569,7 @@
     </section>
   </div>
 
-  <section class="card firmware-card" aria-labelledby="firmwareTitle">
+  <section class="card firmware-card" aria-labelledby="firmwareTitle" data-dev hidden>
     <div class="card-head">
       <strong id="firmwareTitle" data-sim-i18n="firmwareTitle">คอมไพล์และแฟลช ESPHome จริง (เครื่องท้องถิ่น)</strong>
       <span class="badge" id="firmwareBadge">กำลังตรวจ backend…</span>
@@ -592,7 +595,7 @@
     </div>
   </section>
 
-  <aside class="notes" data-sim-i18n="supportedNote">
+  <aside class="notes" data-sim-i18n="supportedNote" data-dev hidden>
     ชุดคำสั่งที่รองรับ: คำสั่งวาดภาพของ ESPHome เช่น print, printf, strftime, เส้น, สี่เหลี่ยม, วงกลมและพิกเซล; id(font_*); sensor ID ของ DBK; TextAlign::*; ตัวแปรตัวเลข; millis(); และนิพจน์พื้นฐานที่ใช้ร่วมกับ JavaScript ได้ ตัวอย่างทั้ง 30 แบบยังแก้ไขในแผง lambda ได้ นี่คือ simulator สำหรับออกแบบในเครื่อง ไม่ใช่ C++ compiler หรือ ESPHome validator แบบเต็ม ใช้ just lab-sim เพื่อคอมไพล์ด้วย ESPHome จริง
   </aside>
 </main>
@@ -600,8 +603,8 @@
 <script>
 (function(){
   var C={
-    th:{eyebrow:'วงจรแห่งดวงดาว · การศึกษา OLED หมายเลข 128×32',intro:'เขียน display.lambda แบบ ESPHome แปลงชุดคำสั่ง C++ ที่รองรับเป็น JavaScript และเรนเดอร์ด้วยบัฟเฟอร์ OLED ขาวดำกับเอนจินฟอนต์เดียวกับแกลเลอรี DBK',galleryTitle:'แกลเลอรีหน้าจอ DBK ต้นฉบับ',galleryHint:'คลิกหน้าจอ 128×32 เพื่อเรนเดอร์และดูโค้ดที่แก้ไขได้',animate20:'เคลื่อนไหว · 20 FPS',yamlTitle:'ESPHome YAML / display lambda',reload:'โหลดที่เลือกใหม่',compileRender:'คอมไพล์และเรนเดอร์',previewTitle:'ตัวอย่าง OLED',scale:'ขนาด',fitWidth:'พอดีความกว้าง',pixelGrid:'ตารางพิกเซล',bloom:'แสงฟุ้ง',animate:'เคลื่อนไหว',fullPanel:'เต็มจอ / ไม่มีขอบ',exampleInfo:'เลือกหนึ่งใน 30 หน้าจอ DBK หรือแก้ไข lambda โดยตรง',waiting:'กำลังรอเอนจิน…',translated:'JavaScript ที่แปลงแล้ว',firmwareTitle:'คอมไพล์และแฟลช ESPHome จริง (เครื่องท้องถิ่น)',deviceConfig:'การตั้งค่าอุปกรณ์',flashTarget:'เป้าหมายการแฟลช',refresh:'รีเฟรช',compileFirmware:'คอมไพล์เฟิร์มแวร์',compileFlash:'คอมไพล์และแฟลช',cancel:'ยกเลิกงานที่กำลังทำ',supportedNote:'ชุดคำสั่งที่รองรับ: คำสั่งวาดภาพของ ESPHome เช่น print, printf, strftime, เส้น, สี่เหลี่ยม, วงกลมและพิกเซล; id(font_*); sensor ID ของ DBK; TextAlign::*; ตัวแปรตัวเลข; millis(); และนิพจน์พื้นฐานที่ใช้ร่วมกับ JavaScript ได้ ตัวอย่างทั้ง 30 แบบยังแก้ไขในแผง lambda ได้ นี่คือ simulator สำหรับออกแบบในเครื่อง ไม่ใช่ C++ compiler หรือ ESPHome validator แบบเต็ม ใช้ just lab-sim เพื่อคอมไพล์ด้วย ESPHome จริง'},
-    en:{eyebrow:'The Starry Circuit · OLED study no. 128×32',intro:'Write an ESPHome-style display.lambda, compile its supported C++-like subset to JavaScript, and render it through the same one-bit OLED buffer and firmware glyph engine used by the DBK gallery.',galleryTitle:'Original DBK display gallery',galleryHint:'Click any 128×32 display to render it and reveal its editable code.',animate20:'animate · 20 FPS',yamlTitle:'ESPHome YAML / display lambda',reload:'Reload selected',compileRender:'Compile & render',previewTitle:'OLED preview',scale:'Scale',fitWidth:'fit width',pixelGrid:'pixel grid',bloom:'bloom',animate:'animate',fullPanel:'full panel / no bezel',exampleInfo:'Choose one of the 30 DBK gallery displays or edit the lambda directly.',waiting:'Waiting for engine…',translated:'Translated JavaScript',firmwareTitle:'Real ESPHome build & flash (local lab)',deviceConfig:'Device configuration',flashTarget:'Flash target',refresh:'Refresh',compileFirmware:'Compile firmware',compileFlash:'Compile & flash',cancel:'Cancel active job',supportedNote:'Supported subset: ESPHome drawing calls such as print, printf, strftime, lines, rectangles, circles, and pixels; id(font_*); common DBK sensor IDs; TextAlign::*; numeric declarations; millis(); and basic JavaScript-compatible expressions. All 30 examples remain editable in the lambda panel. This is a local design simulator, not a full C++ compiler or ESPHome validator. Use just lab-sim for authoritative ESPHome compilation.'}
+    th:{eyebrow:'DUSTBOY KIT · 30 ลาย',intro:'กดลายที่ชอบ ดูตัวอย่างบนจอจำลอง แล้วกดปุ่ม "แฟลช" เพื่อใส่ลายนั้นลงเครื่อง',galleryTitle:'แกลเลอรีหน้าจอ DBK ต้นฉบับ',galleryHint:'คลิกหน้าจอ 128×32 เพื่อเรนเดอร์และดูโค้ดที่แก้ไขได้',animate20:'เคลื่อนไหว · 20 FPS',yamlTitle:'ESPHome YAML / display lambda',reload:'โหลดที่เลือกใหม่',compileRender:'คอมไพล์และเรนเดอร์',previewTitle:'ตัวอย่าง OLED',scale:'ขนาด',fitWidth:'พอดีความกว้าง',pixelGrid:'ตารางพิกเซล',bloom:'แสงฟุ้ง',animate:'เคลื่อนไหว',fullPanel:'เต็มจอ / ไม่มีขอบ',exampleInfo:'เลือกหนึ่งใน 30 หน้าจอ DBK หรือแก้ไข lambda โดยตรง',waiting:'กำลังรอเอนจิน…',translated:'JavaScript ที่แปลงแล้ว',firmwareTitle:'คอมไพล์และแฟลช ESPHome จริง (เครื่องท้องถิ่น)',deviceConfig:'การตั้งค่าอุปกรณ์',flashTarget:'เป้าหมายการแฟลช',refresh:'รีเฟรช',compileFirmware:'คอมไพล์เฟิร์มแวร์',compileFlash:'คอมไพล์และแฟลช',cancel:'ยกเลิกงานที่กำลังทำ',supportedNote:'ชุดคำสั่งที่รองรับ: คำสั่งวาดภาพของ ESPHome เช่น print, printf, strftime, เส้น, สี่เหลี่ยม, วงกลมและพิกเซล; id(font_*); sensor ID ของ DBK; TextAlign::*; ตัวแปรตัวเลข; millis(); และนิพจน์พื้นฐานที่ใช้ร่วมกับ JavaScript ได้ ตัวอย่างทั้ง 30 แบบยังแก้ไขในแผง lambda ได้ นี่คือ simulator สำหรับออกแบบในเครื่อง ไม่ใช่ C++ compiler หรือ ESPHome validator แบบเต็ม ใช้ just lab-sim เพื่อคอมไพล์ด้วย ESPHome จริง'},
+    en:{eyebrow:'DUSTBOY KIT · 30 ลาย',intro:'กดลายที่ชอบ ดูตัวอย่างบนจอจำลอง แล้วกดปุ่ม "แฟลช" เพื่อใส่ลายนั้นลงเครื่อง',galleryTitle:'Original DBK display gallery',galleryHint:'Click any 128×32 display to render it and reveal its editable code.',animate20:'animate · 20 FPS',yamlTitle:'ESPHome YAML / display lambda',reload:'Reload selected',compileRender:'Compile & render',previewTitle:'OLED preview',scale:'Scale',fitWidth:'fit width',pixelGrid:'pixel grid',bloom:'bloom',animate:'animate',fullPanel:'full panel / no bezel',exampleInfo:'Choose one of the 30 DBK gallery displays or edit the lambda directly.',waiting:'Waiting for engine…',translated:'Translated JavaScript',firmwareTitle:'Real ESPHome build & flash (local lab)',deviceConfig:'Device configuration',flashTarget:'Flash target',refresh:'Refresh',compileFirmware:'Compile firmware',compileFlash:'Compile & flash',cancel:'Cancel active job',supportedNote:'Supported subset: ESPHome drawing calls such as print, printf, strftime, lines, rectangles, circles, and pixels; id(font_*); common DBK sensor IDs; TextAlign::*; numeric declarations; millis(); and basic JavaScript-compatible expressions. All 30 examples remain editable in the lambda panel. This is a local design simulator, not a full C++ compiler or ESPHome validator. Use just lab-sim for authoritative ESPHome compilation.'}
   };
   window.t=function(key){return C[window.DBK_LANG||'th'][key]||C.th[key]||key;};
   window.setDbkLanguage=function(lang){lang=lang==='en'?'en':'th';window.DBK_LANG=lang;document.documentElement.lang=lang;localStorage.setItem('dbk-lang',lang);document.querySelectorAll('[data-sim-i18n]').forEach(function(el){el.textContent=window.t(el.dataset.simI18n)});document.querySelectorAll('[data-lang]').forEach(function(b){b.classList.toggle('active',b.dataset.lang===lang)});window.dispatchEvent(new CustomEvent('dbk-language-change',{detail:{lang:lang}}));};
@@ -805,7 +808,7 @@
       compileTime = performance.now();
       lastRuntimeError = "";
       draw(performance.now());
-      setStatus(window.DBK_LANG === "en" ? "128×32 · YAML ready" : "128×32 · YAML พร้อม", "ok");
+      setStatus(window.DBK_LANG === "en" ? "128×32 · ready" : "128×32 · พร้อม", "ok");
     } catch (error) {
       compiled = null;
       document.getElementById("translated").textContent = translated || "(translation failed)";
