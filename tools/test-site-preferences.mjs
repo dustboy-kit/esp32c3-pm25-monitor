@@ -6,6 +6,7 @@ import { readFile } from "node:fs/promises";
 const pages = [
   ["site/index.html", "./ui-preferences.js", true],
   ["site/teacher/index.html", "../ui-preferences.js", false],
+  ["site/board/index.html", "../ui-preferences.js", false],
   ["site/dashboard/index.html", "../ui-preferences.js", true],
   ["site/wifi/index.html", "../ui-preferences.js", true],
   ["site/wifi/recovery/index.html", "../../ui-preferences.js", true],
