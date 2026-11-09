@@ -87,5 +87,5 @@ h1,h2,h3{margin:0}p{margin:0}ul,ol{margin:0;padding:0}
 .step .btn-block,.step .wide-action,.step .action.wide-action:not(.btn),.step improv-wifi-serial-launch-button{width:100%;max-width:440px}
 .step improv-wifi-serial-launch-button{display:block}
 
-.step[id],#step-2{scroll-margin-top:16px}
+.step[id]{scroll-margin-top:16px}
 html{scroll-behavior:smooth}
