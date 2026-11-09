@@ -37,6 +37,20 @@ mqtt:
         id: mqtt_connected
         value: "false"
 
+text_sensor:
+  - platform: template
+    id: mqtt_status
+    name: MQTT Status
+    icon: mdi:cloud-upload
+    entity_category: diagnostic
+    update_interval: 5s
+    # off = no password stored (kit measures locally only), connecting = password
+    # set but no broker session yet, online = connected to CCDC. Read by the
+    # kit's own web page (web/kit-dashboard.js) for the cloud badge.
+    lambda: |-
+      if (id(mqtt_password).state.empty()) return {"off"};
+      return {id(mqtt_client).is_connected() ? "online" : "connecting"};
+
 text:
   - platform: template
     id: kit_id
