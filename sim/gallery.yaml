@@ -185,7 +185,12 @@ captive_portal:
 web_server:
   version: 3
   include_internal: false
-  local: true
+  # The kit serves its own small dashboard (web/kit-dashboard.js, gzipped into
+  # flash) instead of the stock ESPHome UI, so http://<kit>/ shows PM values on
+  # any browser in the same Wi-Fi. REST JSON and /events stay available.
+  local: false
+  js_url: ""
+  js_include: ../../web/kit-dashboard.js
   enable_private_network_access: true
   ota: false
   log: false
