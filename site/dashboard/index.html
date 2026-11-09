@@ -107,7 +107,7 @@ const params=new URLSearchParams(location.search);$('deviceHost').value=params.g
 try{if($('deviceHost').value)$('deviceUi').href=normalizeDeviceUrl($('deviceHost').value)+'/'}catch{}
 const devMode=params.get('dev')==='1'||(params.get('dev')!=='0'&&localStorage.getItem('dbk-dev')==='1');
 if(!$('deviceHost').value.trim()&&!devMode){$('gate').hidden=false;document.querySelectorAll('main > section.feature:not(#gate)').forEach(el=>el.hidden=true)}
-const secureNoLive=location.protocol==='https:'&&!devMode;
+const secureNoLive=location.protocol==='https:'&&params.get('dev')!=='1';
 if(secureNoLive){$('connectButton').hidden=true;$('telemetry').hidden=true;$('deviceUi').querySelector('[data-i18n]').dataset.i18n='openLive';$('deviceUi').classList.remove('btn-outline')}
 function syncDeviceUi(){try{const h=$('deviceHost').value.trim();if(h)$('deviceUi').href=normalizeDeviceUrl(h)+'/'}catch{}}
 $('deviceHost').addEventListener('input',syncDeviceUi);
