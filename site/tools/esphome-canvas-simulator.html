@@ -553,8 +553,9 @@
         </div>
         <div class="selected-flash-actions" aria-live="polite">
           <span id="selectedFlashInstall"></span>
-          <a id="selectedWifiLink" class="selected-icon-action" href="../wifi/">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.6a10.5 10.5 0 0 1 14 0M8.4 16a5.5 5.5 0 0 1 7.2 0M11.2 19.2a1.2 1.2 0 1 1 1.6 0"/></svg>
+          <a id="selectedWifiLink" class="btn btn-outline btn-primary" href="../wifi/" style="height:3rem">
+            <svg viewBox="0 0 24 24" aria-hidden="true" style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12.6a10.5 10.5 0 0 1 14 0M8.4 16a5.5 5.5 0 0 1 7.2 0M11.2 19.2a1.2 1.2 0 1 1 1.6 0"/></svg>
+            <span id="selectedWifiText">ขั้นถัดไป: ตั้งค่า Wi-Fi</span>
           </a>
           <a id="selectedYamlLink" class="selected-icon-action" target="_blank" rel="noopener">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h6"/></svg>
@@ -1033,6 +1034,16 @@
     wifi.href = "../wifi/?from=canvas&design=" + encodeURIComponent(selected.id);
     wifi.title = en ? "Set up Wi-Fi after flashing " + selected.name : "ตั้งค่า Wi-Fi หลังแฟลช " + selected.name;
     wifi.setAttribute("aria-label", wifi.title);
+    document.getElementById("selectedWifiText").textContent = en ? "Next: set up Wi-Fi" : "ขั้นถัดไป: ตั้งค่า Wi-Fi";
+    // esp-web-tools reports its progress; once the image is on the kit, make the next step obvious.
+    installer.addEventListener("state-changed", function (ev) {
+      var st = ev.detail && ev.detail.state;
+      if (st === "FINISHED") {
+        wifi.classList.remove("btn-outline");
+        document.getElementById("selectedWifiText").textContent = en ? "Flashed. Next: set up Wi-Fi" : "แฟลชเสร็จแล้ว → ตั้งค่า Wi-Fi";
+        wifi.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    });
 
     var yaml = document.getElementById("selectedYamlLink");
     yaml.href = "https://github.com/dustboy-kit/esp32c3-pm25-monitor/blob/main/sim/canvas/" + selected.id + ".yaml";
