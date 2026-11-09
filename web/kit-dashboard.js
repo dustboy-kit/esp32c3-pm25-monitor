@@ -6,7 +6,8 @@ const T = {
   title: 'DustBoy Kit', kit: 'Kit ID', live: 'ค่าสด', wait: 'กำลังรอค่า…', air: 'คุณภาพอากาศ',
   rssi: 'Wi-Fi', up: 'เปิดเครื่องมาแล้ว', ip: 'ที่อยู่เครื่อง', updated: 'อัปเดตล่าสุด',
   lost: 'ขาดการติดต่อ กำลังต่อใหม่…', lostAt: 'ค่าล่าสุดเมื่อ', unit: 'µg/m³', site: 'หน้าตั้งค่า DustBoy Kit',
-  GOOD: 'ดี', FAIR: 'ปานกลาง', BAD: 'แย่'
+  GOOD: 'ดี', FAIR: 'ปานกลาง', BAD: 'แย่',
+  mqttOff: 'ยังไม่ส่งขึ้น CCDC', mqttConnecting: 'กำลังต่อ CCDC…', mqttOnline: 'ส่งขึ้น CCDC แล้ว'
 };
 const css = `
 *{box-sizing:border-box}body{margin:0;font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Thai",sans-serif;background:#f3f5f8;color:#1f2937}
@@ -14,7 +15,7 @@ main{max-width:720px;margin:0 auto;padding:20px 16px 32px}
 header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
 h1{font-size:22px;margin:0;font-weight:700}h1 small{display:block;font-size:13px;color:#6b7280;font-weight:500}
 .dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#9ca3af;margin-right:6px;vertical-align:middle}
-.dot.on{background:#16a34a}.kit{font:600 15px/1 ui-monospace,Menlo,monospace;padding:8px 12px;border:1px solid #d1d5db;border-radius:10px;background:#fff}
+.dot.on{background:#16a34a}.cloud{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:13px;font-weight:600;background:#e5e7eb;color:#4b5563}.cloud svg{width:16px;height:16px}.cloud.online{background:#dcfce7;color:#166534}.cloud.connecting{background:#fef3c7;color:#92400e}.hdr-r{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.kit{font:600 15px/1 ui-monospace,Menlo,monospace;padding:8px 12px;border:1px solid #d1d5db;border-radius:10px;background:#fff}
 .big{margin-bottom:12px}.grid{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:1fr;gap:12px}.grid-b{display:grid;grid-template-columns:1fr 2fr;gap:12px;margin-top:12px}
 .card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:14px 16px;min-height:104px;display:flex;flex-direction:column;justify-content:center;min-width:0}
 .card small{display:block;font-size:12px;color:#6b7280;letter-spacing:.04em;text-transform:uppercase}
@@ -29,7 +30,7 @@ footer a{color:#2563eb}
 document.documentElement.lang = 'th';
 document.head.insertAdjacentHTML('beforeend', `<meta name=viewport content="width=device-width,initial-scale=1"><title>${T.title}</title><style>${css}</style>`);
 document.body.innerHTML = `<main>
-<header><h1><span class=dot id=dot></span>${T.title}<small id=sub>${T.wait}</small></h1><div class=kit><span style="color:#6b7280;font-weight:500">${T.kit}</span> <span id=kit>—</span></div></header>
+<header><h1><span class=dot id=dot></span>${T.title}<small id=sub>${T.wait}</small></h1><div class=hdr-r><span class=cloud id=cloud><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 0 0 .4-9A7 7 0 0 0 4.3 12.6 3.5 3.5 0 0 0 6 19z"/><path id=cloudmark d="M9 13l2 2 4-4"/></svg><span id=cloudtxt>${T.mqttOff}</span></span><div class=kit><span style="color:#6b7280;font-weight:500">${T.kit}</span> <span id=kit>—</span></div></div></header>
 <div class="card big" id=c25><small>PM2.5</small><b id=pm2_5>—</b><span>${T.unit}</span><br><span class=badge id=aq>${T.wait}</span></div>
 <div class=grid>
  <div class=card><small>PM1.0</small><b id=pm1_0>—</b><span>${T.unit}</span></div>
@@ -51,8 +52,9 @@ function fitAll(){document.querySelectorAll('.card b.txt').forEach(fit)}
 addEventListener('resize',fitAll);
 const cls = v => v <= GOOD ? 'GOOD' : v <= FAIR ? 'FAIR' : 'BAD';
 function up(s){s=Math.round(s);const d=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60);return d?`${d} วัน ${h} ชม.`:h?`${h} ชม. ${m} น.`:`${m} นาที`}
+function el_mqtt(state) { const st = state === 'online' ? 'online' : state === 'connecting' ? 'connecting' : 'off'; $('cloud').className = 'cloud ' + st; $('cloudtxt').textContent = T[{online:'mqttOnline',connecting:'mqttConnecting',off:'mqttOff'}[st]]; $('cloudmark').setAttribute('d', st === 'online' ? 'M9 13l2 2 4-4' : st === 'connecting' ? 'M12 10v4' : 'M9 10l6 6M15 10l-6 6'); }
 function apply(id, value, state) {
-  let key = id.replace(/^[a-z_]+-/, ''); if (/rssi/.test(key)) key = 'rssi'; if (key === 'kit_id') key = 'kit';
+  let key = id.replace(/^[a-z_]+-/, ''); if (key === 'mqtt_status') { el_mqtt(state); return } if (/rssi/.test(key)) key = 'rssi'; if (key === 'kit_id') key = 'kit';
   const el = $(key); if (!el) return;
   if (key === 'uptime') el.textContent = up(+value);
   else if (key === 'kit') el.textContent = state || '—';
@@ -63,7 +65,7 @@ function apply(id, value, state) {
   $('sub').textContent = T.live; fitAll();
 }
 async function seed() {
-  const paths = ['sensor/pm2_5','sensor/pm1_0','sensor/pm10','sensor/wi-fi_rssi','sensor/wi_fi_rssi','sensor/uptime','text/kit_id','text_sensor/air_quality_level','text_sensor/ip_address'];
+  const paths = ['sensor/pm2_5','sensor/pm1_0','sensor/pm10','sensor/wi-fi_rssi','sensor/wi_fi_rssi','sensor/uptime','text/kit_id','text_sensor/air_quality_level','text_sensor/ip_address','text_sensor/mqtt_status'];
   for (const p of paths) { try { const r = await fetch('/' + p); if (r.ok) { const j = await r.json(); apply(j.id || p.replace('/', '-'), j.value, j.state); } } catch {} }
 }
 let es, retry;

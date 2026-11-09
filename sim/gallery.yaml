@@ -304,6 +304,18 @@ sensor:
   entity_category: diagnostic
 
 text_sensor:
+- platform: template
+  id: mqtt_status
+  name: MQTT Status
+  icon: mdi:cloud-upload
+  entity_category: diagnostic
+  update_interval: 5s
+  # off = no password stored, connecting = password set but no broker session,
+  # online = connected to CCDC. Read by web/kit-dashboard.js for the cloud badge.
+  lambda: |-
+    if (id(mqtt_password).state.empty()) return {"off"};
+    return {id(mqtt_client).is_connected() ? "online" : "connecting"};
+
 - platform: version
   id: esphome_version
   name: ESPHome Version
