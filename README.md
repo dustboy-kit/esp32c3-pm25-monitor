@@ -130,9 +130,15 @@ at 8.5 dBm.
 - Connect the computer to the same Wi‑Fi network as the DBK device.
 - Open `http://dbk-001.local/` in a browser.
 - Replace `dbk-001` with the device `name` if a different ID was configured.
-- The page shows device status and provides basic controls.
-- Factory and Canvas images embed ESPHome Web Server v3, so this UI, its REST
-  JSON endpoints, and `/events` SSE stream work without an internet connection.
+- The page is the kit's own DustBoy dashboard (`web/kit-dashboard.js`, about
+  3 KB gzipped into flash via `web_server: js_include`): PM2.5 large and
+  colour-coded by the same limits as the LED, PM1 / PM10, Kit ID, Wi-Fi signal
+  and uptime, updated live from `/events`. It replaces the stock ESPHome UI
+  (`local: false`, `js_url: ""`), because the public site is https and a
+  browser will not let an https page read an http kit; the kit's own page is
+  same-origin and always works on the same Wi-Fi.
+- Factory and Canvas images embed ESPHome Web Server v3, so the REST JSON
+  endpoints and the `/events` SSE stream work without an internet connection.
 - A factory node gets a unique MAC-suffixed hostname such as
   `dbk-a1b2c3.local`. Its persistent friendly alias starts as `DBK A1B2C3` and
   can be changed from the device page, Home Assistant, or the
@@ -155,8 +161,8 @@ GET  http://dbk-a1b2c3.local/events
 official Web API. The hosted dashboard uses it for `telemetry.snapshot`,
 `device.info`, `entity.get`, `alias.set`, `button.press`, and `device.restart`.
 The browser still talks directly to the ESP32; no telemetry proxy or cloud is
-introduced. If a browser blocks an HTTPS Pages app from reaching an HTTP LAN
-address, open the embedded on-device UI instead.
+introduced. Over https the Pages dashboard cannot poll the kit (mixed content),
+so it shows one button that opens the kit's own dashboard page instead.
 
 ## MQTT (fleet upload to CCDC)
 
