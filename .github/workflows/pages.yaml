@@ -30,6 +30,18 @@ jobs:
                 --arg run "$GITHUB_RUN_NUMBER" \
                 '{sha:$sha,date:$date,run:$run}' > site/version.json
           cat site/version.json
+      - name: Cache-bust firmware and manifests
+        # GitHub Pages serves files with max-age=600. Without this a browser that
+        # flashed in the last 10 minutes gets the previous image (seen 2026-11-09).
+        # Every .bin path inside a manifest and every manifest URL in a page gets
+        # ?v=<sha>, so a new deploy is always a new URL.
+        run: |
+          v="${GITHUB_SHA::7}"
+          find site/manifests -name '*.json' -exec sed -i -E "s#(\.bin)\"#\1?v=${v}\"#g" {} +
+          find site -name '*.html' -exec sed -i -E "s#(manifests/[A-Za-z0-9_./-]+\.json)(\\?\"|\")#\1?v=${v}\2#g" {} +
+          sed -i "s#selected.id + \".json\"#selected.id + \".json?v=${v}\"#" site/tools/esphome-canvas-simulator.html
+          grep -rho 'manifests/[^"\\]*' site --include='*.html' | sort -u | head -5
+          grep -ho '"path": *"[^"]*"' site/manifests/dbk.json
       - uses: actions/upload-pages-artifact@v4
         with:
           path: site
