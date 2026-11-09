@@ -117,7 +117,7 @@ if(secureNoLive){$('connectionStatus').textContent=t('httpsOnly')}document.query
 $('connectButton').addEventListener('click',connect);$('saveAlias').addEventListener('click',saveAlias);$('deviceHost').addEventListener('keydown',event=>{if(event.key!=='Enter')return;if(secureNoLive){syncDeviceUi();window.open($('deviceUi').href,'_blank','noopener')}else connect()});
 $('sendRpc').addEventListener('click',()=>{try{sendRpc(JSON.parse($('rpcRequest').value))}catch(error){$('rpcResponse').textContent=JSON.stringify({jsonrpc:'2.0',id:null,error:{code:-32700,message:error.message}},null,2)}});
 $('discoverRpc').addEventListener('click',()=>{const request={jsonrpc:'2.0',id:1,method:'rpc.discover',params:{}};$('rpcRequest').value=JSON.stringify(request,null,2);sendRpc(request)});
-if($('deviceHost').value)connect();
+if($('deviceHost').value&&!secureNoLive)connect();
 </script>
 <script>document.addEventListener("DOMContentLoaded",function(){window.lucide&&lucide.createIcons()});</script>
 </body>
