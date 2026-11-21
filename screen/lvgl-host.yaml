@@ -1,0 +1,40 @@
+# LVGL kit screen on the HOST: an SDL window on the Mac, no hardware. Learning build.
+#   uvx --from esphome==2026.6.5 esphome run screen/lvgl-host.yaml
+# Fake data sweeps PM2.5 0..120 over a minute so every band colour shows.
+
+esphome:
+  name: dbk-screen-host
+  min_version: 2026.6.5
+
+host:
+
+logger:
+  level: INFO
+
+display:
+  - platform: sdl
+    id: sdl_display
+    auto_clear_enabled: false
+    update_interval: never
+    dimensions:
+      width: 480
+      height: 320
+
+packages:
+  ui: !include lvgl-ui.yaml
+
+interval:
+  - interval: 1s
+    then:
+      - lambda: |-
+          const float phase = (millis() % 60000UL) / 60000.0f;
+          const float pm25 = 60.0f * (1.0f - cosf(phase * 6.2831853f));
+          id(scr_pm25).publish_state(pm25);
+          id(scr_pm1).publish_state(pm25 * 0.62f);
+          id(scr_pm10).publish_state(pm25 * 1.45f);
+          static uint32_t n = 0;
+          n++;
+          if (n == 1) id(scr_kit).publish_state("173e5c");
+          char s[48];
+          snprintf(s, sizeof(s), "ch1 - %us ago - %u frames", (unsigned) (n % 5), (unsigned) (n / 5));
+          id(scr_link).publish_state(s);

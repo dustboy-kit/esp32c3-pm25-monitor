@@ -1,0 +1,178 @@
+# DustBoy Kit screen, LVGL UI (480 x 320 landscape). Learning build.
+#
+# The data comes in through these template entities; whoever includes this package
+# publishes to them:
+#   scr_pm1 / scr_pm25 / scr_pm10   sensors, ug/m3
+#   scr_kit                         text: kit id, e.g. "173e5c"
+#   scr_link                        text: link line, e.g. "ch1 · 2 s ago · 14 frames"
+# screen/lvgl-host.yaml feeds fake data (SDL window on the host, no hardware).
+# screen/dbk-screen-jc3248.yaml feeds the kit's ESP-NOW frames (DBK link v1).
+# Band edges are the kit's: pm25 <= 25 good, <= 50 fair, else poor.
+
+substitutions:
+  good_limit: "25"
+  fair_limit: "50"
+
+sensor:
+  - platform: template
+    id: scr_pm25
+    on_value:
+      - lvgl.arc.update:
+          id: pm25_arc
+          value: !lambda |-
+            return x > 150 ? 150 : (int) x;
+          indicator:
+            arc_color: !lambda |-
+              return x <= ${good_limit} ? lv_color_hex(0x2ECC71) : (x <= ${fair_limit} ? lv_color_hex(0xF1C40F) : lv_color_hex(0xE74C3C));
+      - lvgl.label.update:
+          id: pm25_value
+          text:
+            format: "%.0f"
+            args: [x]
+      - lvgl.label.update:
+          id: band_label
+          text: !lambda |-
+            return x <= ${good_limit} ? std::string("GOOD") : (x <= ${fair_limit} ? std::string("FAIR") : std::string("POOR"));
+          bg_color: !lambda |-
+            return x <= ${good_limit} ? lv_color_hex(0x2ECC71) : (x <= ${fair_limit} ? lv_color_hex(0xF1C40F) : lv_color_hex(0xE74C3C));
+  - platform: template
+    id: scr_pm1
+    on_value:
+      - lvgl.label.update:
+          id: pm1_value
+          text:
+            format: "%.0f"
+            args: [x]
+  - platform: template
+    id: scr_pm10
+    on_value:
+      - lvgl.label.update:
+          id: pm10_value
+          text:
+            format: "%.0f"
+            args: [x]
+
+text_sensor:
+  - platform: template
+    id: scr_kit
+    on_value:
+      - lvgl.label.update:
+          id: kit_label
+          text: !lambda return "DustBoy Kit  DBK-" + x;
+  - platform: template
+    id: scr_link
+    on_value:
+      - lvgl.label.update:
+          id: link_label
+          text: !lambda return x;
+
+lvgl:
+  buffer_size: 25%
+  style_definitions:
+    - id: card
+      bg_color: 0x1B2631
+      bg_opa: cover
+      radius: 12
+      border_width: 0
+      pad_all: 8
+    - id: small_text
+      text_color: 0x95A5A6
+      text_font: montserrat_14
+  pages:
+    - id: main_page
+      bg_color: 0x0B1016
+      bg_opa: cover
+      widgets:
+        # top bar
+        - label:
+            id: kit_label
+            x: 16
+            y: 10
+            text: "DustBoy Kit  (waiting for a kit)"
+            text_color: 0xECF0F1
+            text_font: montserrat_20
+        - label:
+            id: link_label
+            align: top_right
+            x: -16
+            y: 14
+            text: "no link"
+            styles: small_text
+        # PM2.5 arc with the number in the middle
+        - arc:
+            id: pm25_arc
+            x: 16
+            y: 48
+            width: 250
+            height: 250
+            min_value: 0
+            max_value: 150
+            value: 0
+            adjustable: false
+            arc_width: 18
+            indicator:
+              arc_width: 18
+              arc_color: 0x2ECC71
+            knob:
+              opa: transp
+            widgets:
+              - label:
+                  id: pm25_value
+                  align: center
+                  y: -10
+                  text: "--"
+                  text_color: 0xFFFFFF
+                  text_font: montserrat_48
+              - label:
+                  align: center
+                  y: 34
+                  text: "PM2.5  ug/m3"
+                  styles: small_text
+        # band chip
+        - label:
+            id: band_label
+            x: 290
+            y: 60
+            width: 170
+            text: "--"
+            text_align: center
+            text_color: 0x0B1016
+            text_font: montserrat_28
+            bg_color: 0x7F8C8D
+            bg_opa: cover
+            radius: 10
+            pad_top: 6
+            pad_bottom: 6
+        # PM1 / PM10 cards
+        - obj:
+            styles: card
+            x: 290
+            y: 125
+            width: 170
+            height: 75
+            widgets:
+              - label:
+                  text: "PM1"
+                  styles: small_text
+              - label:
+                  id: pm1_value
+                  align: bottom_right
+                  text: "--"
+                  text_color: 0xFFFFFF
+                  text_font: montserrat_28
+        - obj:
+            styles: card
+            x: 290
+            y: 210
+            width: 170
+            height: 75
+            widgets:
+              - label:
+                  text: "PM10"
+                  styles: small_text
+              - label:
+                  id: pm10_value
+                  align: bottom_right
+                  text: "--"
+                  text_color: 0xFFFFFF
+                  text_font: montserrat_28

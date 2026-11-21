@@ -118,6 +118,11 @@ globals:
   type: uint32_t
   restore_value: false
   initial_value: '0'
+# DBK link (packages/dbk-link.yaml): pets (screens) heard within 30 s, shown in the header.
+- id: dbk_pets_linked
+  type: int
+  restore_value: false
+  initial_value: '0'
 sensor:
 - platform: pmsx003
   type: PMSX003
@@ -220,6 +225,7 @@ interval:
       const uint32_t t = millis() / 1000UL;
       id(mqtt_connected) = ((t / 17) % 2) == 0;
       id(wifi_component).connected = ((t / 41) % 4) != 3;
+      id(dbk_pets_linked) = (t / 9) % 3;   // 0, 1, 2 pets linked
       if (!id(wifi_component).connected) {
         if (id(wifi_disconnected_since_ms) == 0) id(wifi_disconnected_since_ms) = millis();
       } else {

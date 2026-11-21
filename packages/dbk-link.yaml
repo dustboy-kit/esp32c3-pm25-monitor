@@ -1,0 +1,185 @@
+# DBK link v1: the kit tells nearby pets (screens) its air reading, with no router and no pairing.
+# Protocol + amendments: Soul-Brews-Studio/esp32-oracle#32 (both sides implement exactly this).
+#
+# Every ${dbk_link_interval} the kit sends one ASCII JSON object (<= 200 bytes):
+#   {"t":"dbk","v":1,"id":"173e5c","pm25":12,"pm10":18,"pm1":7,"band":"good","rssi":-60,"up":1234}
+#   id   = last 3 bytes of the kit MAC, lower-case hex
+#   band = pm25 <= good_limit good, <= fair_limit fair, else poor
+# 1. ESP-NOW broadcast to FF:FF:FF:FF:FF:FF on the kit's Wi-Fi channel (any pet in range).
+# 2. ESP-NOW unicast to every known pet, the same object plus "to":"<pet id>","seq":<n>.
+#    Pets are learned from their status broadcasts {"t":"pet",...} (or pre-seeded with
+#    ${dbk_link_peers}). The send callback is the pet radio's MAC-layer ACK; a pet also answers
+#    {"t":"ack","v":1,"id":"ad48","seq":<n>}. Both are logged: that is the status sync.
+# 3. MQTT DUSTBOY/DBK/<kit id>/link, the broadcast object, when the kit is on its broker.
+# The OLED header shows how many pets are linked (heard within 30 s).
+#
+# Frames are not authenticated. They carry only the public air reading.
+
+substitutions:
+  dbk_link_peers: ""            # optional "AA:BB:CC:DD:EE:FF,11:22:33:44:55:66"
+  dbk_link_interval: 5s
+
+esphome:
+  includes:
+    - packages/dbk_link.h
+  on_boot:
+    - priority: -200
+      then:
+        - lambda: |-
+            std::string list = "${dbk_link_peers}";
+            size_t pos = 0;
+            while (pos < list.size()) {
+              size_t end = list.find(',', pos);
+              if (end == std::string::npos) end = list.size();
+              unsigned int b[6];
+              if (sscanf(list.substr(pos, end - pos).c_str(), "%x:%x:%x:%x:%x:%x",
+                         &b[0], &b[1], &b[2], &b[3], &b[4], &b[5]) == 6) {
+                uint8_t mac[6];
+                for (int i = 0; i < 6; i++) mac[i] = (uint8_t) b[i];
+                esp_err_t err = id(dbk_link)->add_peer(mac);
+                dbklink::Pet *p = dbklink::find(mac, true);
+                ESP_LOGI("dbk_link", "pet %s pre-seeded: %s", p->id, esp_err_to_name(err));
+              }
+              pos = end + 1;
+            }
+
+espnow:
+  id: dbk_link
+  auto_add_peer: false
+  # ESPHome drops a frame from a sender that is not a peer before on_broadcast runs
+  # (espnow_component.cpp: on_unknown_peer, then auto_add_peer). Add only pets, so the
+  # same frame then reaches on_broadcast below; anything else is logged and dropped.
+  on_unknown_peer:
+    - then:
+        - lambda: |-
+            std::string s((const char *) data, size);
+            std::string t = dbklink::str_field(s, "t");
+            char m[18];
+            dbklink::mac_str(info.src_addr, m);
+            if (t == "pet") {
+              esp_err_t err = id(dbk_link)->add_peer(info.src_addr);
+              ESP_LOGI("dbk_link", "unknown sender %s is a pet, add_peer: %s", m, esp_err_to_name(err));
+            } else if (t != "dbk") {
+              ESP_LOGI("dbk_link", "unknown sender %s, %u B (t='%s'): %.80s", m, (unsigned) size, t.c_str(), s.c_str());
+            }
+  on_broadcast:
+    - then:
+        - lambda: |-
+            std::string s((const char *) data, size);
+            std::string t = dbklink::str_field(s, "t");
+            if (t != "pet") {
+              if (t != "dbk") {   // not another kit: log it, so a malformed pet frame is visible
+                char m0[18];
+                dbklink::mac_str(info.src_addr, m0);
+                ESP_LOGI("dbk_link", "bcast %u B from %s (t='%s'): %.80s", (unsigned) size, m0, t.c_str(), s.c_str());
+              }
+              return;
+            }
+            bool is_new = dbklink::find(info.src_addr, false) == nullptr;
+            dbklink::Pet *p = dbklink::find(info.src_addr, true);
+            p->last_status_ms = millis();
+            char m[18];
+            dbklink::mac_str(info.src_addr, m);
+            if (is_new) ESP_LOGI("dbk_link", "pet %s (%s) learned", p->id, m);
+            ESP_LOGI("dbk_link", "pet status %s: %s", m, s.c_str());
+  on_receive:
+    - then:
+        - lambda: |-
+            std::string s((const char *) data, size);
+            char m[18];
+            dbklink::mac_str(info.src_addr, m);
+            if (dbklink::str_field(s, "t") == "ack") {
+              dbklink::Pet *p = dbklink::find(info.src_addr, true);
+              p->last_ack_ms = millis();
+              p->last_ack_seq = (uint32_t) dbklink::num_field(s, "seq", 0);
+              p->acked++;
+              ESP_LOGI("dbk_link", "ack from pet %s seq=%u (%u/%u acked)", p->id,
+                       (unsigned) p->last_ack_seq, (unsigned) p->acked, (unsigned) p->sent);
+            } else {
+              ESP_LOGI("dbk_link", "rx from %s: %s", m, s.c_str());
+            }
+
+globals:
+  - id: dbk_link_seq
+    type: uint32_t
+    restore_value: false
+    initial_value: "0"
+  - id: dbk_pets_linked
+    type: int
+    restore_value: false
+    initial_value: "0"
+
+text_sensor:
+  - platform: template
+    id: dbk_link_status
+    name: DBK Link Status
+    icon: mdi:access-point-network
+    entity_category: diagnostic
+
+interval:
+  - interval: ${dbk_link_interval}
+    then:
+      - lambda: |-
+          id(dbk_pets_linked) = dbklink::linked(millis(), 30000);
+          auto val = [](float v) -> int { return (isnan(v) || v < 0) ? -1 : (int) (v + 0.5f); };
+          int pm25 = val(id(pms_pm25).state), pm10 = val(id(pms_pm10).state), pm1 = val(id(pms_pm1).state);
+          if (pm25 < 0) {
+            ESP_LOGD("dbk_link", "no PM2.5 reading yet, nothing sent");
+            return;
+          }
+          const char *band = pm25 <= ${good_limit} ? "good" : (pm25 <= ${fair_limit} ? "fair" : "poor");
+          std::string mac = get_mac_address();
+          std::string kid = mac.substr(mac.size() - 6);
+          int rssi = wifi::global_wifi_component->is_connected() ? (int) wifi::global_wifi_component->wifi_rssi() : 0;
+          char body[160];
+          int nb = snprintf(body, sizeof(body),
+                            "\"t\":\"dbk\",\"v\":1,\"id\":\"%s\",\"pm25\":%d,\"pm10\":%d,\"pm1\":%d,"
+                            "\"band\":\"%s\",\"rssi\":%d,\"up\":%u",
+                            kid.c_str(), pm25, pm10, pm1, band, rssi, (unsigned) (millis() / 1000));
+          if (nb <= 0 || nb >= (int) sizeof(body)) return;
+          std::string js = std::string("{") + body + "}";
+          uint32_t seq = ++id(dbk_link_seq);
+          uint8_t ch = id(dbk_link)->get_wifi_channel();
+
+          // 1. broadcast
+          static const uint8_t BCAST[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+          std::vector<uint8_t> bc(js.begin(), js.end());
+          esp_err_t e = id(dbk_link)->send(BCAST, bc, [seq](esp_err_t r) {
+            ESP_LOGI("dbk_link", "#%u espnow broadcast sent: %s", (unsigned) seq, esp_err_to_name(r));
+          });
+          ESP_LOGI("dbk_link", "#%u ch=%u pets=%u linked=%d %s%s", (unsigned) seq, ch,
+                   (unsigned) dbklink::pets().size(), id(dbk_pets_linked), js.c_str(),
+                   e == ESP_OK ? "" : " (broadcast queue failed)");
+
+          // 2. unicast to each pet, with "to" and "seq"; the callback is the pet radio's ACK
+          for (size_t i = 0; i < dbklink::pets().size(); i++) {
+            dbklink::Pet &p = dbklink::pets()[i];
+            char u[200];
+            int nu = snprintf(u, sizeof(u), "{%s,\"to\":\"%s\",\"seq\":%u}", body, p.id, (unsigned) seq);
+            if (nu <= 0 || nu >= (int) sizeof(u)) continue;
+            std::vector<uint8_t> uc(u, u + nu);
+            p.sent++;
+            std::string pid(p.id);
+            esp_err_t ue = id(dbk_link)->send(p.mac, uc, [seq, pid, i](esp_err_t r) {
+              if (r == ESP_OK && i < dbklink::pets().size()) {
+                dbklink::pets()[i].last_mac_ack_ms = millis();
+                dbklink::pets()[i].mac_acked++;
+              }
+              ESP_LOGI("dbk_link", "#%u unicast to pet %s: %s", (unsigned) seq, pid.c_str(),
+                       r == ESP_OK ? "MAC ACK" : esp_err_to_name(r));
+            });
+            if (ue != ESP_OK) ESP_LOGW("dbk_link", "#%u unicast to pet %s queue: %s", (unsigned) seq, p.id, esp_err_to_name(ue));
+          }
+
+          // 3. MQTT
+          const char *mq = "off";
+          if (id(mqtt_client).is_connected() && !id(kit_id).state.empty()) {
+            bool ok = id(mqtt_client).publish("DUSTBOY/DBK/" + id(kit_id).state + "/link", js, 0, false);
+            mq = ok ? "published" : "failed";
+            ESP_LOGI("dbk_link", "#%u mqtt DUSTBOY/DBK/%s/link %s", (unsigned) seq, id(kit_id).state.c_str(), mq);
+          }
+
+          char st[64];
+          snprintf(st, sizeof(st), "#%u ch%u pets %d/%u mqtt %s", (unsigned) seq, ch, id(dbk_pets_linked),
+                   (unsigned) dbklink::pets().size(), mq);
+          id(dbk_link_status).publish_state(st);

@@ -37,3 +37,4 @@ packages:
   oled: !include packages/oled.yaml
   diagnostics: !include packages/diagnostics.yaml
   mqtt: !include packages/mqtt.yaml
+  dbk_link: !include packages/dbk-link.yaml

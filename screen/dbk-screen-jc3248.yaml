@@ -1,0 +1,210 @@
+# DustBoy Kit screen on a Guition JC3248W535 (ESP32-S3, 3.5" 320x480 AXS15231, QSPI).
+# Learning build: ESPHome + LVGL + ESP-NOW. The kit has a sensor and no big screen; this
+# board has a screen and no sensor. They talk DBK link v1 (Soul-Brews-Studio/esp32-oracle#32):
+#   kit  -> screen  {"t":"dbk",...} broadcast every 5 s, and unicast with "to"/"seq"
+#   screen -> kit   {"t":"pet",...,"role":"screen"} status broadcast every 5 s
+#   screen -> kit   {"t":"ack","v":1,"id":"<me>","seq":n} for every unicast reading
+# No Wi-Fi: the screen sits on one ESP-NOW channel. While no kit is heard it hops
+# 1, 6, 11, then the rest, 5.5 s per channel (the kit sends every 5 s); once a kit is
+# heard it stays, and hops again after 30 s of silence.
+#
+# Build:  uvx --from esphome==2026.6.5 esphome compile screen/dbk-screen-jc3248.yaml
+# Pins: QSPI CLK 47, D0-D3 21/48/40/39, CS 45 (in the JC3248W535 model), backlight 1,
+# touch I2C SDA 4 / SCL 8 (AXS15231 touch at 0x3B).
+
+substitutions:
+  name: dbk-screen
+  friendly_name: DBK Screen
+
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+  name_add_mac_suffix: true
+  min_version: 2026.6.5
+  includes:
+    - ../packages/dbk_link.h
+  on_boot:
+    - priority: -100
+      then:
+        - lambda: |-
+            std::string mac = get_mac_address();
+            id(my_id) = mac.substr(mac.size() - 4);   // last 2 bytes, e.g. "ad48"
+            ESP_LOGI("dbk_screen", "screen id %s, listening on ch %u", id(my_id).c_str(), id(cur_ch));
+
+esp32:
+  board: esp32-s3-devkitc-1
+  variant: esp32s3
+  flash_size: 16MB
+  framework:
+    type: esp-idf
+
+psram:
+  mode: octal
+  speed: 80MHz
+
+logger:
+  level: INFO
+
+spi:
+  id: display_qspi
+  type: quad
+  clk_pin: 47
+  data_pins: [21, 48, 40, 39]
+
+display:
+  - platform: mipi_spi
+    model: JC3248W535
+    id: panel
+    spi_id: display_qspi
+    auto_clear_enabled: false
+    update_interval: never
+
+output:
+  - platform: ledc
+    id: backlight_pwm
+    pin: GPIO1
+light:
+  - platform: monochromatic
+    id: backlight
+    output: backlight_pwm
+    restore_mode: ALWAYS_ON
+    default_transition_length: 0s
+
+i2c:
+  id: touch_i2c
+  sda: 4
+  scl: 8
+
+touchscreen:
+  - platform: axs15231
+    id: touch
+    i2c_id: touch_i2c
+    display: panel
+    on_touch:
+      - lambda: ESP_LOGI("dbk_screen", "touch x=%d y=%d", touch.x, touch.y);
+
+packages:
+  ui: !include lvgl-ui.yaml
+
+lvgl:
+  rotation: 90          # panel is 320x480 portrait; the UI is 480x320 landscape
+
+globals:
+  - id: my_id
+    type: std::string
+    restore_value: false
+  - id: cur_ch
+    type: uint8_t
+    restore_value: false
+    initial_value: "1"
+  - id: hop_idx
+    type: int
+    restore_value: false
+    initial_value: "0"
+  - id: last_kit_ms
+    type: uint32_t
+    restore_value: false
+    initial_value: "0"
+  - id: last_hop_ms
+    type: uint32_t
+    restore_value: false
+    initial_value: "0"
+  - id: rx_count
+    type: uint32_t
+    restore_value: false
+    initial_value: "0"
+  - id: ack_count
+    type: uint32_t
+    restore_value: false
+    initial_value: "0"
+  - id: kit_id
+    type: std::string
+    restore_value: false
+
+script:
+  # One received kit frame (broadcast or unicast): show it, and ack a unicast.
+  - id: on_kit_frame
+    parameters:
+      js: std::string
+      src: std::vector<uint8_t>
+      unicast: bool
+    then:
+      - lambda: |-
+          if (dbklink::str_field(js, "t") != "dbk") return;
+          id(last_kit_ms) = millis();
+          id(rx_count)++;
+          std::string kid = dbklink::str_field(js, "id");
+          if (kid != id(kit_id)) {
+            id(kit_id) = kid;
+            id(scr_kit).publish_state(kid);
+            ESP_LOGI("dbk_screen", "kit %s heard on ch %u", kid.c_str(), id(cur_ch));
+          }
+          long pm25 = dbklink::num_field(js, "pm25"), pm10 = dbklink::num_field(js, "pm10"), pm1 = dbklink::num_field(js, "pm1");
+          if (pm25 >= 0) id(scr_pm25).publish_state(pm25);
+          if (pm10 >= 0) id(scr_pm10).publish_state(pm10);
+          if (pm1 >= 0) id(scr_pm1).publish_state(pm1);
+          long seq = dbklink::num_field(js, "seq", -1);
+          ESP_LOGI("dbk_screen", "rx %s ch=%u kit=%s pm25=%ld seq=%ld", unicast ? "unicast" : "bcast", id(cur_ch), kid.c_str(), pm25, seq);
+          if (unicast && seq >= 0 && src.size() == 6) {
+            char a[64];
+            int n = snprintf(a, sizeof(a), "{\"t\":\"ack\",\"v\":1,\"id\":\"%s\",\"seq\":%ld}", id(my_id).c_str(), seq);
+            std::vector<uint8_t> ack(a, a + n);
+            id(screen_link)->send(src.data(), ack, [seq](esp_err_t r) {
+              ESP_LOGI("dbk_screen", "ack seq=%ld sent: %s", seq, r == ESP_OK ? "MAC ACK" : esp_err_to_name(r));
+            });
+            id(ack_count)++;
+          }
+
+espnow:
+  id: screen_link
+  channel: 1
+  auto_add_peer: false
+  on_unknown_peer:
+    - then:
+        - lambda: |-
+            std::string s((const char *) data, size);
+            if (dbklink::str_field(s, "t") == "dbk") id(screen_link)->add_peer(info.src_addr);  // kits only
+  on_broadcast:
+    - then:
+        - lambda: |-
+            id(on_kit_frame).execute(std::string((const char *) data, size), std::vector<uint8_t>(info.src_addr, info.src_addr + 6), false);
+  on_receive:
+    - then:
+        - lambda: |-
+            id(on_kit_frame).execute(std::string((const char *) data, size), std::vector<uint8_t>(info.src_addr, info.src_addr + 6), true);
+
+interval:
+  # status broadcast, so kits learn this screen and unicast to it
+  - interval: 5s
+    then:
+      - lambda: |-
+          char s[200];
+          int n = snprintf(s, sizeof(s),
+                           "{\"t\":\"pet\",\"v\":1,\"id\":\"%s\",\"name\":\"DBK-SCREEN-%s\",\"role\":\"screen\","
+                           "\"state\":\"%s\",\"rx\":%u,\"kit\":\"%s\",\"ch\":%u}",
+                           id(my_id).c_str(), id(my_id).c_str(), id(last_kit_ms) ? "linked" : "searching",
+                           (unsigned) id(rx_count), id(kit_id).c_str(), id(cur_ch));
+          static const uint8_t BCAST[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+          id(screen_link)->send(BCAST, std::vector<uint8_t>(s, s + n), nullptr);
+  # link line on the screen + channel hop while no kit is heard
+  - interval: 1s
+    then:
+      - lambda: |-
+          const uint32_t now = millis();
+          const bool linked = id(last_kit_ms) != 0 && now - id(last_kit_ms) < 30000;
+          char s[64];
+          if (linked) {
+            snprintf(s, sizeof(s), "ch%u - %us ago - rx %u - ack %u", id(cur_ch),
+                     (unsigned) ((now - id(last_kit_ms)) / 1000), (unsigned) id(rx_count), (unsigned) id(ack_count));
+          } else {
+            snprintf(s, sizeof(s), "searching ch%u", id(cur_ch));
+          }
+          id(scr_link).publish_state(s);
+          if (!linked && now - id(last_hop_ms) >= 5500) {
+            static const uint8_t order[13] = {1, 6, 11, 2, 3, 4, 5, 7, 8, 9, 10, 12, 13};
+            id(hop_idx) = (id(hop_idx) + 1) % 13;
+            id(cur_ch) = order[id(hop_idx)];
+            id(screen_link)->set_wifi_channel(id(cur_ch));
+            id(screen_link)->apply_wifi_channel();
+            id(last_hop_ms) = now;
+          }
