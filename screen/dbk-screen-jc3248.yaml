@@ -86,8 +86,6 @@ touchscreen:
 packages:
   ui: !include lvgl-ui.yaml
 
-lvgl:
-  rotation: 90          # panel is 320x480 portrait; the UI is 480x320 landscape
 
 globals:
   - id: my_id
@@ -186,7 +184,8 @@ interval:
                            (unsigned) id(rx_count), id(kit_id).c_str(), id(cur_ch));
           static const uint8_t BCAST[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
           id(screen_link)->send(BCAST, std::vector<uint8_t>(s, s + n), nullptr);
-  # link line on the screen + channel hop while no kit is heard
+  # link line on the screen + channel hop while no kit is heard (1 s tick; the label
+  # itself is republished only every 5 s, to keep LVGL redraws low)
   - interval: 1s
     then:
       - lambda: |-
@@ -199,7 +198,11 @@ interval:
           } else {
             snprintf(s, sizeof(s), "searching ch%u", id(cur_ch));
           }
-          id(scr_link).publish_state(s);
+          static uint32_t last_label_ms = 0;
+          if (now - last_label_ms >= 5000 || !linked) {
+            last_label_ms = now;
+            if (id(scr_link).state != s) id(scr_link).publish_state(s);
+          }
           if (!linked && now - id(last_hop_ms) >= 5500) {
             static const uint8_t order[13] = {1, 6, 11, 2, 3, 4, 5, 7, 8, 9, 10, 12, 13};
             id(hop_idx) = (id(hop_idx) + 1) % 13;

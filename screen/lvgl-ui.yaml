@@ -1,4 +1,5 @@
-# DustBoy Kit screen, LVGL UI (480 x 320 landscape). Learning build.
+# DustBoy Kit screen, LVGL UI (320 x 480 portrait, the JC3248W535 panel's own shape,
+# no rotation). Learning build.
 #
 # The data comes in through these template entities; whoever includes this package
 # publishes to them:
@@ -16,6 +17,8 @@ substitutions:
 sensor:
   - platform: template
     id: scr_pm25
+    filters:
+      - delta: 1        # redraw only when the value really changes
     on_value:
       - lvgl.arc.update:
           id: pm25_arc
@@ -37,6 +40,8 @@ sensor:
             return x <= ${good_limit} ? lv_color_hex(0x2ECC71) : (x <= ${fair_limit} ? lv_color_hex(0xF1C40F) : lv_color_hex(0xE74C3C));
   - platform: template
     id: scr_pm1
+    filters:
+      - delta: 1        # redraw only when the value really changes
     on_value:
       - lvgl.label.update:
           id: pm1_value
@@ -45,6 +50,8 @@ sensor:
             args: [x]
   - platform: template
     id: scr_pm10
+    filters:
+      - delta: 1        # redraw only when the value really changes
     on_value:
       - lvgl.label.update:
           id: pm10_value
@@ -67,7 +74,7 @@ text_sensor:
           text: !lambda return x;
 
 lvgl:
-  buffer_size: 25%
+  buffer_size: 12%     # smaller flushes; less LVGL work per loop
   style_definitions:
     - id: card
       bg_color: 0x1B2631
@@ -83,35 +90,28 @@ lvgl:
       bg_color: 0x0B1016
       bg_opa: cover
       widgets:
-        # top bar
+        # top: kit name
         - label:
             id: kit_label
-            x: 16
-            y: 10
-            text: "DustBoy Kit  (waiting for a kit)"
+            align: top_mid
+            y: 12
+            text: "DustBoy Kit  (waiting)"
             text_color: 0xECF0F1
             text_font: montserrat_20
-        - label:
-            id: link_label
-            align: top_right
-            x: -16
-            y: 14
-            text: "no link"
-            styles: small_text
         # PM2.5 arc with the number in the middle
         - arc:
             id: pm25_arc
-            x: 16
+            align: top_mid
             y: 48
-            width: 250
-            height: 250
+            width: 260
+            height: 260
             min_value: 0
             max_value: 150
             value: 0
             adjustable: false
-            arc_width: 18
+            arc_width: 20
             indicator:
-              arc_width: 18
+              arc_width: 20
               arc_color: 0x2ECC71
             knob:
               opa: transp
@@ -125,15 +125,15 @@ lvgl:
                   text_font: montserrat_48
               - label:
                   align: center
-                  y: 34
+                  y: 36
                   text: "PM2.5  ug/m3"
                   styles: small_text
-        # band chip
+        # band chip under the arc
         - label:
             id: band_label
-            x: 290
-            y: 60
-            width: 170
+            align: top_mid
+            y: 300
+            width: 200
             text: "--"
             text_align: center
             text_color: 0x0B1016
@@ -143,13 +143,13 @@ lvgl:
             radius: 10
             pad_top: 6
             pad_bottom: 6
-        # PM1 / PM10 cards
+        # PM1 / PM10 cards side by side
         - obj:
             styles: card
-            x: 290
-            y: 125
-            width: 170
-            height: 75
+            x: 12
+            y: 360
+            width: 142
+            height: 76
             widgets:
               - label:
                   text: "PM1"
@@ -162,10 +162,10 @@ lvgl:
                   text_font: montserrat_28
         - obj:
             styles: card
-            x: 290
-            y: 210
-            width: 170
-            height: 75
+            x: 166
+            y: 360
+            width: 142
+            height: 76
             widgets:
               - label:
                   text: "PM10"
@@ -176,3 +176,10 @@ lvgl:
                   text: "--"
                   text_color: 0xFFFFFF
                   text_font: montserrat_28
+        # bottom: link status
+        - label:
+            id: link_label
+            align: bottom_mid
+            y: -10
+            text: "no link"
+            styles: small_text

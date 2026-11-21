@@ -17,8 +17,8 @@ display:
     auto_clear_enabled: false
     update_interval: never
     dimensions:
-      width: 480
-      height: 320
+      width: 320
+      height: 480
 
 packages:
   ui: !include lvgl-ui.yaml
