@@ -1,0 +1,91 @@
+# The JC3248 kit screen (screen/lvgl-ui.yaml, 320x480 portrait) on Espressif QEMU, machine
+# esp32s3, painted into QEMU's virtual RGB panel by the qemu_rgb display (full colour).
+# QEMU has no ESP-NOW radio, so the kit's DBK link v1 JSON arrives as lines on UART1 from
+# tools/qemu-dbk-feeder.py (127.0.0.1:5557), the same objects the kit broadcasts on air.
+
+esphome:
+  name: dbk-screen-qemu
+  min_version: 2026.6.5
+  includes:
+    - ../../packages/dbk_link.h
+
+esp32:
+  board: esp32-s3-devkitc-1
+  variant: esp32s3
+  flash_size: 16MB
+  framework:
+    type: esp-idf
+
+external_components:
+  - source:
+      type: local
+      path: components
+
+logger:
+  hardware_uart: UART0
+  level: INFO
+
+display:
+  - platform: qemu_rgb
+    id: panel
+    width: 320
+    height: 480
+    mono: false
+    auto_clear_enabled: false
+    update_interval: never
+
+packages:
+  ui: !include ../../screen/lvgl-ui.yaml
+
+uart:
+  - id: link_uart
+    rx_pin: GPIO18
+    tx_pin: GPIO17
+    baud_rate: 115200
+    rx_buffer_size: 1024
+
+globals:
+  - id: line_buf
+    type: std::string
+    restore_value: false
+  - id: last_kit_ms
+    type: uint32_t
+    restore_value: false
+    initial_value: "0"
+  - id: rx_count
+    type: uint32_t
+    restore_value: false
+    initial_value: "0"
+  - id: kit_id
+    type: std::string
+    restore_value: false
+
+interval:
+  - interval: 50ms
+    then:
+      - lambda: |-
+          uint8_t c;
+          while (id(link_uart).available() && id(link_uart).read_byte(&c)) {
+            if (c != '\n') { if (id(line_buf).size() < 300) id(line_buf) += (char) c; continue; }
+            std::string js = id(line_buf);
+            id(line_buf).clear();
+            if (dbklink::str_field(js, "t") != "dbk") continue;
+            id(last_kit_ms) = millis();
+            id(rx_count)++;
+            std::string kid = dbklink::str_field(js, "id");
+            if (kid != id(kit_id)) { id(kit_id) = kid; id(scr_kit).publish_state(kid); }
+            long pm25 = dbklink::num_field(js, "pm25"), pm10 = dbklink::num_field(js, "pm10"), pm1 = dbklink::num_field(js, "pm1");
+            if (pm25 >= 0) id(scr_pm25).publish_state(pm25);
+            if (pm10 >= 0) id(scr_pm10).publish_state(pm10);
+            if (pm1 >= 0) id(scr_pm1).publish_state(pm1);
+            ESP_LOGI("dbk_screen", "rx uart kit=%s pm25=%ld", kid.c_str(), pm25);
+          }
+  - interval: 5s
+    then:
+      - lambda: |-
+          char s[64];
+          if (id(last_kit_ms) && millis() - id(last_kit_ms) < 30000)
+            snprintf(s, sizeof(s), "qemu link - %us ago - rx %u", (unsigned) ((millis() - id(last_kit_ms)) / 1000), (unsigned) id(rx_count));
+          else
+            snprintf(s, sizeof(s), "qemu link - waiting");
+          id(scr_link).publish_state(s);
