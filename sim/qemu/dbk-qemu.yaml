@@ -1,0 +1,172 @@
+# DustBoy Kit on the QEMU board simulator (Espressif QEMU, machine esp32c3).
+# GENERATED into dbk-qemu.yaml by tools/qemu-sim.py: the OLED lambda below the marker is
+# lifted unchanged from packages/oled.yaml. Edit this template, not dbk-qemu.yaml.
+#
+# Real kit packages (board, PMS7003, status LED, OLED) with three changes for the emulator:
+#   - logger on UART0, so QEMU's serial 0 shows the log
+#   - no Wi-Fi / MQTT / ESP-NOW (QEMU has no radio): small shims stand in for the
+#     OLED lambda's id(wifi_component) and id(network_time)
+#   - a qemu_rgb display paints the same OLED lambda into QEMU's virtual RGB panel, 4x
+# The PMS7003 is real code: tools/qemu-pms-feeder.py sends PMS7003 frames into UART1.
+
+substitutions:
+  name: dbk-qemu
+  friendly_name: DBK QEMU
+  device_id: DBK
+  name_add_mac_suffix: "false"
+  project_version: "0.1.0-qemu"
+  good_limit: "25"
+  fair_limit: "50"
+  splash_seconds: "3"
+  wifi_ap_timeout_seconds: "90"
+  wifi_ap_active_timeout_minutes: "15"
+  warmup_seconds: "30"
+  stale_seconds: "10"
+  timezone: "Asia/Bangkok"
+
+external_components:
+  - source:
+      type: local
+      path: components
+
+packages:
+  board: !include ../../packages/board.yaml
+  pms7003: !include ../../packages/pms7003.yaml
+  status_led: !include ../../packages/status-led.yaml
+
+# WifiShim / TimeShim (the OLED lambda's id(wifi_component) / id(network_time)) are declared
+# in components/qemu_rgb/qemu_rgb.h: component headers are included before the globals.
+
+logger:
+  hardware_uart: UART0
+  level: DEBUG
+
+globals:
+  - id: wifi_component
+    type: WifiShim
+    restore_value: false
+    initial_value: WifiShim{}
+  - id: network_time
+    type: TimeShim
+    restore_value: false
+    initial_value: TimeShim{}
+  - id: mqtt_connected
+    type: bool
+    restore_value: false
+    initial_value: "false"
+  - id: wifi_disconnected_since_ms
+    type: uint32_t
+    restore_value: false
+    initial_value: "0"
+  - id: dbk_pets_linked
+    type: int
+    restore_value: false
+    initial_value: "0"
+
+display:
+  - platform: qemu_rgb
+    id: oled
+    width: 128
+    height: 32
+    scale: 4
+    update_interval: 1s
+    lambda: |-
+      const uint32_t splash_duration_ms = ${splash_seconds} * 1000UL;
+      if (millis() < splash_duration_ms) {
+        it.print(64, 5, id(font_header), TextAlign::TOP_CENTER, "Dustboy Kit For Kids");
+        it.rectangle(14, 24, 100, 6);
+        const int progress_width = (millis() * 96UL) / splash_duration_ms;
+        it.filled_rectangle(16, 26, progress_width, 2);
+        return;
+      }
+
+      if (id(wifi_component).is_connected()) {
+        const auto now = id(network_time).now();
+        if (now.is_valid()) {
+          it.strftime(0, -1, id(font_header), TextAlign::TOP_LEFT, "%H:%M", now);
+        } else {
+          it.print(0, -1, id(font_header), TextAlign::TOP_LEFT, "--:--");
+        }
+      } else {
+        const uint32_t disconnected_since = id(wifi_disconnected_since_ms);
+        const uint32_t disconnected_ms = disconnected_since == 0
+                                             ? millis()
+                                             : (uint32_t) (millis() - disconnected_since);
+        const uint32_t timeout_seconds = ${wifi_ap_timeout_seconds};
+        const uint32_t ap_active_seconds = ${wifi_ap_active_timeout_minutes} * 60UL;
+        const uint32_t elapsed_seconds = disconnected_ms / 1000UL;
+        if (elapsed_seconds < timeout_seconds) {
+          const uint32_t remaining_seconds = timeout_seconds - elapsed_seconds;
+          it.printf(0, -1, id(font_header), TextAlign::TOP_LEFT, "(%lus)", remaining_seconds);
+        } else if (elapsed_seconds < timeout_seconds + ap_active_seconds) {
+          const uint32_t ap_elapsed_seconds = elapsed_seconds - timeout_seconds;
+          const uint32_t remaining_seconds = ap_active_seconds - ap_elapsed_seconds;
+          if (remaining_seconds >= 60) {
+            const uint32_t remaining_minutes = (remaining_seconds + 59) / 60;
+            it.printf(0, -1, id(font_header), TextAlign::TOP_LEFT, "(AP %lum)", remaining_minutes);
+          } else {
+            it.printf(0, -1, id(font_header), TextAlign::TOP_LEFT, "(AP %lus)", remaining_seconds);
+          }
+        } else {
+          it.print(0, -1, id(font_header), TextAlign::TOP_LEFT, "(AP 0s)");
+        }
+      }
+
+      if (id(mqtt_connected)) {
+        it.filled_circle(68, 5, 3);
+      } else {
+        it.circle(68, 5, 3);
+      }
+
+      if (id(wifi_component).is_connected()) {
+        it.print(74, 0, id(font_icons), "\U000F05A9");
+      } else {
+        it.print(74, 0, id(font_icons), "\U000F05AA");
+      }
+      if (id(dbk_pets_linked) > 0) {   // DBK link: pets (screens) heard within 30 s
+        it.printf(86, 1, id(font_label), TextAlign::TOP_LEFT, "P%d", id(dbk_pets_linked));
+      }
+      it.print(124, -1, id(font_header), TextAlign::TOP_RIGHT, "${device_id}");
+      it.horizontal_line(0, 11, 128);
+
+      if (millis() < (${warmup_seconds} * 1000UL)) {
+        it.print(64, 18, id(font_header), TextAlign::CENTER, "CHECKING SENSOR...");
+        return;
+      }
+
+      const bool stale = id(last_pms_update_ms) == 0 ||
+                         (uint32_t) (millis() - id(last_pms_update_ms)) > (${stale_seconds} * 1000UL);
+      if (!id(pms_pm25).has_state() || stale) {
+        it.print(64, 18, id(font_header), TextAlign::CENTER, "SENSOR ERROR");
+        return;
+      }
+
+      it.vertical_line(42, 11, 21);
+      it.vertical_line(85, 11, 21);
+
+      it.print(21, 11, id(font_label), TextAlign::TOP_CENTER, "PM1");
+      it.print(64, 11, id(font_label), TextAlign::TOP_CENTER, "PM2.5");
+      it.print(106, 11, id(font_label), TextAlign::TOP_CENTER, "PM10");
+
+      it.printf(21, 19, id(font_value), TextAlign::TOP_CENTER, "%.0f", id(pms_pm1).state);
+      it.printf(64, 19, id(font_value), TextAlign::TOP_CENTER, "%.0f", id(pms_pm25).state);
+      it.printf(106, 19, id(font_value), TextAlign::TOP_CENTER, "%.0f", id(pms_pm10).state);
+
+
+font:
+  - file: "https://raw.githubusercontent.com/Templarian/MaterialDesign-Webfont/v7.4.47/fonts/materialdesignicons-webfont.ttf"
+    id: font_icons
+    size: 10
+    glyphs:
+      - "\U000F05A9" # mdi-wifi
+      - "\U000F05AA" # mdi-wifi-off
+  - file: "gfonts://Roboto Mono"
+    id: font_header
+    size: 10
+  - file: "gfonts://Roboto Mono"
+    id: font_label
+    size: 7
+  - file: "gfonts://Open Sans"
+    id: font_value
+    size: 10
+    glyphs: " 0123456789"

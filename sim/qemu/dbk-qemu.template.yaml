@@ -1,0 +1,74 @@
+# DustBoy Kit on the QEMU board simulator (Espressif QEMU, machine esp32c3).
+# GENERATED into dbk-qemu.yaml by tools/qemu-sim.py: the OLED lambda below the marker is
+# lifted unchanged from packages/oled.yaml. Edit this template, not dbk-qemu.yaml.
+#
+# Real kit packages (board, PMS7003, status LED, OLED) with three changes for the emulator:
+#   - logger on UART0, so QEMU's serial 0 shows the log
+#   - no Wi-Fi / MQTT / ESP-NOW (QEMU has no radio): small shims stand in for the
+#     OLED lambda's id(wifi_component) and id(network_time)
+#   - a qemu_rgb display paints the same OLED lambda into QEMU's virtual RGB panel, 4x
+# The PMS7003 is real code: tools/qemu-pms-feeder.py sends PMS7003 frames into UART1.
+
+substitutions:
+  name: dbk-qemu
+  friendly_name: DBK QEMU
+  device_id: DBK
+  name_add_mac_suffix: "false"
+  project_version: "0.1.0-qemu"
+  good_limit: "25"
+  fair_limit: "50"
+  splash_seconds: "3"
+  wifi_ap_timeout_seconds: "90"
+  wifi_ap_active_timeout_minutes: "15"
+  warmup_seconds: "30"
+  stale_seconds: "10"
+  timezone: "Asia/Bangkok"
+
+external_components:
+  - source:
+      type: local
+      path: components
+
+packages:
+  board: !include ../../packages/board.yaml
+  pms7003: !include ../../packages/pms7003.yaml
+  status_led: !include ../../packages/status-led.yaml
+
+# WifiShim / TimeShim (the OLED lambda's id(wifi_component) / id(network_time)) are declared
+# in components/qemu_rgb/qemu_rgb.h: component headers are included before the globals.
+
+logger:
+  hardware_uart: UART0
+  level: DEBUG
+
+globals:
+  - id: wifi_component
+    type: WifiShim
+    restore_value: false
+    initial_value: WifiShim{}
+  - id: network_time
+    type: TimeShim
+    restore_value: false
+    initial_value: TimeShim{}
+  - id: mqtt_connected
+    type: bool
+    restore_value: false
+    initial_value: "false"
+  - id: wifi_disconnected_since_ms
+    type: uint32_t
+    restore_value: false
+    initial_value: "0"
+  - id: dbk_pets_linked
+    type: int
+    restore_value: false
+    initial_value: "0"
+
+display:
+  - platform: qemu_rgb
+    id: oled
+    width: 128
+    height: 32
+    scale: 4
+    update_interval: 1s
+    lambda: |-
+      // @@OLED_LAMBDA@@
